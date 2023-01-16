@@ -1,1 +1,1 @@
-g++ -o main main.cpp -lopencv_core -lopencv_videoio -lopencv_video -lopencv_highgui
+g++ -o main main.cpp -lopencv_core -lopencv_videoio -lopencv_video -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs

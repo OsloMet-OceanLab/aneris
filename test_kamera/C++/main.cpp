@@ -13,6 +13,8 @@ int main(void)
 		return -1;
 	}
 
+	cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
+
 	printf("Press the escape key to quit\n");
 
 	double dWidth = cap.get(cv::CAP_PROP_FRAME_WIDTH);
@@ -23,10 +25,12 @@ int main(void)
 	char *window_title = "Camera feed";
 	cv::namedWindow(window_title);
 
+	cv::Mat frame;
+	bool bSuccess = false;
+
 	while(true)
 	{
-		cv::Mat frame;
-		bool bSuccess = cap.read(frame);
+		bSuccess = cap.read(frame);
 		if (!bSuccess)
 		{
 			fputs("Can't get feed from camera\n", stderr);
