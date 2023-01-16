@@ -17,20 +17,31 @@ int main(void)
 
 	double dWidth = cap.get(cv::CAP_PROP_FRAME_WIDTH);
 	double dHeight = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+	//double dWidth = 4;
+	//double dHeight = 4;
 
 	printf("Resolution: %f x %f\n", dWidth, dHeight);
 
 	char *window_title = "Camera feed";
-	cv::namedWindow(window_title);
+	//cv::namedWindow(window_title);
+
+	int index = 0;
+	cv::Mat frame;
+	bool bSuccess = false;
 
 	while(true)
 	{
-		cv::Mat frame;
-		bool bSuccess = cap.read(frame);
+		bSuccess = cap.read(frame);
 		if (!bSuccess)
 		{
 			fputs("Can't get feed from camera\n", stderr);
-			return -2;
+			cap.release();
+			//return -2;
+			cv::VideoCapture cap(0, cv::CAP_V4L2);
+			bSuccess = cap.read(frame);
+			index++;
+			if(index>10)
+				return -2;
 		}
 
 		cv::imshow(window_title, frame);
@@ -38,7 +49,12 @@ int main(void)
 		if(cv::waitKey(10) == 27)
 		{
 			printf("Closing...\n");
+			cap.release();
 			return 0;
 		}
 	}
+	
+	
+	
+	return 0;
 }
