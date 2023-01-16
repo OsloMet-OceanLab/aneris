@@ -1,7 +1,7 @@
 import cv2 as cv
 
 def main():
-	cap = cv.VideoCapture(-1, cv.CAP_V4L)
+	cap = cv.VideoCapture(0, cv.CAP_V4L)
 	if not cap.isOpened():
 		print("Camera is unavailable")
 		exit()
