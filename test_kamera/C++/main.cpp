@@ -1,9 +1,7 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
-//using namespace cv;
-
-int main(void)
+int main(int argc, char** argv, char** envp)
 {
 	cv::VideoCapture cap(0, cv::CAP_V4L2);
 
@@ -13,7 +11,7 @@ int main(void)
 		return -1;
 	}
 
-	cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
+//	cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
 
 	printf("Press the escape key to quit\n");
 
@@ -22,7 +20,7 @@ int main(void)
 
 	printf("Resolution: %f x %f\n", dWidth, dHeight);
 
-	char *window_title = "Camera feed";
+	const char *window_title = "Camera feed";
 	cv::namedWindow(window_title);
 
 	cv::Mat frame;
