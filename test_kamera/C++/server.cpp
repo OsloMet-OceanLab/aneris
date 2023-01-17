@@ -22,6 +22,8 @@ int main(int argc, char** argv)
 	cv::Mat frame;
 	bool bSuccess = false;
 	
+	printf("Setup opencv\n");
+	
 	// set up UDP socket
 	int sockfd;
 	struct sockaddr_in servaddr, cliaddr;
@@ -32,6 +34,8 @@ int main(int argc, char** argv)
 		fputs("Couldn't create a socket\n", stderr);
 		return 2;
 	}
+	
+	printf("Setup socket\n");
 	
 	memset(&servaddr, 0, sizeof(servaddr));
 	memset(&cliaddr, 0, sizeof(cliaddr));
@@ -46,7 +50,11 @@ int main(int argc, char** argv)
 		return 3;
 	}
 	
+	printf("Bind socket\n");
+	
 	int len = sizeof(cliaddr);
+	
+	printf("Start loop\n");
 
 	do
 	{
@@ -59,7 +67,9 @@ int main(int argc, char** argv)
 		if(!frame.isContinuous())
 			frame = frame.clone();
 		
-		sendto(sockfd, (void*)&frame, frame.total() * frame.elemSize(), MSG_CONFIRM, (const struct sockaddr*)&cliaddr, len);
+		//sendto(sockfd, (void*)&frame, frame.total() * frame.elemSize(), MSG_CONFIRM, (const struct sockaddr*)&cliaddr, len);
+		printf("%d\n", frame.total() * frame.elemSize());
+		break;
 	} while (true);
 	
 	close(sockfd);

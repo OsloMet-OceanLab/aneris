@@ -17,6 +17,8 @@ int main(int argc, char** argv)
 
 	cv::Mat frame;
 	
+	printf("Setup opencv");
+	
 	// set up socket
 	int sockfd;
 	struct sockaddr_in servaddr;
@@ -28,6 +30,8 @@ int main(int argc, char** argv)
 		return 1;
 	}
 	
+	printf("Setup socket");
+	
 	memset(&servaddr, 0, sizeof(servaddr));
 	
 	servaddr.sin_family = AF_INET;
@@ -35,6 +39,8 @@ int main(int argc, char** argv)
 	servaddr.sin_port = htons(PORT);
 	
 	int n, len;
+	
+	printf("Begin loop");
 
 	while(true)
 	{
