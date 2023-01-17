@@ -1,11 +1,15 @@
 CPP := g++
-CFLAGS := -Wall -lopencv_core -lopencv_videoio -lopencv_video -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs
+CFLAGS := -g -Wall
+LIBS := -lopencv_core -lopencv_videoio -lopencv_video -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs
 TARGET := main
 
-all: $(TARGET)
+default: $(TARGET)
 
-$(TARGET): $(TARGET).cpp
-	$(CPP) -o $(TARGET) $(TARGET).cpp $(CFLAGS)
+$(TARGET): $(TARGET).o
+	$(CPP) -o $(TARGET) $(TARGET).o $(CFLAGS) $(LIBS)
+	
+$(TARGET).o: $(TARGET).cpp
+	$(CPP) -c $(TARGET).cpp $(CFLAGS)
 
 clean:
-	$(RM) $(TARGET)
+	$(RM) $(TARGET) *.o
