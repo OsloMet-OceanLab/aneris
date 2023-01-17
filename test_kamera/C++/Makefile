@@ -10,6 +10,19 @@ $(TARGET): $(TARGET).o
 	
 $(TARGET).o: $(TARGET).cpp
 	$(CPP) -c $(TARGET).cpp $(CFLAGS)
+	
+udp: client.o server.o
+	$(CPP) -o client client.o $(CFLAGS) $(LIBS)
+	$(CPP) -o server server.o $(CFLAGS) $(LIBS)
+
+client.o: client.cpp
+	$(CPP) -c client.cpp $(CFLAGS)
+	
+server.o: server.cpp
+	$(CPP) -c server.cpp $(CFLAGS)
 
 clean:
 	$(RM) $(TARGET) *.o
+
+udpclean:
+	$(RM) client server
