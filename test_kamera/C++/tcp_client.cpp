@@ -1,11 +1,10 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
-#include <unistd.h>
 #include <string>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <arpa/inet.h>
-#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include "Base64.hpp"
 
 #define PORT	5000
 
@@ -16,43 +15,60 @@ int main(int argc, char** argv)
 	cv::namedWindow(window_title);
 
 	cv::Mat frame;
+	//frame = cv::Mat::zeros(480, 640, CV_8UC1);
+	int imgSize = 307200;//frame.total() * frame.elemSize();
+	std::string data = "";
 	
-	printf("Setup opencv");
+	printf("Setup opencv\n");
 	
 	// set up socket
-	int sockfd;
-	struct sockaddr_in servaddr;
+	int sock = 0, valread, client_fd;
+	struct sockaddr_in serv_addr;
 	
-	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-	if(sockfd < 0)
+	sock = socket(AF_INET, SOCK_STREAM, 0);
+	if(sock < 0)
 	{
-		fputs("Couldn't create a socket\n", stderr);
+		fputs("Can't create socket\n", stderr);
 		return 1;
 	}
 	
-	printf("Setup socket");
+	printf("Setup socket\n");
 	
-	memset(&servaddr, 0, sizeof(servaddr));
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(PORT);
 	
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = INADDR_ANY;
-	servaddr.sin_port = htons(PORT);
+	int addr_assignment = inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr);
+	if(addr_assignment <= 0)
+	{
+		fputs("Invalid address\n", stderr);
+		return 2;
+	}
 	
-	int n, len;
+	client_fd = connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+	if(client_fd < 0)
+	{
+		fputs("Connection failed\n", stderr);
+		return 3;
+	}
 	
-	printf("Begin loop");
+	printf("Connected to server\n");
+	
+	printf("Begin loop\n");
 
 	while(true)
 	{
-		n = recvfrom(sockfd, (void*)&frame, sizeof(frame), MSG_WAITALL, (struct sockaddr*)&servaddr, (socklen_t*)&len);
+		valread = recv(client_fd, (void*)&data, imgSize, MSG_WAITALL);
+		
+		frame.data = Base64::Decode(data, (std::string)frame.data);
+		
 		cv::imshow(window_title, frame);
+		std::cout<<frame.data;
 
 		if(cv::waitKey(10) == 27)
 		{
 			printf("Closing...\n");
-			close(sockfd);
+			close(client_fd);
 			return 0;
 		}
 	}
 }
-

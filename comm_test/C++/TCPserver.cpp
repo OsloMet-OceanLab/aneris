@@ -47,6 +47,9 @@ int main(int argc, char** argv)
 		return 4;
 	}
 	
+	do
+	{
+	memset(buffer, 0, 1024);
 	new_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
 	if(new_socket < 0)
 	{
@@ -55,11 +58,16 @@ int main(int argc, char** argv)
 	}
 	
 	valread = read(new_socket, buffer, 1024);
-	printf("%s\n", buffer);
+	printf("%s, %d\n", buffer, valread);
 	send(new_socket, msg, strlen(msg), 0);
 	printf("Message sent\n");
 	
 	close(new_socket);
+	
+	buffer[valread] = '\0';
+	
+	} while (strncmp(buffer, "Quit", 1024) != 0);
+
 	shutdown(server_fd, SHUT_RDWR);
 	
 	return 0;

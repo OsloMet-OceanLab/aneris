@@ -44,4 +44,4 @@ tcpclean:
 	$(RM) tcp_client tcp_server
 	
 cleanall:
-	$(RM) client server $(TARGET)
+	$(RM) udp_client udp_server tcp_client tcp_server $(TARGET)

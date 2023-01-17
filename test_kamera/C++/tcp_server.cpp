@@ -1,11 +1,10 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <string>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include "Base64.hpp"
 
 #define PORT	5000
 
@@ -20,39 +19,62 @@ int main(int argc, char** argv)
 		return 1;
 	}
 	cv::Mat frame;
+	frame = cv::Mat::zeros(480, 640, CV_8UC1);
 	bool bSuccess = false;
+	int imgSize = frame.total() * frame.elemSize();
+	Base64 en;
 	
 	printf("Setup opencv\n");
 	
-	// set up UDP socket
-	int sockfd;
-	struct sockaddr_in servaddr, cliaddr;
+	// set up TCP socket
+	int server_fd, new_socket, valread;
+	struct sockaddr_in address;
+	int opt = 1, addrlen = sizeof(address);
 	
-	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-	if(sockfd < 0)
+	server_fd = socket(AF_INET, SOCK_STREAM, 0);
+	if(server_fd < 0)
 	{
-		fputs("Couldn't create a socket\n", stderr);
-		return 2;
+		fputs("Can't create socket", stderr);
+		return 1;
 	}
 	
 	printf("Setup socket\n");
 	
-	memset(&servaddr, 0, sizeof(servaddr));
-	memset(&cliaddr, 0, sizeof(cliaddr));
-	
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = INADDR_ANY;
-	servaddr.sin_port = htons(PORT);
-	
-	if(bind(sockfd, (const struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)
+	if(setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
 	{
-		fputs("Couldn't bind the socket\n", stderr);
+		fprintf(stderr, "Can't attach socket to port %d", PORT);
+		return 2;
+	}
+	
+	printf("Socket attached\n");
+	
+	address.sin_family = AF_INET;
+	address.sin_addr.s_addr = INADDR_ANY;
+	address.sin_port = htons(PORT);
+	
+	int bound = bind(server_fd, (struct sockaddr*)&address, sizeof(address));
+	
+	if(bound)
+	{
+		fputs("Can't bind to port", stderr);
 		return 3;
 	}
 	
 	printf("Bind socket\n");
 	
-	int len = sizeof(cliaddr);
+	if(listen(server_fd, 3) < 0)
+	{
+		fputs("Can't listen to port", stderr);
+		return 4;
+	}
+	
+	new_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen); // ditto
+	if(new_socket < 0)
+	{
+		fputs("Can't accept new connections", stderr);
+		return 5;
+	}
+
 	
 	printf("Start loop\n");
 
@@ -64,13 +86,17 @@ int main(int argc, char** argv)
 			fputs("Can't get feed from camera\n", stderr);
 			return 4;
 		}
-		if(!frame.isContinuous())
-			frame = frame.clone();
+		if(!frame.isContinuous()) frame = frame.clone();
 		
-		//sendto(sockfd, (void*)&frame, frame.total() * frame.elemSize(), MSG_CONFIRM, (const struct sockaddr*)&cliaddr, len);
-		printf("%d\n", frame.total() * frame.elemSize());
+		std::string data = Base64::Encode(frame.data);
+			
+		send(new_socket, (void*)&data, imgSize, 0);
+		
 		break;
 	} while (true);
 	
-	close(sockfd);
+	close(new_socket); // might wanna move this at the end of the do loop
+	
+	shutdown(server_fd, SHUT_RDWR);
+	return 0;
 }
