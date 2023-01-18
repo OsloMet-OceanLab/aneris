@@ -11,8 +11,7 @@ GPIO::GPIO(int pin)
     
     // Open the export file
     std::ofstream ofs("/sys/class/gpio/export", std::ofstream::out);
-    if (!ofs.is_open())
-	throw new ExportError("Unable to export GPIO");
+    if (!ofs.is_open()) throw new ExportError("Unable to export GPIO");
     // Write the GPIO number to export
     ofs << this->gpionum;
     ofs.close();
@@ -23,8 +22,7 @@ GPIO::~GPIO()
     this->setval(0);
     // Open the unexport file
     std::ofstream ofs("/sys/class/gpio/unexport", std::ofstream::out);
-    if (!ofs.is_open())
-	throw new UnexportError("Unable to unexport GPIO");
+    if (!ofs.is_open()) throw new UnexportError("Unable to unexport GPIO");
     // Write GPIO number to unexport
     ofs << this->gpionum;
     ofs.close();
@@ -37,13 +35,13 @@ int GPIO::setdir(std::string dir)
     std::ofstream ofs(setdir_str.c_str(), std::ofstream::out);
     if (!ofs.is_open())
     {
-	fprintf(stderr, "Unable to set direction of GPIO %i\n", this->gpionum);
-	return -1;
+        fprintf(stderr, "Unable to set direction of GPIO %i\n", this->gpionum);
+        return -1;
     }
     if (dir != "in" && dir != "out")
     {
-	fprintf(stderr, "Invalid direction chosen: %s\n", dir.c_str());
-	return -1;
+        fprintf(stderr, "Invalid direction chosen: %s\n", dir.c_str());
+        return -1;
     }
     // Write the direction to direction file
     ofs << dir;
@@ -58,8 +56,8 @@ int GPIO::setval(int val)
     std::ofstream ofs(setval_str.c_str());
     if (!ofs.is_open())
     {
-	fprintf(stderr, "Unable to set the value of GPIO %i\n", this->gpionum);
-	return -1;
+        fprintf(stderr, "Unable to set the value of GPIO %i\n", this->gpionum);
+        return -1;
     }
     // Write the value to value file
     ofs << val;
@@ -74,15 +72,15 @@ int GPIO::getval()
     std::ifstream ifs(getval_str.c_str());
     if (!ifs.is_open())
     {
-	fprintf(stderr, "Unable to get value of GPIO %i\n", this->gpionum);
-	return -1;
+        fprintf(stderr, "Unable to get value of GPIO %i\n", this->gpionum);
+        return -1;
     }
     // Read the current gpio value
     int val;
     ifs >> val;
     ifs.close();
-    if(!val)
-	val = 1;
+    
+    if(!val) val = 1;
     return val;
 }
 

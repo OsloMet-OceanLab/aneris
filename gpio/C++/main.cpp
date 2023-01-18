@@ -1,8 +1,15 @@
 #include <iostream>
+#include <unistd.h>
 #include "GPIO.h"
 
-int main(int argc, char** argv, char** envp)
+int main(void)
 {
+	if(geteuid())
+	{
+		fputs("This program needs to be run as root\n", stderr);
+		return 1;
+	}
+	
 	GPIO gp;
 	int choice;
 	
