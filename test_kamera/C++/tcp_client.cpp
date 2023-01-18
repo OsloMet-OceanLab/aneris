@@ -11,7 +11,7 @@
 int main(int argc, char** argv)
 {
 	// set up opencv
-	const char *window_title = "Camera feed";
+	const char *window_title = "Client feed";
 	cv::namedWindow(window_title);
 
 	cv::Mat frame = cv::Mat::zeros(480, 640, CV_8UC1);
@@ -61,11 +61,6 @@ int main(int argc, char** argv)
 		
 		cv::imshow(window_title, frame);
 		
-		//std::cout << frame.empty() << std::endl;
-		//std::cout << frame.data << std::endl;
-		
-		//return 0;
-
 		if(cv::waitKey(10) == 27)
 		{
 			printf("Closing...\n");

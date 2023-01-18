@@ -12,6 +12,11 @@ int main(int argc, char** argv)
 {
 	// set up opencv
 	cv::VideoCapture cap(0, cv::CAP_V4L2);
+	
+	cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
+	
+	const char *window_title = "Server feed";
+	cv::namedWindow(window_title);
 
 	if (!cap.isOpened())
 	{
@@ -19,6 +24,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 	cv::Mat frame = cv::Mat::zeros(480, 640, CV_8UC1);
+	cv::Mat greyFrame = cv::Mat::zeros(480, 640, CV_8UC1);
 	bool bSuccess = false;
 	int imgSize = frame.total() * frame.elemSize();
 	
@@ -66,7 +72,7 @@ int main(int argc, char** argv)
 		return 4;
 	}
 	
-	sock = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen); // ditto
+	sock = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
 	if(sock < 0)
 	{
 		fputs("Can't accept new connections", stderr);
@@ -85,13 +91,20 @@ int main(int argc, char** argv)
 		}
 		if(!frame.isContinuous()) frame = frame.clone();
 		
+		cv::cvtColor(frame, greyFrame, cv::COLOR_BGR2GRAY);
+		
 		send(sock, frame.data, imgSize, 0);
 		
-		//break;
+		cv::imshow(window_title, frame);
+		
+		if(cv::waitKey(10) == 27)
+		{
+			printf("Closing...\n");
+			break;
+		}
 	} while (true);
 	
-	close(sock); // might wanna move this at the end of the do loop
-	
+	close(sock);
 	shutdown(server_fd, SHUT_RDWR);
 	return 0;
 }
