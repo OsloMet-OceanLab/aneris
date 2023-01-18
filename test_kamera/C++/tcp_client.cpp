@@ -14,10 +14,8 @@ int main(int argc, char** argv)
 	const char *window_title = "Camera feed";
 	cv::namedWindow(window_title);
 
-	cv::Mat frame;
-	//frame = cv::Mat::zeros(480, 640, CV_8UC1);
-	int imgSize = 307200;//frame.total() * frame.elemSize();
-	std::string data = "";
+	cv::Mat frame = cv::Mat::zeros(480, 640, CV_8UC1);
+	int imgSize = frame.total() * frame.elemSize();
 	
 	printf("Setup opencv\n");
 	
@@ -54,15 +52,19 @@ int main(int argc, char** argv)
 	printf("Connected to server\n");
 	
 	printf("Begin loop\n");
-
+	
+	uchar* iptr = frame.data;
+	
 	while(true)
 	{
-		valread = recv(client_fd, (void*)&data, imgSize, MSG_WAITALL);
-		
-		frame.data = Base64::Decode(data, (std::string)frame.data);
+		valread = recv(sock, iptr, imgSize, MSG_WAITALL);
 		
 		cv::imshow(window_title, frame);
-		std::cout<<frame.data;
+		
+		//std::cout << frame.empty() << std::endl;
+		//std::cout << frame.data << std::endl;
+		
+		//return 0;
 
 		if(cv::waitKey(10) == 27)
 		{

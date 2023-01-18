@@ -18,16 +18,14 @@ int main(int argc, char** argv)
 		fputs("Could't open the camera feed\n", stderr);
 		return 1;
 	}
-	cv::Mat frame;
-	frame = cv::Mat::zeros(480, 640, CV_8UC1);
+	cv::Mat frame = cv::Mat::zeros(480, 640, CV_8UC1);
 	bool bSuccess = false;
 	int imgSize = frame.total() * frame.elemSize();
-	Base64 en;
 	
 	printf("Setup opencv\n");
 	
 	// set up TCP socket
-	int server_fd, new_socket, valread;
+	int server_fd, sock, valread;
 	struct sockaddr_in address;
 	int opt = 1, addrlen = sizeof(address);
 	
@@ -68,16 +66,15 @@ int main(int argc, char** argv)
 		return 4;
 	}
 	
-	new_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen); // ditto
-	if(new_socket < 0)
+	sock = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen); // ditto
+	if(sock < 0)
 	{
 		fputs("Can't accept new connections", stderr);
 		return 5;
 	}
 
-	
 	printf("Start loop\n");
-
+	
 	do
 	{
 		bSuccess = cap.read(frame);
@@ -88,14 +85,12 @@ int main(int argc, char** argv)
 		}
 		if(!frame.isContinuous()) frame = frame.clone();
 		
-		std::string data = Base64::Encode(frame.data);
-			
-		send(new_socket, (void*)&data, imgSize, 0);
+		send(sock, frame.data, imgSize, 0);
 		
-		break;
+		//break;
 	} while (true);
 	
-	close(new_socket); // might wanna move this at the end of the do loop
+	close(sock); // might wanna move this at the end of the do loop
 	
 	shutdown(server_fd, SHUT_RDWR);
 	return 0;
