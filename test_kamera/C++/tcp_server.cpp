@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 		
 		cv::cvtColor(frame, greyFrame, cv::COLOR_BGR2GRAY);
 		
-		send(sock, frame.data, imgSize, 0);
+		send(sock, greyFrame.data, imgSize, 0);
 		
 		cv::imshow(window_title, frame);
 		
