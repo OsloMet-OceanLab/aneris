@@ -80,7 +80,7 @@ int GPIO::getval()
     ifs >> val;
     ifs.close();
     
-    if(!val) val = 1;
+    if(val) val = 1;
     return val;
 }
 

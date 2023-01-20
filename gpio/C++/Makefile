@@ -6,10 +6,16 @@ default: $(TARGET)
 
 $(TARGET): main.o GPIO.o
 	$(CPP) -o $(TARGET) main.o GPIO.o $(CFLAGS)
-	
+
+read: read.o GPIO.o
+	$(CPP) -o read read.o GPIO.o $(CFLAGS)
+
 args: argmain.o GPIO.o
 	$(CPP) -o args argmain.o GPIO.o $(CFLAGS)
-	
+
+read.o: read.cpp
+	$(CPP) -c read.cpp $(CFLAGS)
+
 main.o: main.cpp GPIO.h
 	$(CPP) -c main.cpp $(CFLAGS)
 	
@@ -20,5 +26,5 @@ GPIO.o: GPIO.cpp GPIO.h
 	$(CPP) -c GPIO.cpp $(CFLAGS)
 
 clean:
-	$(RM) $(TARGET) args *.o
+	$(RM) $(TARGET) args read *.o
 	

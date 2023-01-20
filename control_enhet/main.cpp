@@ -1,5 +1,4 @@
 /**
- * test that gpio is accessible/works
  * test network connection to computer (ping?)
  * if the above works, begin by opening port for listening to commands
  * if it does NOT work, reboot once and repeat
@@ -12,6 +11,8 @@
 
 #include <iostream>
 #include <unistd.h>
+#include <stdlib.h>
+#include "../gpio/C++/GPIO.h"
 
 int main(void)
 {
@@ -26,7 +27,14 @@ int main(void)
 	//blah
 	
 	// check if gpio is available
-	//use gpio.h and enable/read pin, if no fails all good
+	//use gpio.h and read pin, if no fails all good
+	GPIO test_gpio(17);
+	test_gpio.setdir("in");
+	if(!test_gpio.getval())
+	{
+		fputs("GPIO unavailable", stderr);
+		printf("reboot");//system("reboot");
+	}
 	
 	unsigned int command = 0;
 	while (true)
@@ -40,9 +48,11 @@ int main(void)
 				break;
 			case 1:
 				system("reboot");
+				break;
 			default:
 				// return that command is invalid
+				return 0;
 		}
 	}
-	return 0;
+	//return 0;
 }
