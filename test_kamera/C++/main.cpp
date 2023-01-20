@@ -11,6 +11,8 @@ int main(int argc, char** argv, char** envp)
 		return -1;
 	}
 
+	cap.set(3, 1920);
+	cap.set(4, 1080);
 //	cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
 
 	printf("Press the escape key to quit\n");
