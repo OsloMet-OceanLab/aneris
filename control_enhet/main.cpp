@@ -1,5 +1,6 @@
 /**
  * test network connection to computer (ping?)
+ * check both network cards are up (hydrophone and land)
  * if the above works, begin by opening port for listening to commands
  * if it does NOT work, reboot once and repeat
  * if on 3rd attempt still does not work, log and turn off
@@ -17,7 +18,7 @@
 
 int main(void)
 {
-	// check user is root
+	// verify user is root
 	if(geteuid())
 	{
 		log("This program needs to be run as root", LOG_ERROR);
@@ -26,10 +27,7 @@ int main(void)
 	}
 	log("Verified user permission", LOG_INFO);
 	
-	// check if connected to network
-	//blah
-	
-	// check if gpio is available
+	// verify gpio is available
 	try
 	{
 		GPIO test_gpio(17);
@@ -44,6 +42,9 @@ int main(void)
 	}
 	log("Verified GPIO is available", LOG_INFO);
 	
+	// test uplink to hydrophone/fathom tether interface
+	//blah
+		
 	unsigned int command = 2;
 	while (true)
 	{
