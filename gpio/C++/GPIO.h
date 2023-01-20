@@ -17,25 +17,10 @@ private:
     int gpionum; // GPIO number associated with the instance of an object
 };
 
-struct ExportError : std::exception
+class Error : std::exception
 {
 public:
-    ExportError(const char* message)
-    {
-        this->msg = message;
-    }
-    virtual const char* what()
-    {
-        return this->msg;
-    }
-private:
-    const char* msg;
-};
-
-struct UnexportError : std::exception
-{
-public:
-    UnexportError(const char* message)
+    Error(const char* message)
     {
         this->msg = message;
     }

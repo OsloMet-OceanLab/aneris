@@ -13,30 +13,38 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include "../gpio/C++/GPIO.h"
+#include "Log.h"
 
 int main(void)
 {
 	// check user is root
 	if(geteuid())
 	{
-		fputs("This program needs to be run as root\n", stderr);
-		printf("reboot");//system("reboot");
+		log("This program needs to be run as root", LOG_ERROR);
+		printf("reboot\n"); // system("reboot");
+		return 0;
 	}
+	log("Verified user permission", LOG_INFO);
 	
 	// check if connected to network
 	//blah
 	
 	// check if gpio is available
-	//use gpio.h and read pin, if no fails all good
-	GPIO test_gpio(17);
-	test_gpio.setdir("in");
-	if(!test_gpio.getval())
+	try
 	{
-		fputs("GPIO unavailable", stderr);
-		printf("reboot");//system("reboot");
+		GPIO test_gpio(17);
+		test_gpio.setdir("in");
+		if(!test_gpio.getval()) throw new Error("GPIO unavailable");
 	}
+	catch(Error* e)
+	{
+		log(e->what(), LOG_ERROR);
+		printf("reboot\n"); // system("reboot");
+		return 0;
+	}
+	log("Verified GPIO is available", LOG_INFO);
 	
-	unsigned int command = 0;
+	unsigned int command = 2;
 	while (true)
 	{
 		// logic to receive command
@@ -54,5 +62,4 @@ int main(void)
 				return 0;
 		}
 	}
-	//return 0;
 }
