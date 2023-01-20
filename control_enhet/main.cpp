@@ -34,11 +34,11 @@ int main(void)
 	{
 		GPIO test_gpio(17);
 		test_gpio.setdir("in");
-		if(!test_gpio.getval()) throw new Error("GPIO unavailable");
+		if(!test_gpio.getval()) throw Error("GPIO unavailable");
 	}
-	catch(Error* e)
+	catch(Error& e)
 	{
-		log(e->what(), LOG_ERROR);
+		log(e.what(), LOG_ERROR);
 		printf("reboot\n"); // system("reboot");
 		return 0;
 	}
