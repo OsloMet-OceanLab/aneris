@@ -17,7 +17,7 @@ private:
     int gpionum; // GPIO number associated with the instance of an object
 };
 
-class Error : std::exception
+class GPIOError : std::exception
 {
 public:
     Error(const char* message)

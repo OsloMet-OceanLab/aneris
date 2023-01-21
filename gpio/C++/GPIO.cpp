@@ -11,7 +11,7 @@ GPIO::GPIO(int pin)
     
     // Open the export file
     std::ofstream ofs("/sys/class/gpio/export", std::ofstream::out);
-    if (!ofs.is_open()) throw new Error("Unable to export GPIO");
+    if (!ofs.is_open()) throw GPIOError("Unable to export GPIO");
     // Write the GPIO number to export
     ofs << this->gpionum;
     ofs.close();
@@ -22,7 +22,7 @@ GPIO::~GPIO()
     this->setval(0);
     // Open the unexport file
     std::ofstream ofs("/sys/class/gpio/unexport", std::ofstream::out);
-    if (!ofs.is_open()) throw new Error("Unable to unexport GPIO");
+    if (!ofs.is_open()) throw GPIOError("Unable to unexport GPIO");
     // Write GPIO number to unexport
     ofs << this->gpionum;
     ofs.close();
@@ -33,8 +33,8 @@ int GPIO::setdir(std::string dir)
     // Open the direction file for gpio
     std::string setdir_str = "/sys/class/gpio/gpio" + std::to_string(this->gpionum) + "/direction";
     std::ofstream ofs(setdir_str.c_str(), std::ofstream::out);
-    if (!ofs.is_open()) throw new Error("Unable to set the direction of GPIO");
-    if (dir != "in" && dir != "out") throw new Error("Invalid direction chosen");
+    if (!ofs.is_open()) throw GPIOError("Unable to set the direction of GPIO");
+    if (dir != "in" && dir != "out") throw GPIOError("Invalid direction chosen");
     // Write the direction to direction file
     ofs << dir;
     ofs.close();
@@ -46,7 +46,7 @@ int GPIO::setval(int val)
     // Open the value file for gpio
     std::string setval_str = "/sys/class/gpio/gpio" + std::to_string(this->gpionum) + "/value";
     std::ofstream ofs(setval_str.c_str());
-    if (!ofs.is_open()) throw new Error("Unable to set the value of GPIO");
+    if (!ofs.is_open()) throw GPIOError("Unable to set the value of GPIO");
     // Write the value to value file
     ofs << val;
     ofs.close();
@@ -58,7 +58,7 @@ int GPIO::getval()
     // Open the value file for gpio
     std::string getval_str = "/sys/class/gpio/gpio" + std::to_string(this->gpionum) + "/value";
     std::ifstream ifs(getval_str.c_str());
-    if (!ifs.is_open()) throw new Error("Unable to read the value of GPIO");
+    if (!ifs.is_open()) throw GPIOError("Unable to read the value of GPIO");
     // Read the current gpio value
     int val;
     ifs >> val;
