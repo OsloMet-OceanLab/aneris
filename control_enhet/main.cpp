@@ -21,11 +21,11 @@ int main(void)
 	// verify user is root
 	if(geteuid())
 	{
-		log("This program needs to be run as root", LOG_ERROR);
+		Logger::log("This program needs to be run as root", Logger::LOG_ERROR);
 		printf("reboot\n"); // system("reboot");
 		return 0;
 	}
-	log("Verified user permission", LOG_INFO);
+	Logger::log("Verified user permission", Logger::LOG_INFO);
 	
 	// verify gpio is available
 	try
@@ -36,11 +36,11 @@ int main(void)
 	}
 	catch(GPIOError& e)
 	{
-		log(e.what(), LOG_ERROR);
+		Logger::log(e.what(), Logger::LOG_ERROR);
 		printf("reboot\n"); // system("reboot");
 		return 0;
 	}
-	log("Verified GPIO is available", LOG_INFO);
+	Logger::log("Verified GPIO is available", Logger::LOG_INFO);
 	
 	// test uplink to hydrophone/fathom tether interface
 	//blah
@@ -53,9 +53,11 @@ int main(void)
 		switch(command)
 		{
 			case 0: // shutdown
+				Logger::log("Received shutdown command", Logger::LOG_INFO);
 				system("poweroff");
 				break;
 			case 1:
+				Logger::log("Received reboot command", Logger::LOG_INFO);
 				system("reboot");
 				break;
 			default:

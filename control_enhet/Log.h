@@ -5,6 +5,9 @@
 #include <fstream>
 #include <time.h>
 
+namespace Logger
+{
+
 #define LOG_INFO		0x1
 #define LOG_WARNING		0x2
 #define LOG_ERROR		0x4
@@ -31,4 +34,5 @@ inline void log(std::string logMsg, long level)
 	ofs.close();
 }
 
+}
 #endif
