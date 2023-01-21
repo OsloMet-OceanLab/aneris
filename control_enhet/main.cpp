@@ -21,7 +21,7 @@ int main(void)
 	// verify user is root
 	if(geteuid())
 	{
-		Logger::log("This program needs to be run as root", Logger::LOG_ERROR);
+		Logger::log("This program needs to be run as root", Logger::LOG_FATAL);
 		printf("reboot\n"); // system("reboot");
 		return 0;
 	}
@@ -36,7 +36,7 @@ int main(void)
 	}
 	catch(GPIOError& e)
 	{
-		Logger::log(e.what(), Logger::LOG_ERROR);
+		Logger::log(e.what(), Logger::LOG_FATAL);
 		printf("reboot\n"); // system("reboot");
 		return 0;
 	}
@@ -60,8 +60,8 @@ int main(void)
 				Logger::log("Received reboot command", Logger::LOG_INFO);
 				system("reboot");
 				break;
-			default:
-				// return that command is invalid
+			default: // return that command is invalid
+				Logger::log("Receiven an invalid command", Logger::LOG_INFO)
 				return 0;
 		}
 	}

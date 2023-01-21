@@ -8,9 +8,10 @@
 namespace Logger
 {
 
-#define LOG_INFO		0x1
-#define LOG_WARNING		0x2
-#define LOG_ERROR		0x4
+#define LOG_INFO		0x1 // general information
+#define LOG_WARNING		0x2 // can cause oddities
+#define LOG_ERROR		0x4 // fatal to an operation but not a program
+#define LOG_FATAL		0x8 // fatal to the whole program
 
 static inline std::string getCurrentDateTime()
 {
@@ -28,9 +29,10 @@ inline void log(std::string logMsg, long level)
 	if(level & LOG_INFO) strLevel = "[INFO]";
 	else if(level & LOG_WARNING) strLevel = "[WARNING]";
 	else if(level & LOG_ERROR) strLevel = "[ERROR]";
-	std::string now = getCurrentDateTime();
+	else if(level & LOG_FATAL) strLevel = "[FATAL]";
+	std::string time = getCurrentDateTime();
 	std::ofstream ofs(filepath.c_str(), std::ios_base::out | std::ios_base::app);
-	ofs << strLevel << '\t' << now << '\t' << logMsg << '\n';
+	ofs << strLevel << '\t' << time << '\t' << logMsg << '\n';
 	ofs.close();
 }
 
