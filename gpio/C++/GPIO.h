@@ -3,13 +3,24 @@
 
 #include <string>
 
+namespace gpionum
+{
+
+enum
+{
+    GPIO_LOW =      0x1,
+    GPIO_HIGH =     0x2,
+    GPIO_INPUT =    0x4,
+    GPIO_OUTPUT =   0x8
+};
+
 class GPIO
 {
 public:
     explicit GPIO(int pin = 0);
     virtual ~GPIO();
-    int setdir(std::string dir); // Set GPIO Direction ("in" or "out")
-    int setval(int val); // Set GPIO Value (on/off)
+    int setdir(long dir); // Set GPIO Direction (input/output)
+    int setval(long val); // Set GPIO Value (high/low)
     int getval(); // Get GPIO Value
     int get_gpionum();
     
@@ -31,5 +42,7 @@ public:
 private:
     const char* msg;
 };
+
+} // end namespace gpio
 
 #endif

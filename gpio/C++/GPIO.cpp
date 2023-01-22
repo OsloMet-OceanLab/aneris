@@ -1,9 +1,11 @@
 #include <fstream>
 #include <string>
 #include <iostream>
-#include <sstream>
 
 #include "GPIO.h"
+
+namespace gpio
+{
 
 GPIO::GPIO(int pin)
 {
@@ -28,27 +30,29 @@ GPIO::~GPIO()
     ofs.close();
 }
 
-int GPIO::setdir(std::string dir)
+int GPIO::setdir(long dir)
 {
     // Open the direction file for gpio
     std::string setdir_str = "/sys/class/gpio/gpio" + std::to_string(this->gpionum) + "/direction";
     std::ofstream ofs(setdir_str.c_str(), std::ofstream::out);
     if (!ofs.is_open()) throw GPIOError("Unable to set the direction of GPIO");
-    if (dir != "in" && dir != "out") throw GPIOError("Invalid direction chosen");
     // Write the direction to direction file
-    ofs << dir;
+    if (dir & GPIO_INPUT) ofs << "in";
+    else if (dir & GPIO_INPUT) ofs << "out";
+    else throw GPIOError("Invalid direction chosen");
     ofs.close();
     return 0;
 }
 
-int GPIO::setval(int val)
+int GPIO::setval(long val)
 {
     // Open the value file for gpio
     std::string setval_str = "/sys/class/gpio/gpio" + std::to_string(this->gpionum) + "/value";
     std::ofstream ofs(setval_str.c_str());
     if (!ofs.is_open()) throw GPIOError("Unable to set the value of GPIO");
     // Write the value to value file
-    ofs << val;
+    if (dir & GPIO_HIGH) ofs << 1;
+    else if (dir & GPIO_LOW) ofs << 0;
     ofs.close();
     return 0;
 }
@@ -72,3 +76,5 @@ int GPIO::get_gpionum()
 {
     return this->gpionum;
 }
+
+} // end namespace gpio

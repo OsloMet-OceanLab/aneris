@@ -30,11 +30,12 @@ int main(void)
 	// verify gpio is available
 	try
 	{
-		GPIO test_gpio(17);
-		test_gpio.setdir("in");
-		if(!test_gpio.getval()) throw GPIOError("GPIO unavailable");
+		gpio::GPIO *test_gpio = new gpio::GPIO(17);
+		test_gpio->setdir(gpio::GPIO_INPUT);
+		if(!test_gpio->getval()) throw gpio::GPIOError("GPIO unavailable");
+		delete test_gpio;
 	}
-	catch(GPIOError& e)
+	catch(gpio::GPIOError& e)
 	{
 		Logger::log(e.what(), Logger::LOG_FATAL);
 		printf("reboot\n"); // system("reboot");
@@ -44,8 +45,8 @@ int main(void)
 	
 	// test uplink to hydrophone/fathom tether interface
 	//blah
-		
-	unsigned int command = 2;
+	
+	uint8_t command = 2;
 	while (true)
 	{
 		// logic to receive command
