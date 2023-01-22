@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include "../gpio/C++/GPIO.h"
-#include "Log.h"
+#include "Logger.h"
 
 int main(void)
 {
