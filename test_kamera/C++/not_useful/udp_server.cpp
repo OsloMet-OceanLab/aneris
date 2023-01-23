@@ -9,6 +9,8 @@
 
 #define PORT	5000
 
+int sendall(const int sockfd, void __restrict *buf, int *buf_len, const struct sockaddr *cliaddr, const int cliaddr_len);
+
 int main(int argc, char** argv)
 {
 	// set up opencv
@@ -52,7 +54,7 @@ int main(int argc, char** argv)
 	
 	printf("Bind socket\n");
 	
-	int len = sizeof(cliaddr);
+	int cliaddr_len = sizeof(cliaddr);
 	
 	printf("Start loop\n");
 
@@ -67,10 +69,27 @@ int main(int argc, char** argv)
 		if(!frame.isContinuous())
 			frame = frame.clone();
 		
-		//sendto(sockfd, (void*)&frame, frame.total() * frame.elemSize(), MSG_CONFIRM, (const struct sockaddr*)&cliaddr, len);
+		//sendto(sockfd, (void*)&frame, frame.total() * frame.elemSize(), MSG_CONFIRM, (const struct sockaddr*)&cliaddr, cliaddr_len);
+		sendall(sockfd, frame.data, frame.total() * frame.elemSize(), (const struct sockaddr*)&cliaddr, cliaddr_len)
 		printf("%d\n", frame.total() * frame.elemSize());
 		break;
 	} while (true);
 	
 	close(sockfd);
+}
+
+int sendall(const int sockfd, void __restrict *buf, int *buf_len, const struct sockaddr *cliaddr, const int cliaddr_len)
+{
+	int total = 0, bytes_left = *buf_len, n = 0;
+
+	while (total < *buf_len)
+	{
+		n = sendto(sockfd, buf + total, (bytes_left > 65507 ? 65507 : bytes_left), MSG_CONFIRM, cliaddr, cliaddr_len);
+		if (n == -1) break;
+		total += n;
+		bytes_left > 65507 ? bytes_left -= 65507 : bytes_left = 0;
+	}
+
+	*buf_len = total;
+	return n == -1 ? -1 : 0;
 }
