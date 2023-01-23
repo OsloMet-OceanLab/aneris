@@ -4,7 +4,6 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include "Base64.hpp"
 
 #define PORT	5000
 
@@ -14,8 +13,8 @@ int main(int argc, char** argv)
 	const char *window_title = "Client feed";
 	cv::namedWindow(window_title);
 
-	cv::Mat frame = cv::Mat::zeros(480, 640, CV_8UC1);
-	int imgSize = frame.total() * frame.elemSize();
+	cv::Mat frame = cv::Mat::zeros(480, 640, CV_8UC3);
+	int imgSize = frame.total() * frame.elemSize() * 9;
 	
 	printf("Setup opencv\n");
 	
@@ -60,6 +59,10 @@ int main(int argc, char** argv)
 		valread = recv(sock, iptr, imgSize, MSG_WAITALL);
 		
 		cv::imshow(window_title, frame);
+		
+		std::cout << valread << std::endl;
+		
+		memset(iptr, 0, valread);
 		
 		if(cv::waitKey(10) == 27)
 		{

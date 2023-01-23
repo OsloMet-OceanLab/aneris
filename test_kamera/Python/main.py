@@ -15,9 +15,9 @@ def main():
 		
 		gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 		
-		cv.imshow('frame', gray)
+		cv.imshow('frame', frame)
 		
-		if cv.waitKey(1) == ord(q):
+		if cv.waitKey(10) == 27:
 			break
 
 if __name__ == "__main__":

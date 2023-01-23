@@ -4,7 +4,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include "Base64.hpp"
+#include <fstream>
 
 #define PORT	5000
 
@@ -13,20 +13,20 @@ int main(int argc, char** argv)
 	// set up opencv
 	cv::VideoCapture cap(0, cv::CAP_V4L2);
 	
-	cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
+	cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('H', '2', '6', '4'));
 	
-	const char *window_title = "Server feed";
-	cv::namedWindow(window_title);
+	//const char *window_title = "Server feed";
+	//cv::namedWindow(window_title);
 
 	if (!cap.isOpened())
 	{
 		fputs("Could't open the camera feed\n", stderr);
 		return 1;
 	}
-	cv::Mat frame = cv::Mat::zeros(480, 640, CV_8UC1);
+	cv::Mat frame = cv::Mat::zeros(480, 640, CV_8UC3);
 	cv::Mat greyFrame = cv::Mat::zeros(480, 640, CV_8UC1);
 	bool bSuccess = false;
-	int imgSize = frame.total() * frame.elemSize();
+	int imgSize = frame.total() * frame.elemSize() * 9;
 	
 	printf("Setup opencv\n");
 	
@@ -81,6 +81,8 @@ int main(int argc, char** argv)
 
 	printf("Start loop\n");
 	
+	int sent = 0;
+	
 	do
 	{
 		bSuccess = cap.read(frame);
@@ -91,17 +93,25 @@ int main(int argc, char** argv)
 		}
 		if(!frame.isContinuous()) frame = frame.clone();
 		
+		std::ofstream ofs("/home/pi/Desktop/serv", std::ios_base::out);
+		
+		ofs << frame.data;
+		
+		ofs.close();
+		
 		cv::cvtColor(frame, greyFrame, cv::COLOR_BGR2GRAY);
 		
-		send(sock, greyFrame.data, imgSize, 0);
+		sent = send(sock, frame.data, imgSize, 0);
 		
-		cv::imshow(window_title, frame);
+		std::cout << sent << std::endl;
+		
+		/*cv::imshow(window_title, frame);
 		
 		if(cv::waitKey(10) == 27)
 		{
 			printf("Closing...\n");
 			break;
-		}
+		}*/
 	} while (true);
 	
 	close(sock);

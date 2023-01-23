@@ -13,8 +13,8 @@ $(TARGET).o: $(TARGET).cpp
 	$(CPP) -c $(TARGET).cpp $(CFLAGS)
 	
 udp: udp_client.o udp_server.o
-	$(CPP) -o udp_client udp_client.o $(CFLAGS) $(LIBS)
 	$(CPP) -o udp_server udp_server.o $(CFLAGS) $(LIBS)
+	$(CPP) -o udp_client udp_client.o $(CFLAGS) $(LIBS)
 	$(RM) *.o
 
 udp_client.o: udp_client.cpp
@@ -24,8 +24,8 @@ udp_server.o: udp_server.cpp
 	$(CPP) -c udp_server.cpp $(CFLAGS)
 	
 tcp: tcp_client.o tcp_server.o
-	$(CPP) -o tcp_client tcp_client.o $(CFLAGS) $(LIBS)
 	$(CPP) -o tcp_server tcp_server.o $(CFLAGS) $(LIBS)
+	$(CPP) -o tcp_client tcp_client.o $(CFLAGS) $(LIBS)
 	$(RM) *.o
 
 tcp_client.o: tcp_client.cpp
@@ -33,15 +33,24 @@ tcp_client.o: tcp_client.cpp
 	
 tcp_server.o: tcp_server.cpp
 	$(CPP) -c tcp_server.cpp $(CFLAGS)
+	
+size: size_test.o
+	$(CPP) -o size_test size_test.o $(CFLAGS) $(LIBS)
+
+size_test.o: size_test.cpp
+	$(CPP) -c size_test.cpp $(CFLAGS)
 
 clean:
 	$(RM) $(TARGET)
 
-udpclean:
+cleanudp:
 	$(RM) udp_client udp_server
 	
-tcpclean:
+cleantcp:
 	$(RM) tcp_client tcp_server
 	
+cleansize:
+	$(RM) size_test
+	
 cleanall:
-	$(RM) udp_client udp_server tcp_client tcp_server $(TARGET)
+	$(RM) udp_client udp_server tcp_client tcp_server size_test $(TARGET)
