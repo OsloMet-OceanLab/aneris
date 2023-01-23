@@ -1,6 +1,8 @@
 #include <iostream>
 #include <unistd.h>
-#include "GPIO.h"
+#include "GPIO.hpp"
+
+using namespace gpio;
 
 int main(int argc, char** argv)
 {

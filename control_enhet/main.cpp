@@ -14,8 +14,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <csignal>
+#include <pthread.h>
 #include "../gpio/C++/GPIO.h"
-#include "Logger.h"
+#include "Logger.hpp"
 
 void handler(const int signum);
 

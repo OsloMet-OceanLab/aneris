@@ -1,11 +1,12 @@
 CPP := g++
 CFLAGS := -g -Wall
+LIBS := -lpthread
 TARGET := main
 
 default: $(TARGET)
 
 $(TARGET): $(TARGET).o GPIO.o
-	$(CPP) -o $(TARGET) $(TARGET).o GPIO.o $(CFLAGS)
+	$(CPP) -o $(TARGET) $(TARGET).o GPIO.o $(CFLAGS) $(LIBS)
 	$(RM) *.o
 
 $(TARGET).o: $(TARGET).cpp

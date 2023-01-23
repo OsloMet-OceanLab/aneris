@@ -1,5 +1,5 @@
-#ifndef GPIO_H
-#define GPIO_H
+#ifndef GPIO_HPP
+#define GPIO_HPP
 
 #include <string>
 

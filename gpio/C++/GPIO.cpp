@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 
-#include "GPIO.h"
+#include "GPIO.hpp"
 
 namespace gpio
 {
