@@ -11,11 +11,12 @@ int main(void)
 		fputs("This program needs to be run as root\n", stderr);
 		return 1;
 	}
-	
+	try
+	{
 	GPIO gp;
 	int choice;
 	
-	gp.setdir("out"); // in or out
+	gp.setdir(GPIO_OUTPUT); // in or out
 	
 	do
 	{
@@ -30,16 +31,20 @@ int main(void)
 				break;
 			case 0:
 				std::cout<<"Off\n";
-				gp.setval(0);
+				gp.setval(GPIO_LOW);
 				break;
 			case 1:
 				std::cout<<"On\n";
-				gp.setval(1);
+				gp.setval(GPIO_HIGH);
 				break;
 			default:
 				std::cout<<"Invalid choice\n";
 		}
 	} while (choice != -1);
-	
+	}
+	catch (GPIOError& e)
+	{
+		std::cout<<e.what()<<std::endl;
+	}
 	return 0;
 }

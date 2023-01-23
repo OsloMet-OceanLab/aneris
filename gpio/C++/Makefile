@@ -16,13 +16,13 @@ args: argmain.o GPIO.o
 read.o: read.cpp
 	$(CPP) -c read.cpp $(CFLAGS)
 
-main.o: main.cpp GPIO.h
+main.o: main.cpp GPIO.hpp
 	$(CPP) -c main.cpp $(CFLAGS)
 	
 argmain.o: argmain.cpp
 	$(CPP) -c argmain.cpp $(CFLAGS)
 
-GPIO.o: GPIO.cpp GPIO.h
+GPIO.o: GPIO.cpp GPIO.hpp
 	$(CPP) -c GPIO.cpp $(CFLAGS)
 
 clean:

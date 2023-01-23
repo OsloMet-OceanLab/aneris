@@ -38,7 +38,7 @@ int GPIO::setdir(long dir)
     if (!ofs.is_open()) throw GPIOError("Unable to set the direction of GPIO");
     // Write the direction to direction file
     if (dir & GPIO_INPUT) ofs << "in";
-    else if (dir & GPIO_INPUT) ofs << "out";
+    else if (dir & GPIO_OUTPUT) ofs << "out";
     else throw GPIOError("Invalid direction chosen");
     ofs.close();
     return 0;
