@@ -51,8 +51,8 @@ int GPIO::setval(long val)
     std::ofstream ofs(setval_str.c_str());
     if (!ofs.is_open()) throw GPIOError("Unable to set the value of GPIO");
     // Write the value to value file
-    if (dir & GPIO_HIGH) ofs << 1;
-    else if (dir & GPIO_LOW) ofs << 0;
+    if (val & GPIO_HIGH) ofs << 1;
+    else if (val & GPIO_LOW) ofs << 0;
     ofs.close();
     return 0;
 }

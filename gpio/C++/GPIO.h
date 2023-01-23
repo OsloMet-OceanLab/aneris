@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace gpionum
+namespace gpio
 {
 
 enum
@@ -31,7 +31,7 @@ private:
 class GPIOError : std::exception
 {
 public:
-    Error(const char* message)
+    GPIOError(const char* message)
     {
         this->msg = message;
     }

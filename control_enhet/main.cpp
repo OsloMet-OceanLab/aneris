@@ -13,11 +13,22 @@
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
+#include <csignal>
 #include "../gpio/C++/GPIO.h"
 #include "Logger.h"
 
+void handler(const int signum);
+
 int main(void)
 {
+	// register signal handler
+	signal(SIGINT, handler);
+	signal(SIGTERM, handler);
+	signal(SIGABRT, handler);
+	signal(SIGSEGV, handler);
+	signal(SIGFPE, handler);
+	signal(SIGBUS, handler);
+	
 	// verify user is root
 	if(geteuid())
 	{
@@ -62,8 +73,14 @@ int main(void)
 				system("reboot");
 				break;
 			default: // return that command is invalid
-				Logger::log("Receiven an invalid command", Logger::LOG_INFO)
+				Logger::log("Receiven an invalid command", Logger::LOG_INFO);
 				return 0;
 		}
 	}
 }
+
+void handler(const int signum)
+{
+	exit(signum);
+}
+
