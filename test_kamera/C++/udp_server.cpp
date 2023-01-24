@@ -21,8 +21,7 @@ int main(int argc, char** argv)
 		fputs("Could't open the camera feed\n", stderr);
 		return 1;
 	}
-	cv::Mat frame;
-	bool bSuccess = false;
+	cv::Mat frame = cv::Mat::zeros(480, 640, CV_8UC1);
 	
 	printf("Setup opencv\n");
 	
@@ -55,23 +54,21 @@ int main(int argc, char** argv)
 	printf("Bind socket\n");
 	
 	int cliaddr_len = sizeof(cliaddr);
+	int frameSize = frame.total() * frame.elemSize() * 3;
 	
 	printf("Start loop\n");
 
 	do
 	{
-		bSuccess = cap.read(frame);
-		if (!bSuccess)
+		if (!cap.read(frame))
 		{
 			fputs("Can't get feed from camera\n", stderr);
 			return 4;
 		}
-		if(!frame.isContinuous())
-			frame = frame.clone();
+		if(!frame.isContinuous()) frame = frame.clone();
 		
-		//sendto(sockfd, (void*)&frame, frame.total() * frame.elemSize(), MSG_CONFIRM, (const struct sockaddr*)&cliaddr, cliaddr_len);
-		sendall(sockfd, frame.data, frame.total() * frame.elemSize(), (const struct sockaddr*)&cliaddr, cliaddr_len)
-		printf("%d\n", frame.total() * frame.elemSize());
+		sendall(sockfd, frame.data, &frameSize, (const struct sockaddr*)&cliaddr, cliaddr_len);
+		printf("%d\n", frameSize);
 		break;
 	} while (true);
 	
@@ -80,14 +77,17 @@ int main(int argc, char** argv)
 
 int sendall(const int sockfd, void __restrict *buf, int *buf_len, const struct sockaddr *cliaddr, const int cliaddr_len)
 {
-	int total = 0, bytes_left = *buf_len, n = 0;
+	// inform receiver of transmission size
+	if(send(sock, buf_len, sizeof(int), 0) < 0) return -1;
 
+	int total = 0, bytes_left = *buf_len, n = 0;
+	
 	while (total < *buf_len)
 	{
-		n = sendto(sockfd, buf + total, (bytes_left > 65507 ? 65507 : bytes_left), MSG_CONFIRM, cliaddr, cliaddr_len);
+		n = sendto(sockfd, buf + total, (bytes_left > 1024 ? 1024 : bytes_left), MSG_CONFIRM, cliaddr, cliaddr_len);
 		if (n == -1) break;
 		total += n;
-		bytes_left > 65507 ? bytes_left -= 65507 : bytes_left = 0;
+		bytes_left -= n;
 	}
 
 	*buf_len = total;
