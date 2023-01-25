@@ -9,7 +9,7 @@
 
 #define PORT	5000
 
-int sendall(const int sockfd, void __restrict *buf, int *buf_len, const struct sockaddr *cliaddr, const int cliaddr_len);
+int sendall(const int sockfd, void *buf, int *buf_len, const struct sockaddr *cliaddr, const int cliaddr_len);
 
 int main(int argc, char** argv)
 {
@@ -69,16 +69,15 @@ int main(int argc, char** argv)
 		
 		sendall(sockfd, frame.data, &frameSize, (const struct sockaddr*)&cliaddr, cliaddr_len);
 		printf("%d\n", frameSize);
-		break;
 	} while (true);
 	
 	close(sockfd);
 }
 
-int sendall(const int sockfd, void __restrict *buf, int *buf_len, const struct sockaddr *cliaddr, const int cliaddr_len)
+int sendall(const int sockfd, void *buf, int *buf_len, const struct sockaddr *cliaddr, const int cliaddr_len)
 {
 	// inform receiver of transmission size
-	if(send(sock, buf_len, sizeof(int), 0) < 0) return -1;
+	if(send(sockfd, buf_len, sizeof(int), 0) < 0) return -1;
 
 	int total = 0, bytes_left = *buf_len, n = 0;
 	

@@ -9,7 +9,7 @@
 
 #define PORT	5000
 
-int recvall(const int sockfd, void __restrict *buf, int *buf_len, const struct sockaddr *servaddr, socklen_t *servaddr_len);
+int recvall(const int sockfd, void *buf, int *buf_len, struct sockaddr *servaddr, socklen_t *servaddr_len);
 
 int main(int argc, char** argv)
 {
@@ -17,7 +17,7 @@ int main(int argc, char** argv)
 	const char *window_title = "Camera feed";
 	cv::namedWindow(window_title);
 
-	cv::Mat frame;
+	cv::Mat frame = cv::Mat::zeros(480, 640, CV_8UC1);
 	
 	printf("Setup opencv");
 	
@@ -40,13 +40,13 @@ int main(int argc, char** argv)
 	servaddr.sin_addr.s_addr = INADDR_ANY;
 	servaddr.sin_port = htons(PORT);
 	
-	int n, servaddr_len;
+	int n, servaddr_len, frameSize = frame.total() * frame.elemSize() * 3;
 	
 	printf("Begin loop");
 
 	while(true)
 	{
-		n = recvall(sockfd, frame.data, &frameSize, (const struct sockaddr*)&servaddr, (socklen_t*)&servaddr_len);
+		n = recvall(sockfd, frame.data, &frameSize, (struct sockaddr*)&servaddr, (socklen_t*)&servaddr_len);
 		cv::imshow(window_title, frame);
 
 		if(cv::waitKey(10) == 27)
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 	}
 }
 
-int recvall(const int sockfd, void __restrict *buf, int *buf_len, const struct sockaddr *servaddr, socklen_t *servaddr_len)
+int recvall(const int sockfd, void *buf, int *buf_len, struct sockaddr *servaddr, socklen_t *servaddr_len)
 {
 	if(recv(sockfd, buf_len, sizeof(int), MSG_WAITALL) < 0) return -1;
 	

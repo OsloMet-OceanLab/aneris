@@ -15,8 +15,8 @@ UDPserver.o: UDPserver.cpp
 	$(CPP) -c UDPserver.cpp $(CFLAGS)
 
 tcp: TCPclient.o TCPserver.o
-	$(CPP) -o TCPclient TCPclient.o $(CFLAGS) $(LIBS)
-	$(CPP) -o TCPserver TCPserver.o $(CFLAGS) $(LIBS)
+	$(CPP) -o TCPclient TCPclient.o $(CFLAGS)
+	$(CPP) -o TCPserver TCPserver.o $(CFLAGS)
 	$(RM) *.o
 	
 TCPclient.o: TCPclient.cpp
@@ -24,12 +24,25 @@ TCPclient.o: TCPclient.cpp
 	
 TCPserver.o: TCPserver.cpp
 	$(CPP) -c TCPserver.cpp $(CFLAGS)
+	
+pipe: PIPEserv.o PIPEcli.o
+	$(CPP) -o PIPEserv PIPEserv.o $(CFLAGS)
+	$(CPP) -o PIPEcli PIPEcli.o $(CFLAGS)
+	
+PIPEserv.o: PIPEserv.cpp
+	$(CPP) -c PIPEserv.cpp $(CFLAGS)
+
+PIPEcli.o: PIPEcli.cpp
+	$(CPP) -c PIPEcli.cpp $(CFLAGS)
 
 cleanudp:
 	$(RM) UDPclient UDPserver
 
 cleantcp:
 	$(RM) TCPclient TCPserver
+	
+cleanpipe:
+	$(RM) PIPEserv PIPEcli
 
 cleanall:
-	$(RM) UDPclient UDPserver TCPclient TCPserver
+	$(RM) UDPclient UDPserver TCPclient TCPserver PIPEserv PIPEcli
