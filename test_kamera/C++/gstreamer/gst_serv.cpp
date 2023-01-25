@@ -2,6 +2,7 @@
 #include <glib-unix.h>
 
 #define HOST	"127.0.0.1"
+#define PORT	5000
 
 int signal_handler(void* num);
 
@@ -62,7 +63,8 @@ int main(gint argc, gchar **argv)
 		goto no_muxer;
 	}
 	
-	sink = gst_element_factory_make("tcpserversink", "tcpserversink");
+	//sink = gst_element_factory_make("tcpserversink", "tcpserversink");
+	sink = gst_element_factory_make("udpsink", "udpsink");
 	if(!sink)
 	{
 		g_printerr("Failed to create sink\n");
@@ -70,6 +72,7 @@ int main(gint argc, gchar **argv)
 	}
 	
 	g_object_set(sink, "host", HOST, NULL);
+	g_object_set(sink, "port", PORT, NULL);
 	
 	gst_bin_add_many(GST_BIN(pipeline), src, videoconvert, videoscale, capsfilter, encoder, muxer, sink, NULL);
 	//gst_element_link(src, videoconvert, videoscale, capsfilter, encoder, muxer, sink, NULL); // wrong
