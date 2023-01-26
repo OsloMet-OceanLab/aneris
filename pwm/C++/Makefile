@@ -1,11 +1,12 @@
 CPP := g++
 CFLAGS := -g -Wall
 TARGET := main
+LIBS := -lwiringPi
 
 default: $(TARGET)
 
-$(TARGET): $(TARGET).o PWM.o
-	$(CPP) -o $(TARGET).o PWM.o $(CFLAGS)
+$(TARGET): $(TARGET).o
+	$(CPP) -o $(TARGET) $(TARGET).o $(CFLAGS) $(LIBS)
 	$(RM) *.o
 	
 $(TARGET).o: $(TARGET).cpp

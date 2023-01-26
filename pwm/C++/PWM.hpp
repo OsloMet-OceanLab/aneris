@@ -23,7 +23,7 @@ public:
     int setdir(long dir); // Set GPIO Direction (input/output)
     int setval(long val); // Set GPIO Value (high/low)
     int getval(); // Get GPIO Value
-    int get_gpionum();
+    int get_pwmnum();
     
 private:
     int pwmnum; // GPIO number associated with the instance of an object
