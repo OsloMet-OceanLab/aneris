@@ -1,27 +1,46 @@
-#include <gst/gst.h>
+#include <gstreamer-1.0/gst/gst.h>
+#include <opencv2/opencv.hpp>
 
-int main(int argc, char *argv[]) {
-    gst_init(&argc, &argv);
+int main() {
+// Initialize Gstreamer pipeline
+GstElement *pipeline;
+pipeline = gst_pipeline_new("webcam-server");
 
-    GstElement *pipeline, *src, *hls, *sink;
+// Create elements for pipeline
+GstElement *source = gst_element_factory_make("v4l2src", "webcam-source");
+GstElement *convert = gst_element_factory_make("videoconvert", "convert");
+GstElement *encoder = gst_element_factory_make("x264enc", "encoder");
+GstElement *payloader = gst_element_factory_make("rtph264pay", "payloader");
+GstElement *sink = gst_element_factory_make("udpsink", "udp-sink");
 
-    pipeline = gst_pipeline_new("my-pipeline");
-    src = gst_element_factory_make("v4l2src", "webcam-src");
-    hls = gst_element_factory_make("hlssink", "hls-sink");
-    sink = gst_element_factory_make("filesink", "file-sink");
+// Set properties for elements
+g_object_set(G_OBJECT(source), "device", "/dev/video0", NULL);
+g_object_set(G_OBJECT(encoder), "bitrate", 2000, NULL);
+g_object_set(G_OBJECT(payloader), "config-interval", 1, NULL);
+g_object_set(G_OBJECT(sink), "host", "localhost", NULL);
+g_object_set(G_OBJECT(sink), "port", 5000, NULL);
 
-    g_object_set(G_OBJECT(src), "device", "/dev/video0", NULL);
-    g_object_set(G_OBJECT(hls), "location", "hls/stream.m3u8", NULL);
-    g_object_set(G_OBJECT(hls), "playlist-location", "hls/playlist.m3u8", NULL);
-    g_object_set(G_OBJECT(sink), "location", "hls/segment%05d.ts", NULL);
-    g_object_set(G_OBJECT(hls), "max-files", 5, NULL);
+// Add elements to pipeline
+gst_bin_add_many(GST_BIN(pipeline), source, convert, encoder, payloader, sink, NULL);
 
-    gst_bin_add_many(GST_BIN(pipeline), src, hls, sink, NULL);
-    gst_element_link_many(src, hls, sink, NULL);
+// Link elements together
+gst_element_link_many(source, convert, encoder, payloader, sink, NULL);
 
-    gst_element_set_state(pipeline, GST_STATE_PLAYING);
-    gst_element_get_state(pipeline, NULL, NULL, GST_CLOCK_TIME_NONE);
+// Start pipeline
+gst_element_set_state(pipeline, GST_STATE_PLAYING);
 
-    return 0;
+// OpenCV code to display live feed
+cv::VideoCapture cap(0);
+cv::Mat frame;
+while (true) {
+cap >> frame;
+cv::imshow("Webcam Live Feed", frame);
+if (cv::waitKey(30) >= 0) break;
+}
+
+// Stop pipeline
+gst_element_set_state(pipeline, GST_STATE_NULL);
+
+return 0;
 }
 
