@@ -5,9 +5,15 @@ OPENCV := -lopencv_core -lopencv_videoio -lopencv_video -lopencv_highgui -lopenc
 
 default: gst
 
-gst: gst_serv.o gst_cli.o
+udp: udp_serv.o
+	$(CPP) -o udp_serv udp_serv.o $(CFLAGS) $(GST)
+	$(RM) *.o
+
+udp_serv.o: udp_serv.cpp
+	$(CPP) -c udp_serv.cpp $(CFLAGS) $(GST)
+
+gst: gst_serv.o
 	$(CPP) -o gst_serv gst_serv.o $(CFLAGS) $(GST)
-	$(CPP) -o gst_cli gst_cli.o $(CFLAGS) $(GST)
 	$(RM) *.o
 
 gst_serv.o: gst_serv.cpp
