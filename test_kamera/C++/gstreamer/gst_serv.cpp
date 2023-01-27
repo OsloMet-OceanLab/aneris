@@ -1,8 +1,8 @@
-#include <gstreamer-1.0/gst/gst.h>
-#include <opencv2/opencv.hpp>
+#include <gst/gst.h>
 
 int main()
 {
+	gst_init(NULL, NULL);
 	// Initialize Gstreamer pipeline
 	GstElement *pipeline;
 	pipeline = gst_pipeline_new("webcam-server");
@@ -30,14 +30,7 @@ int main()
 	// Start pipeline
 	gst_element_set_state(pipeline, GST_STATE_PLAYING);
 
-	// OpenCV code to display live feed
-	cv::VideoCapture cap(0);
-	cv::Mat frame;
-	while (true) {
-	cap >> frame;
-	cv::imshow("Webcam Live Feed", frame);
-	if (cv::waitKey(30) >= 0) break;
-	}
+	while(true);
 
 	// Stop pipeline
 	gst_element_set_state(pipeline, GST_STATE_NULL);
