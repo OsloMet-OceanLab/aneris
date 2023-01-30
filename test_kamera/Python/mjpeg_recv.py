@@ -1,22 +1,26 @@
-from cv2 import VideoCapture, imshow, destroyAllWindows, waitKey
-from sys import exit
+from cv2 import VideoCapture, imshow, destroyAllWindows, waitKey, error
+
+class Video(VideoCapture):
+	def __enter__(self):
+		return self
+	def __exit__(self, *args):
+		self.release()
 
 def main():
 	try:
-		cap = VideoCapture("http://localhost:5000/stream")
-		if not cap.isOpened():
-			print('Unable to open stream')
-			exit(1)
-			
-		while True:
-			_, frame = cap.read()
-			imshow('frame', frame)
-			if waitKey(10) == 27:
-				break
+		with Video("http://localhost:5000/stream") as cap:
+			if not cap.isOpened():
+				raise Exception('Unable to open stream')
+			while True:
+				_, frame = cap.read()
+				imshow('frame', frame)
+				if waitKey(10) == 27:
+					break
 	except Exception as e:
 		print(f'Exception: {str(e)}')
+	except error as e: # opencv custom exceptions handling
+		print(f'Exception: {str(e)}')
 	finally:
-		cap.release()
 		destroyAllWindows()
 		print('Done')
 

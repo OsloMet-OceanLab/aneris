@@ -1,20 +1,10 @@
-#ifndef LOG_H
-#define LOG_H
-
-#include <string>
+#include "Logger.hpp"
 #include <fstream>
 #include <time.h>
+#include <string>
 
 namespace Logger
 {
-
-enum
-{
-	LOG_INFO =		0x1, // general information
-	LOG_WARNING =	0x2, // can cause oddities
-	LOG_ERROR =		0x4, // fatal to an operation but not a program
-	LOG_FATAL =		0x8 // fatal to the whole program
-};
 
 static std::string getCurrentTime()
 {
@@ -25,7 +15,7 @@ static std::string getCurrentTime()
 	return std::string(buf);
 }
 
-void log(std::string logMsg, long level)
+void log(long level, std::string logMsg)
 {
 	std::string filepath = "/home/pi/Desktop/log.txt", strLevel = "";
 	
@@ -40,5 +30,3 @@ void log(std::string logMsg, long level)
 }
 
 } // end namespace Logger
-
-#endif

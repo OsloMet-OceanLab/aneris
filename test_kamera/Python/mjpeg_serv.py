@@ -36,6 +36,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
 			self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
 			self.end_headers()
 			try:
+				global output
 				while True:
 					with output.condition:
 						output.condition.wait()
@@ -50,6 +51,8 @@ class StreamingHandler(BaseHTTPRequestHandler):
 				warning(
 					'Removed streaming client %s: %s',
 					self.client_address, str(e))
+		#elif self.path == "/log": # display log file
+		#	ye
 		else:
 			self.send_error(404)
 			self.end_headers()
@@ -61,6 +64,7 @@ class StreamingServer(ThreadingMixIn, HTTPServer):
 output = StreamingOutput()
 
 def main():
+	global output
 	with PiCamera(resolution='640x480', framerate=24) as camera:
 		camera.start_recording(output, format='mjpeg') # this type of format uses lossy compression so it might not be suited to opencv image analysis
 		try:
@@ -75,6 +79,6 @@ def main():
 			print('Additional information: %s', str(e))
 		finally:
 			camera.stop_recording()
-			
+
 if __name__ == "__main__":
 	main()

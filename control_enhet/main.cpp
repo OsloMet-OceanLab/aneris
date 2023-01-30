@@ -1,6 +1,5 @@
 /**
- * test network connection to computer (ping?)
- * check both network cards are up (hydrophone and land)
+ * check hydrophone is up (led pin on connecor might be a good play)
  * if the above works, begin by opening port for listening to commands
  * if it does NOT work, reboot once and repeat
  * if on 3rd attempt still does not work, log and turn off
@@ -15,8 +14,8 @@
 #include <stdlib.h>
 #include <csignal>
 #include <pthread.h>
-#include "../gpio/C++/GPIO.h"
-#include "Logger.hpp"
+#include "../gpio/C++/GPIO.hpp"
+#include "Logger/Logger.hpp"
 
 void handler(const int signum);
 
@@ -33,11 +32,11 @@ int main(void)
 	// verify user is root
 	if(geteuid())
 	{
-		Logger::log("This program needs to be run as root", Logger::LOG_FATAL);
+		Logger::log(Logger::LOG_FATAL, "This program needs to be run as root");
 		printf("reboot\n"); // system("reboot");
 		return 0;
 	}
-	Logger::log("Verified user permission", Logger::LOG_INFO);
+	Logger::log(Logger::LOG_INFO, "Verified user permission");
 	
 	// verify gpio is available
 	try
@@ -49,14 +48,32 @@ int main(void)
 	}
 	catch(gpio::GPIOError& e)
 	{
-		Logger::log(e.what(), Logger::LOG_FATAL);
+		Logger::log(Logger::LOG_FATAL, e.what());
 		printf("reboot\n"); // system("reboot");
 		return 0;
 	}
-	Logger::log("Verified GPIO is available", Logger::LOG_INFO);
+	Logger::log(Logger::LOG_INFO, "Verified GPIO is available");
 	
-	// test uplink to hydrophone/fathom tether interface
-	//blah
+	// test uplink to fathom tether interface
+	// if main device uses e.g. ip 192.168.2.1, then
+	int counter = 0, tether_up;
+	std::string attempt = "";
+	do
+	{
+		attempt = "Testing connection to land, attempt " + std::to_string(counter + 1);
+		Logger::log(Logger::LOG_INFO, attempt);
+		tether_up = system("ping -c 1 192.168.2.1"); // 0 on successful ping, other integer otherwise
+
+		if(tether_up && counter < 2)
+		{
+			++counter;
+			sleep(1);
+		}
+		else break;
+	} while(true);
+	
+	if(tether_up) Logger::log(Logger::LOG_WARNING, "No connection to land");
+	else Logger::log(Logger::LOG_INFO, "Verified connection to land is available");
 	
 	uint8_t command = 2;
 	while (true)
@@ -66,15 +83,15 @@ int main(void)
 		switch(command)
 		{
 			case 0: // shutdown
-				Logger::log("Received shutdown command", Logger::LOG_INFO);
+				Logger::log(Logger::LOG_INFO, "Received shutdown command");
 				system("poweroff");
 				break;
 			case 1:
-				Logger::log("Received reboot command", Logger::LOG_INFO);
+				Logger::log(Logger::LOG_INFO, "Received reboot command");
 				system("reboot");
 				break;
 			default: // return that command is invalid
-				Logger::log("Receiven an invalid command", Logger::LOG_INFO);
+				Logger::log(Logger::LOG_INFO, "Receiven an invalid command");
 				return 0;
 		}
 	}
