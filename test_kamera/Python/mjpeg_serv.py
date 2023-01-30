@@ -58,9 +58,10 @@ class StreamingServer(ThreadingMixIn, HTTPServer):
 	allow_reuse_address = True
 	daemon_threads = True
 
+output = StreamingOutput()
+
 def main():
-	with PiCamera(resolution='1920x1080', framerate=24) as camera:
-		output = StreamingOutput()
+	with PiCamera(resolution='640x480', framerate=24) as camera:
 		camera.start_recording(output, format='mjpeg') # this type of format uses lossy compression so it might not be suited to opencv image analysis
 		try:
 			address = (ADDRESS, PORT)
