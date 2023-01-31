@@ -10,8 +10,8 @@
 #include "gpio/GPIO.hpp"
 #include "Logger/Logger.hpp"
 
-#define COMMAND_PORT 5000
-#define WEB_SERVER_PORT 5001
+#define WEB_SERVER_PORT 5000
+#define COMMAND_PORT 5001
 
 #define GPIO_LIGHTS 4
 #define GPIO_TEST 17
