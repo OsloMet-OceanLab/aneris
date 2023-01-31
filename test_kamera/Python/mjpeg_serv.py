@@ -8,8 +8,7 @@ from logging import warning
 from socketserver import ThreadingMixIn
 from threading import Condition
 from http.server import BaseHTTPRequestHandler, HTTPServer
-
-ADDRESS, PORT = '', 5000
+from sys import exit, argv
 
 class StreamingOutput:
 	def __init__(self):
@@ -65,10 +64,13 @@ output = StreamingOutput()
 
 def main():
 	global output
+	if len(argv) != 1 or not isinstance(argv[0], int):
+		print("Usage: python3 server.py <port>")
+		exit(1)
 	with PiCamera(resolution='640x480', framerate=24) as camera:
 		camera.start_recording(output, format='mjpeg') # this type of format uses lossy compression so it might not be suited to opencv image analysis
 		try:
-			address = (ADDRESS, PORT)
+			address = ('', argv[0]) # ip, port
 			server = StreamingServer(address, StreamingHandler)
 			print('Stream started successfully')
 			server.serve_forever()
@@ -77,8 +79,10 @@ def main():
 		except Exception as e:
 			print('Couldn\'t start stream')
 			print('Additional information: %s', str(e))
-		finally:
 			camera.stop_recording()
+			exit(2)
+		camera.stop_recording()
+		exit(0)
 
 if __name__ == "__main__":
 	main()

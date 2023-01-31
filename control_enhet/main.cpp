@@ -17,6 +17,14 @@
 #include "../gpio/C++/GPIO.hpp"
 #include "Logger/Logger.hpp"
 
+#define COMMAND_PORT 5000
+#define LOG_PORT 5001
+#define STREAMING_PORT 5002
+
+#define GPIO_LIGHTS 4
+#define GPIO_TEST 17
+#define GPIO_WIPER 21
+
 void handler(const int signum);
 
 int main(void)
@@ -32,7 +40,7 @@ int main(void)
 	// verify user is root
 	if(geteuid())
 	{
-		Logger::log(Logger::LOG_FATAL, "This program needs to be run as root");
+		Logger::log(Logger::LOG_ERROR, "This program needs to be run as root");
 		printf("reboot\n"); // system("reboot");
 		return 0;
 	}
@@ -41,14 +49,15 @@ int main(void)
 	// verify gpio is available
 	try
 	{
-		gpio::GPIO *test_gpio = new gpio::GPIO(17);
+		gpio::GPIO *test_gpio = new gpio::GPIO(GPIO_TEST);
+		if(!test_gpio) throw gpio::GPIOError("Couldn't allocate memory for 'test_gpio' variable")
 		test_gpio->setdir(gpio::GPIO_INPUT);
 		if(!test_gpio->getval()) throw gpio::GPIOError("GPIO unavailable");
 		delete test_gpio;
 	}
 	catch(gpio::GPIOError& e)
 	{
-		Logger::log(Logger::LOG_FATAL, e.what());
+		Logger::log(Logger::LOG_ERROR, e.what());
 		printf("reboot\n"); // system("reboot");
 		return 0;
 	}
@@ -75,7 +84,13 @@ int main(void)
 	if(tether_up) Logger::log(Logger::LOG_WARNING, "No connection to land");
 	else Logger::log(Logger::LOG_INFO, "Verified connection to land is available");
 	
+	// start command listener
+	// start log web browser
+	// start python web browser
+	//create new thread for the web server
+	
 	uint8_t command = 2;
+
 	while (true)
 	{
 		// logic to receive command
@@ -86,10 +101,59 @@ int main(void)
 				Logger::log(Logger::LOG_INFO, "Received shutdown command");
 				system("poweroff");
 				break;
-			case 1:
+			case 1: // reboot
 				Logger::log(Logger::LOG_INFO, "Received reboot command");
 				system("reboot");
 				break;
+			case 2: // turn lights on/off
+				gpio::GPIO *lights = new GPIO(GPIO_LIGHTS);
+				try
+				{
+					if(!lights) throw gpio::GPIOError("Couldn't allocate memory for 'lights' variable");
+					lights->setdir(gpio::GPIO_OUTPUT);
+					if(lights->getval())
+					{
+						lights->setval(gpio::GPIO_LOW);
+						Logger::log(Logger::LOG_INFO, "Disabled lights");
+					}
+					else
+					{
+						lights->setval(gpio::GPIO_HIGH);
+						Logger::log(Logger::LOG_INFO, "Enabled lights");
+					}
+				}
+				catch(gpio::GPIOError& e)
+				{
+					Logger::log(Logger::LOG_ERROR, e.what());
+				}
+				delete lights;
+				break;
+			case 3: // turn wipers on/off
+				gpio::GPIO *wiper = new GPIO(GPIO_WIPER);
+				try
+				{
+					if(!wiper) throw gpio::GPIOError("Couldn't allocate memory for 'wiper' variable");
+					wiper->setdir(gpio::GPIO_OUTPUT);
+					if(wiper->getval())
+					{
+						wiper->setval(gpio::GPIO_LOW);
+						Logger::log(Logger::LOG_INFO, "Disabled wiper");
+					}
+					else
+					{
+						wiper->setval(gpio::GPIO_HIGH);
+						Logger::log(Logger::LOG_INFO, "Enabled wiper");
+					}
+				}
+				catch(gpio::GPIOError& e)
+				{
+					Logger::log(Logger::LOG_ERROR, e.what());
+				}
+				delete wiper;
+				break;
+			case 4:
+			case 5:
+			case 6:
 			default: // return that command is invalid
 				Logger::log(Logger::LOG_INFO, "Receiven an invalid command");
 				return 0;
@@ -101,4 +165,3 @@ void handler(const int signum)
 {
 	exit(signum);
 }
-

@@ -1,4 +1,4 @@
-from cv2 import VideoCapture, imshow, destroyAllWindows, waitKey, error
+from cv2 import VideoCapture, imshow, destroyAllWindows, waitKey
 
 class Video(VideoCapture):
 	def __enter__(self):
@@ -17,8 +17,6 @@ def main():
 				if waitKey(10) == 27:
 					break
 	except Exception as e:
-		print(f'Exception: {str(e)}')
-	except error as e: # opencv custom exceptions handling
 		print(f'Exception: {str(e)}')
 	finally:
 		destroyAllWindows()

@@ -24,6 +24,7 @@ void log(long level, std::string logMsg)
 	else if(level & LOG_ERROR) strLevel = "[ERROR]";
 	else if(level & LOG_FATAL) strLevel = "[FATAL]";
 
+	// out flag allows to write, app flag allows to not overwrite file
 	std::ofstream ofs(filepath.c_str(), std::ios_base::out | std::ios_base::app);
 	ofs << strLevel << '\t' << getCurrentTime() << '\t' << logMsg << '\n';
 	ofs.close();
