@@ -7,7 +7,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#include "../gpio/C++/GPIO.hpp"
+#include "gpio/GPIO.hpp"
 #include "Logger/Logger.hpp"
 
 #define COMMAND_PORT 5000
@@ -70,7 +70,7 @@ int main(void)
 		else break;
 	} while(true);
 	
-	if(tether_up) Logger::log(Logger::LOG_WARNING, "No connection to land");
+	if(tether_up) Logger::log(Logger::LOG_WARN, "No connection to land");
 	else Logger::log(Logger::LOG_INFO, "Verified connection to land is available");
 	
 	// test that hydrophone is up
@@ -230,7 +230,7 @@ int main(void)
 				send(sock, msg.c_str(), strlen(msg.c_str()), 0);
 				break;
 			}
-			case 4: {}
+			case 4: {} // clean up log file
 			case 5: {}
 			case 6: {}
 			default: // return that command is invalid

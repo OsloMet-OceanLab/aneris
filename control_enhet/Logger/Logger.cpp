@@ -20,13 +20,13 @@ void log(long level, std::string logMsg)
 	std::string filepath = "/home/pi/Desktop/log.txt", strLevel = "";
 	
 	if(level & LOG_INFO) strLevel = "[INFO]";
-	else if(level & LOG_WARNING) strLevel = "[WARNING]";
+	else if(level & LOG_WARN) strLevel = "[WARN]";
 	else if(level & LOG_ERROR) strLevel = "[ERROR]";
 	else if(level & LOG_FATAL) strLevel = "[FATAL]";
 
 	// out flag allows to write, app flag allows to not overwrite file
 	std::ofstream ofs(filepath.c_str(), std::ios_base::out | std::ios_base::app);
-	ofs << strLevel << '\t\t' << getCurrentTime() << '\t' << logMsg << '\n';
+	ofs << strLevel << '\t' << getCurrentTime() << '\t' << logMsg << '\n';
 	ofs.close();
 }
 

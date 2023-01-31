@@ -12,8 +12,8 @@ $(TARGET): $(TARGET).o GPIO.o Logger.o
 $(TARGET).o: $(TARGET).cpp
 	$(CPP) -c $(TARGET).cpp $(CFLAGS)
 	
-GPIO.o: ../gpio/C++/GPIO.cpp
-	$(CPP) -c ../gpio/C++/GPIO.cpp $(CFLAGS)
+GPIO.o: gpio/GPIO.cpp
+	$(CPP) -c gpio/GPIO.cpp $(CFLAGS)
 	
 Logger.o: Logger/Logger.cpp
 	$(CPP) -c Logger/Logger.cpp $(CFLAGS)
