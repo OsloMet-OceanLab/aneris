@@ -27,7 +27,11 @@ class StreamingOutput:
 
 class StreamingHandler(BaseHTTPRequestHandler):
 	def do_GET(self):
-		if self.path == '/stream':
+		if self.path == '/':
+			self.show_index()
+		elif self.path == '/index.html':
+			self.show_index()
+		elif self.path == '/stream':
 			self.send_response(200)
 			self.send_header('Age', 0)
 			self.send_header('Cache-Control', 'no-cache, private')
@@ -50,11 +54,37 @@ class StreamingHandler(BaseHTTPRequestHandler):
 				warning(
 					'Removed streaming client %s: %s',
 					self.client_address, str(e))
-		#elif self.path == "/log": # display log file
-		#	ye
+		elif self.path == '/log':
+			try:
+				with open('/home/pi/Desktop/log.txt', 'rb') as log:
+					self.send_response(200)
+					self.send_header('Content-Type', 'text/plain')
+					self.end_headers()
+					self.wfile.write(log.read())
+					
+			except FileNotFoundError as e:
+				self.send_response(404)
+				self.send_header('Content-type', 'text/plain')
+				self.end_headers()
+				self.wfile.write('Error: log file does not exist'.encode())
+		elif self.path == '/metadata':
+			pass
 		else:
 			self.send_error(404)
 			self.end_headers()
+	def show_index(self):
+		try:
+			with open('index.html', 'rb') as index:
+				self.send_response(200)
+				self.send_header('Content-Type', 'text/html')
+				self.end_headers()
+				self.wfile.write(index.read())
+					
+		except FileNotFoundError as e:
+			self.send_response(404)
+			self.send_header('Content-type', 'text/plain')
+			self.end_headers()
+			self.wfile.write('Error: index page does not exist'.encode())
 
 class StreamingServer(ThreadingMixIn, HTTPServer):
 	allow_reuse_address = True

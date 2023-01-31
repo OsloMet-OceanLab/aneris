@@ -1,30 +1,24 @@
-/**
- * check hydrophone is up (led pin on connecor might be a good play)
- * if the above works, begin by opening port for listening to commands
- * if it does NOT work, reboot once and repeat
- * if on 3rd attempt still does not work, log and turn off
- * will have 2 ports: ex. 5000 to send video stream, 5001 to listen to commands
- * when command is received, needs to return successfulness
- * program needs to, at a minimum, recognize commands for reboot/shutdown
- * can probably use switch statement with integer for command
- */
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <csignal>
-#include <pthread.h>
+#include <cstring>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
 #include "../gpio/C++/GPIO.hpp"
 #include "Logger/Logger.hpp"
 
 #define COMMAND_PORT 5000
-#define LOG_PORT 5001
-#define STREAMING_PORT 5002
+#define WEB_SERVER_PORT 5001
 
 #define GPIO_LIGHTS 4
 #define GPIO_TEST 17
 #define GPIO_HYDROPHONE 19
 #define GPIO_WIPER 21
+
+#define COMMAND_BUFFER_SIZE 4
 
 void handler(const int signum);
 
@@ -60,7 +54,6 @@ int main(void)
 	
 	
 	// test uplink to fathom tether interface
-	// if main device uses e.g. ip 192.168.2.1, then
 	int counter = 0, tether_up;
 	std::string attempt = "";
 	do
@@ -98,12 +91,9 @@ int main(void)
 	}
 	
 	// start command listener
-	int server_fd, socket, valread;
 	struct sockaddr_in address;
-	int opt = 1;
-	int addrlen = sizeof(address);
-	char buffer[1024] = { 0 };
-	char* msg = "Message from the server";
+	int server_fd, sock, valread, opt = 1, addrlen = sizeof(address);
+	char buffer[COMMAND_BUFFER_SIZE] = { 0 };
 	
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if(server_fd < 0)
@@ -140,40 +130,45 @@ int main(void)
 	//create new thread for the web servers
 	
 	uint8_t command = 2;
+	std::string msg = "";
 
 	while (true)
 	{
 		// logic to receive command
-		memset(buffer, 0, 1024);
-		socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
+		msg = "";
+		memset(buffer, 0, COMMAND_BUFFER_SIZE);
+		sock = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
 		if(socket < 0)
 		{
 			Logger::log(Logger::LOG_FATAL, "Can't accept new connections");
 			return 0; //system("reboot")
 		}
 		
-		valread = read(socket, buffer, 1024);
-		printf("%s, %d\n", buffer, valread);
-		
-		send(socket, msg, strlen(msg), 0);
-		printf("Message sent\n");
-		
-		close(socket);
-		
+		valread = read(sock, buffer, COMMAND_BUFFER_SIZE);
 		buffer[valread] = '\0';
+		command = atoi(buffer);
 		
 		switch(command)
 		{
 			case 0: // shutdown
 			{
-				Logger::log(Logger::LOG_INFO, "Received shutdown command");
+				msg = "Received shutdown command";
+				Logger::log(Logger::LOG_INFO, msg);
+				send(sock, msg.c_str(), strlen(msg.c_str()), 0);
+				
+				close(sock);
 				shutdown(server_fd, SHUT_RDWR);
 				system("poweroff");
 				break;
 			}
 			case 1: // reboot
 			{
-				Logger::log(Logger::LOG_INFO, "Received reboot command");
+				msg = "Received reboot command";
+				Logger::log(Logger::LOG_INFO, msg);
+				send(sock, msg.c_str(), strlen(msg.c_str()), 0);
+
+				close(sock);
+				shutdown(server_fd, SHUT_RDWR);
 				system("reboot");
 				break;
 			}
@@ -186,20 +181,24 @@ int main(void)
 					lights->setdir(gpio::GPIO_OUTPUT);
 					if(lights->getval())
 					{
+						msg = "Disabled lights";
 						lights->setval(gpio::GPIO_LOW);
-						Logger::log(Logger::LOG_INFO, "Disabled lights");
+						Logger::log(Logger::LOG_INFO, msg);
 					}
 					else
 					{
+						msg = "Enabled lights";
 						lights->setval(gpio::GPIO_HIGH);
-						Logger::log(Logger::LOG_INFO, "Enabled lights");
+						Logger::log(Logger::LOG_INFO, msg);
 					}
 				}
 				catch(gpio::GPIOError& e)
 				{
 					Logger::log(Logger::LOG_ERROR, e.what());
+					msg = std::string(e.what());
 				}
 				delete lights;
+				send(sock, msg.c_str(), strlen(msg.c_str()), 0);
 				break;
 			}
 			case 3: // turn wipers on/off
@@ -211,20 +210,24 @@ int main(void)
 					wiper->setdir(gpio::GPIO_OUTPUT);
 					if(wiper->getval())
 					{
+						msg = "Disabled wiper";
 						wiper->setval(gpio::GPIO_LOW);
-						Logger::log(Logger::LOG_INFO, "Disabled wiper");
+						Logger::log(Logger::LOG_INFO, msg);
 					}
 					else
 					{
+						msg = "Enabled wiper";
 						wiper->setval(gpio::GPIO_HIGH);
-						Logger::log(Logger::LOG_INFO, "Enabled wiper");
+						Logger::log(Logger::LOG_INFO, msg);
 					}
 				}
 				catch(gpio::GPIOError& e)
 				{
 					Logger::log(Logger::LOG_ERROR, e.what());
+					msg = std::string(e.what());
 				}
 				delete wiper;
+				send(sock, msg.c_str(), strlen(msg.c_str()), 0);
 				break;
 			}
 			case 4: {}
@@ -236,6 +239,7 @@ int main(void)
 				return 0;
 			}
 		}
+		close(sock);
 	}
 }
 
