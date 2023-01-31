@@ -52,7 +52,6 @@ int main(void)
 		Logger::log(Logger::LOG_ERROR, "GPIO unavailable");
 	}
 	
-	
 	// test uplink to fathom tether interface
 	int counter = 0, tether_up;
 	std::string attempt = "";
