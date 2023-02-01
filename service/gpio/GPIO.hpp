@@ -10,6 +10,7 @@ enum
 {
     GPIO_LOW =      0x1,
     GPIO_HIGH =     0x2,
+    
     GPIO_INPUT =    0x4,
     GPIO_OUTPUT =   0x8
 };
@@ -17,15 +18,15 @@ enum
 class GPIO
 {
 public:
-    explicit GPIO(int pin = 0);
+    explicit GPIO(int pin = 4, long dir = GPIO_INPUT);
     virtual ~GPIO();
-    int setdir(long dir); // Set GPIO Direction (input/output)
-    int setval(long val); // Set GPIO Value (high/low)
+    void setval(long val); // Set GPIO Value (high/low)
     int getval(); // Get GPIO Value
     int get_gpionum();
     
 private:
     int gpionum; // GPIO number associated with the instance of an object
+    long direction;
 };
 
 class GPIOError : std::exception

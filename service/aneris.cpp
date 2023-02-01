@@ -39,9 +39,8 @@ int main(void)
 	// verify gpio is available
 	try
 	{
-		gpio::GPIO *test_gpio = new gpio::GPIO(GPIO_TEST);
+		gpio::GPIO *test_gpio = new gpio::GPIO(GPIO_TEST, gpio::GPIO_INPUT);
 		if(!test_gpio) throw gpio::GPIOError("Couldn't allocate memory for 'test_gpio' variable");
-		test_gpio->setdir(gpio::GPIO_INPUT);
 		if(test_gpio->getval()) Logger::log(Logger::LOG_INFO, "Verified GPIO is available");
 		else Logger::log(Logger::LOG_ERROR, "GPIO unavailable");
 		delete test_gpio;
@@ -76,9 +75,8 @@ int main(void)
 	//assuming that the led pin on the connector is on when it has power:
 	try
 	{
-		gpio::GPIO *hydrophone = new gpio::GPIO(GPIO_HYDROPHONE);
+		gpio::GPIO *hydrophone = new gpio::GPIO(GPIO_HYDROPHONE, gpio::GPIO_INPUT);
 		if(!hydrophone) throw gpio::GPIOError("Couldn't allocate memory for 'hydrophone' variable");
-		hydrophone->setdir(gpio::GPIO_INPUT);
 		if(hydrophone->getval()) Logger::log(Logger::LOG_INFO, "Verified Hydrophone is available");
 		else Logger::log(Logger::LOG_ERROR, "Hydrophone is not available");
 		delete hydrophone;
@@ -173,11 +171,10 @@ int main(void)
 			}
 			case 2: // turn lights on/off
 			{
-				gpio::GPIO *lights = new gpio::GPIO(GPIO_LIGHTS);
 				try
 				{
+					gpio::GPIO *lights = new gpio::GPIO(GPIO_LIGHTS, gpio::GPIO_OUTPUT);
 					if(!lights) throw gpio::GPIOError("Couldn't allocate memory for 'lights' variable");
-					lights->setdir(gpio::GPIO_OUTPUT);
 					if(lights->getval())
 					{
 						msg = "Disabled lights";
@@ -202,11 +199,10 @@ int main(void)
 			}
 			case 3: // turn wipers on/off
 			{
-				gpio::GPIO *wiper = new gpio::GPIO(GPIO_WIPER);
 				try
 				{
+					gpio::GPIO *wiper = new gpio::GPIO(GPIO_WIPER, gpio::GPIO_OUTPUT);
 					if(!wiper) throw gpio::GPIOError("Couldn't allocate memory for 'wiper' variable");
-					wiper->setdir(gpio::GPIO_OUTPUT);
 					if(wiper->getval())
 					{
 						msg = "Disabled wiper";
