@@ -68,7 +68,14 @@ class StreamingHandler(BaseHTTPRequestHandler):
 				self.end_headers()
 				self.wfile.write('Error: log file does not exist'.encode())
 		elif self.path == '/metadata':
-			pass
+			self.send_error(418)
+			self.end_headers()
+		elif self.path == '/console':
+			self.send_error(418)
+			self.end_headers()
+		elif self.path == '/docs':
+			self.send_error(418)
+			self.end_headers()
 		else:
 			self.send_error(404)
 			self.end_headers()
