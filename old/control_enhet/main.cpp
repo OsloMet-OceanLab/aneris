@@ -10,8 +10,8 @@
 #include "gpio/GPIO.hpp"
 #include "Logger/Logger.hpp"
 
-#define COMMAND_PORT 5000
-#define WEB_SERVER_PORT 5001
+#define WEB_SERVER_PORT 5000
+#define COMMAND_PORT 5001
 
 #define GPIO_LIGHTS 4
 #define GPIO_TEST 17
@@ -51,7 +51,6 @@ int main(void)
 		Logger::log(Logger::LOG_ERROR, e.what());
 		Logger::log(Logger::LOG_ERROR, "GPIO unavailable");
 	}
-	
 	
 	// test uplink to fathom tether interface
 	int counter = 0, tether_up;
