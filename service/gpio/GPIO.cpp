@@ -76,4 +76,9 @@ int GPIO::get_gpionum()
     return this->gpionum;
 }
 
+long GPIO::get_direction()
+{
+    return this->direction;
+}
+
 } // end namespace gpio

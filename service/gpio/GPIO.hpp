@@ -23,6 +23,7 @@ public:
     void setval(long val); // Set GPIO Value (high/low)
     int getval(); // Get GPIO Value
     int get_gpionum();
+    long get_direction();
     
 private:
     int gpionum; // GPIO number associated with the instance of an object
