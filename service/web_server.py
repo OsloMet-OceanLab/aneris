@@ -29,8 +29,10 @@ class StreamingHandler(BaseHTTPRequestHandler):
 	def do_GET(self):
 		if self.path == '/':
 			self.show_index()
+			
 		elif self.path == '/index.html':
 			self.show_index()
+			
 		elif self.path == '/stream':
 			self.send_response(200)
 			self.send_header('Age', 0)
@@ -54,6 +56,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
 				warning(
 					'Removed streaming client %s: %s',
 					self.client_address, str(e))
+					
 		elif self.path == '/log':
 			try:
 				with open('/home/pi/Desktop/log.txt', 'rb') as log:
@@ -61,24 +64,28 @@ class StreamingHandler(BaseHTTPRequestHandler):
 					self.send_header('Content-Type', 'text/plain')
 					self.end_headers()
 					self.wfile.write(log.read())
-					
 			except FileNotFoundError as e:
 				self.send_response(404)
 				self.send_header('Content-type', 'text/plain')
 				self.end_headers()
 				self.wfile.write('Error: log file does not exist'.encode())
+				
 		elif self.path == '/metadata':
 			self.send_error(418)
 			self.end_headers()
+			
 		elif self.path == '/console':
 			self.send_error(418)
 			self.end_headers()
+			
 		elif self.path == '/docs':
 			self.send_error(418)
 			self.end_headers()
+			
 		else:
-			self.send_error(404)
+			self.send_error(418)
 			self.end_headers()
+			
 	def show_index(self):
 		try:
 			with open('index.html', 'rb') as index:
@@ -100,11 +107,11 @@ class StreamingServer(ThreadingMixIn, HTTPServer):
 output = StreamingOutput()
 
 def main():
-	global output
-	if len(argv) != 2 or not isinstance(int(argv[1]), int):
+	if len(argv) != 2 or not argv[1].isdigit():
 		print(f"Usage: python3 {argv[0]} <port>")
 		exit(1)
 	with PiCamera(resolution='1280x720', framerate=30) as camera:
+		global output
 		camera.start_recording(output, format='mjpeg') # this type of format uses lossy compression so it might not be suited to opencv image analysis
 		try:
 			address = ('', int(argv[1])) # ip, port
