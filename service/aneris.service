@@ -1,0 +1,11 @@
+[Unit]
+Description=Aneris streaming service
+
+[Service]
+User=root
+WorkingDirectory=/etc/aneris
+ExecStart=aneris
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
