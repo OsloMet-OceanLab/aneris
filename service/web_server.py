@@ -56,6 +56,34 @@ class StreamingHandler(BaseHTTPRequestHandler):
 				warning(
 					'Removed streaming client %s: %s',
 					self.client_address, str(e))
+
+		elif self.path == '/video':
+			self.send_response(200)
+			self.send_header('Age', 0)
+			self.send_header('Cache-Control', 'no-cache, private')
+			self.send_header('Pragma', 'no-cache')
+			self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
+			self.end_headers()
+			try:
+				global output
+				while True:
+					with output.condition:
+						output.condition.wait()
+						frame = output.frame
+					self.wfile.write(b'--FRAME\r\n')
+					self.send_header('Content-Type', 'image/jpeg')
+					self.send_header('Content-Length', len(frame))
+					self.end_headers()
+					self.wfile.write(frame)
+					self.wfile.write(b'\r\n')
+			except Exception as e:
+				warning(
+					'Removed streaming client %s: %s',
+					self.client_address, str(e))
+
+		elif self.path == '/audio':
+			self.send_error(418)
+			self.end_headers()
 					
 		elif self.path == '/log':
 			try:
@@ -83,7 +111,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
 			self.end_headers()
 			
 		else:
-			self.send_error(418)
+			self.send_error(404)
 			self.end_headers()
 			
 	def show_index(self):
@@ -98,7 +126,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
 			self.send_response(404)
 			self.send_header('Content-type', 'text/plain')
 			self.end_headers()
-			self.wfile.write('Error: index page does not exist'.encode())
+			self.wfile.write('Error: index.html does not exist'.encode())
 
 class StreamingServer(ThreadingMixIn, HTTPServer):
 	allow_reuse_address = True
@@ -112,7 +140,7 @@ def main():
 		exit(1)
 	with PiCamera(resolution='1280x720', framerate=30) as camera:
 		global output
-		camera.start_recording(output, format='mjpeg') # this type of format uses lossy compression so it might not be suited to opencv image analysis
+		camera.start_recording(output, format='mjpeg') # this type of format uses lossy compression so it might or might not be suited to opencv image analysis
 		try:
 			address = ('', int(argv[1])) # ip, port
 			server = StreamingServer(address, StreamingHandler)
