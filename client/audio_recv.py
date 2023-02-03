@@ -1,40 +1,15 @@
-# -*- coding: utf-8 -*-
-"""
-Spyder Editor
-
-This is a temporary script file.
-"""
-
 from socket import socket, AF_INET, SOCK_DGRAM
-from pyaudio import PyAudio, paInt24, paInt16, paInt32
-import winsound
-from os import name
-"""
-from ao import AudioDevice
-def play_data(filename, first_sec, second_sec):
-  import ao
-  from ao import AudioDevice 
-  dev = AudioDevice(2, bits=16, rate=16000,channels=1)
-  f = open(filename, 'r')
-  data_len = (second_sec-first_sec)*32000
-  f.seek(32000*first_sec)
-  data = f.read(data_len)
-  dev.play(data)
-  f.close()
-"""
-p = PyAudio()
-FORMAT = paInt16
-CHANNELS = 1
-RATE = 96_000
-CHUNK = 999
-stream = p.open(format = FORMAT, channels = CHANNELS, rate = RATE, output = True, frames_per_buffer = CHUNK)
+import sounddevice
 
 HOST, PORT = '', 5453
 
 with socket(AF_INET, SOCK_DGRAM) as sock:
     sock.bind((HOST, PORT))
+    d = []
+    i = 0
     while True:
         try:
+            i += 1
             message, address = sock.recvfrom(4096)
             sync = message.hex()[0:4]
             print(f"Sync: {sync}")
@@ -66,15 +41,9 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             scnt = int(data.hex()[22:26], 16)
             print(f"Samples per channel: {scnt}")
             raw = data[13:(3*scnt*chmap)+13]
-            if name == 'nt':
-                winsound.PlaySound(raw, winsound.SND_NOSTOP)
-            elif name == 'posix':
-                #stream.write(raw)
-                pass
-                
+            print(raw.hex())
+            sounddevice.RawStream(samplerate=96_000, dtype=int16, blocksize=333, channels=1)
+            
         except KeyboardInterrupt:
             print("Done")
             break
-		
-stream.close()
-p.terminate()
