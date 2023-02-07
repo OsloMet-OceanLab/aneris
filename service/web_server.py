@@ -2,13 +2,20 @@
 # make sure the legacy camera stack is enabled if it doesn't work
 # include copyright notice here
 
-from io import BytesIO
-from picamera import PiCamera
-from logging import warning
-from socketserver import ThreadingMixIn
-from threading import Condition
-from http.server import BaseHTTPRequestHandler, HTTPServer
-from sys import exit, argv
+try:
+	from io import BytesIO
+	from picamera import PiCamera
+	from logging import warning
+	from socketserver import ThreadingMixIn
+	from threading import Condition
+	from http.server import BaseHTTPRequestHandler, HTTPServer
+	from sys import exit, argv
+	from urllib.parse import urlsplit
+	#from datetime import datetime
+except ImportError as e:
+	print("Error: couldn't import all modules")
+	print(f"Additional information: {str(e)}")
+	exit(0)
 
 class StreamingOutput:
 	def __init__(self):
@@ -27,65 +34,68 @@ class StreamingOutput:
 
 class StreamingHandler(BaseHTTPRequestHandler):
 	def do_GET(self):
-		if self.path == '/':
+		path, query = urlsplit(self.path).path, urlsplit(self.path).query
+		try:
+			get_params = dict(query.split('=') for query in query.split('&'))
+			if 'content' not in get_params:
+				get_params['content'] = 'video'
+			if 'timestamp' not in get_params:
+				get_params['timestamp'] = 'false'
+		except ValueError:
+			get_params = {'content': 'video',
+							'timestamp': 'false'}
+
+		if path == '/':
+			self.show_index()
+
+		elif path == '/index.html':
 			self.show_index()
 			
-		elif self.path == '/index.html':
-			self.show_index()
+		# Get params for stream:
+		# content: video, audio, videoaudio, default: videoaudio
+		# timestamp: true, false (ignored when content: audio), default: true
+		# N.B. timestamp has been temporarily disabled
 			
-		elif self.path == '/stream':
-			self.send_response(200)
-			self.send_header('Age', 0)
-			self.send_header('Cache-Control', 'no-cache, private')
-			self.send_header('Pragma', 'no-cache')
-			self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
-			self.end_headers()
-			try:
+		elif path == '/stream':
+			if get_params['content'] == 'video':
 				global output
-				while True:
-					with output.condition:
-						output.condition.wait()
-						frame = output.frame
-					self.wfile.write(b'--FRAME\r\n')
-					self.send_header('Content-Type', 'image/jpeg')
-					self.send_header('Content-Length', len(frame))
-					self.end_headers()
-					self.wfile.write(frame)
-					self.wfile.write(b'\r\n')
-			except Exception as e:
-				warning(
-					'Removed streaming client %s: %s',
-					self.client_address, str(e))
+				self.send_response(200)
+				self.send_header('Age', 0)
+				self.send_header('Cache-Control', 'no-cache, private')
+				self.send_header('Pragma', 'no-cache')
+				self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
+				self.end_headers()
+				try:
+					while True:
+						# lets us annotate time on top of the frame, but
+						# this choice is forced on all users
+						#if get_params['timestamp'] == 'true':
+							#camera.annotate_text = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+						#else:
+							#camera.annotate_text = ""
+						with output.condition:
+							output.condition.wait()
+							frame = output.frame
+						self.wfile.write(b'--FRAME\r\n')
+						self.send_header('Content-Type', 'image/jpeg')
+						self.send_header('Content-Length', len(frame))
+						self.end_headers()
+						self.wfile.write(frame)
+						self.wfile.write(b'\r\n')
+				except Exception as e:
+					warning(
+						'Removed streaming client %s: %s',
+						self.client_address, str(e))
+							
+			elif get_params['content'] == 'videoaudio':
+				self.send_error(418)
+				self.end_headers()
+				
+			elif get_params['content'] == 'audio':
+				self.send_error(418)
+				self.end_headers()
 
-		elif self.path == '/video':
-			self.send_response(200)
-			self.send_header('Age', 0)
-			self.send_header('Cache-Control', 'no-cache, private')
-			self.send_header('Pragma', 'no-cache')
-			self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
-			self.end_headers()
-			try:
-				global output
-				while True:
-					with output.condition:
-						output.condition.wait()
-						frame = output.frame
-					self.wfile.write(b'--FRAME\r\n')
-					self.send_header('Content-Type', 'image/jpeg')
-					self.send_header('Content-Length', len(frame))
-					self.end_headers()
-					self.wfile.write(frame)
-					self.wfile.write(b'\r\n')
-			except Exception as e:
-				warning(
-					'Removed streaming client %s: %s',
-					self.client_address, str(e))
-
-		elif self.path == '/audio':
-			self.send_error(418)
-			self.end_headers()
-					
-		elif self.path == '/log':
+		elif path == '/log':
 			try:
 				with open('/home/pi/Desktop/log.txt', 'rb') as log:
 					self.send_response(200)
@@ -98,15 +108,15 @@ class StreamingHandler(BaseHTTPRequestHandler):
 				self.end_headers()
 				self.wfile.write('Error: log file does not exist'.encode())
 				
-		elif self.path == '/metadata':
+		elif path == '/metadata':
 			self.send_error(418)
 			self.end_headers()
 			
-		elif self.path == '/console':
+		elif path == '/console':
 			self.send_error(418)
 			self.end_headers()
 			
-		elif self.path == '/docs':
+		elif path == '/docs':
 			self.send_error(418)
 			self.end_headers()
 			
@@ -121,7 +131,6 @@ class StreamingHandler(BaseHTTPRequestHandler):
 				self.send_header('Content-Type', 'text/html')
 				self.end_headers()
 				self.wfile.write(index.read())
-					
 		except FileNotFoundError as e:
 			self.send_response(404)
 			self.send_header('Content-type', 'text/plain')
@@ -138,8 +147,9 @@ def main():
 	if len(argv) != 2 or not argv[1].isdigit():
 		print(f"Usage: python3 {argv[0]} <port>")
 		exit(1)
+	
+	global output
 	with PiCamera(resolution='1280x720', framerate=30) as camera:
-		global output
 		camera.start_recording(output, format='mjpeg') # this type of format uses lossy compression so it might or might not be suited to opencv image analysis
 		try:
 			address = ('', int(argv[1])) # ip, port
