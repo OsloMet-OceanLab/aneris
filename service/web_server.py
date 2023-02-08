@@ -45,10 +45,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
 			get_params = {'content': 'video',
 							'timestamp': 'false'}
 
-		if path == '/':
-			self.show_index()
-
-		elif path == '/index.html':
+		if path == '/' or path == '/index.html' or path == '/index':
 			self.show_index()
 			
 		# Get params for stream:
