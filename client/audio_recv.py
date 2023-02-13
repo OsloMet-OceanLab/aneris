@@ -3,7 +3,7 @@ import sys, wave
 
 HOST, PORT = '', 5453
 
-d = b''
+d = ''
 i = 0
 
 with socket(AF_INET, SOCK_DGRAM) as sock:
@@ -44,19 +44,16 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             raw = data[13:(3*scnt*chmap)+13]
             #print(raw.hex())
             
-            header = '52494646 24f00000 57415645 666d7420 10000000 0100 0100 00770100 00ee0200 0200 1000 64617461 00f00000'
-                     '52494646 240f1e00 57415645 666d7420 10000000 0100 0100 00770100 00ee0200 0200 1000 64617461 000f1e00'
-            
-            d += raw
+            d += raw.hex()
             
             if i % 1000 == 0:
-                header += d
+                header = '5249464624f0000057415645666d742010000000010001000077010000ee0200020010006461746100f00000'
+
+                wavfile = header + d
                 break
         
-        with wave.open('test.wav', 'wb') as wavfile:
-            wavfile.setparams((1, 2, 96_000, 0, 'NONE', 'NONE'))
-            wavfile.writeframes(d)
-        print(d)
+        with open('test.wav', 'wb') as stream:
+            stream.write(bytes.fromhex(wavfile))
 
     except KeyboardInterrupt:
         print("Done")
