@@ -8,9 +8,11 @@ i = 0
 
 with socket(AF_INET, SOCK_DGRAM) as sock:
     sock.bind((HOST, PORT))
+    print("Bound")
     try:
         while True:
             i += 1
+            print(i)
             message, address = sock.recvfrom(4096)
             sync = message.hex()[0:4]
             #print(f"Sync: {sync}")
@@ -46,10 +48,18 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             
             d += raw.hex()
             
-            if i % 1000 == 0:
-                header = '5249464624f0000057415645666d742010000000010001000077010000ee0200020010006461746100f00000'
+            if i % 2500 == 0:
+                header = '52494646 totsize 57415645666d742010000000010001000077010000ee02000200100064617461 filsize '
+
+                length = len(d)
+                header = header.replace(' totsize ', hex(length+44*2-8*2)[2:])
+                print(hex(length+44*2-8*2)[2:])
+                header = header.replace(' filsize ', hex(length)[2:])
+                print(hex(length)[2:])
+                print(header, len(header)/2)
 
                 wavfile = header + d
+                
                 break
         
         with open('test.wav', 'wb') as stream:
