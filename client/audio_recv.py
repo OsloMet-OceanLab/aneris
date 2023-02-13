@@ -44,11 +44,13 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             raw = data[13:(3*scnt*chmap)+13]
             #print(raw.hex())
             
-            file = b'RIFF 0413 WAVE fmt  0000 01 01 17700 192000 02 0f data 0000'
+            header = '52494646 24f00000 57415645 666d7420 10000000 0100 0100 00770100 00ee0200 0200 1000 64617461 00f00000'
+                     '52494646 240f1e00 57415645 666d7420 10000000 0100 0100 00770100 00ee0200 0200 1000 64617461 000f1e00'
             
             d += raw
             
             if i % 1000 == 0:
+                header += d
                 break
         
         with wave.open('test.wav', 'wb') as wavfile:
