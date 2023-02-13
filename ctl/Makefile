@@ -13,3 +13,5 @@ $(TARGET).o: $(TARGET).cpp
 
 clean:
 	$(RM) $(TARGET) *.o
+
+remake: clean $(TARGET)

@@ -1,0 +1,89 @@
+[INFO]	2023-02-13 14:19:30	Cleared out log file
+[INFO]	2023-02-13 14:19:42	Received an invalid command
+[INFO]	2023-02-13 14:40:10	Verified user permission
+[INFO]	2023-02-13 14:40:10	Verified GPIO is available
+[INFO]	2023-02-13 14:40:10	Testing connection to land, attempt 1
+[INFO]	2023-02-13 14:40:11	Testing connection to land, attempt 2
+[INFO]	2023-02-13 14:40:12	Testing connection to land, attempt 3
+[WARN]	2023-02-13 14:40:12	No connection to land
+[ERROR]	2023-02-13 14:40:12	Hydrophone is not available
+[INFO]	2023-02-13 14:41:29	Verified user permission
+[INFO]	2023-02-13 14:41:29	Verified GPIO is available
+[INFO]	2023-02-13 14:41:29	Testing connection to land, attempt 1
+[INFO]	2023-02-13 14:41:30	Testing connection to land, attempt 2
+[INFO]	2023-02-13 14:41:42	Testing connection to land, attempt 3
+[WARN]	2023-02-13 14:41:52	No connection to land
+[ERROR]	2023-02-13 14:41:52	Hydrophone is not available
+[INFO]	2023-02-13 14:46:18	Verified user permission
+[INFO]	2023-02-13 14:46:18	Verified GPIO is available
+[INFO]	2023-02-13 14:46:18	Testing connection to land, attempt 1
+[INFO]	2023-02-13 14:46:19	Testing connection to land, attempt 2
+[INFO]	2023-02-13 14:46:20	Testing connection to land, attempt 3
+[WARN]	2023-02-13 14:46:30	No connection to land
+[ERROR]	2023-02-13 14:46:30	Hydrophone is not available
+[INFO]	2023-02-13 14:47:46	Verified user permission
+[INFO]	2023-02-13 14:47:46	Verified GPIO is available
+[INFO]	2023-02-13 14:47:46	Testing connection to land, attempt 1
+[INFO]	2023-02-13 14:47:47	Testing connection to land, attempt 2
+[INFO]	2023-02-13 14:47:48	Testing connection to land, attempt 3
+[WARN]	2023-02-13 14:47:48	No connection to land
+[ERROR]	2023-02-13 14:47:48	Hydrophone is not available
+[INFO]	2023-02-13 14:49:05	Verified user permission
+[INFO]	2023-02-13 14:49:05	Verified GPIO is available
+[INFO]	2023-02-13 14:49:05	Testing connection to land, attempt 1
+[INFO]	2023-02-13 14:49:06	Testing connection to land, attempt 2
+[INFO]	2023-02-13 14:49:17	Testing connection to land, attempt 3
+[WARN]	2023-02-13 14:49:27	No connection to land
+[ERROR]	2023-02-13 14:49:27	Hydrophone is not available
+[INFO]	2023-02-13 14:50:46	Verified user permission
+[INFO]	2023-02-13 14:50:46	Verified GPIO is available
+[INFO]	2023-02-13 14:50:46	Testing connection to land, attempt 1
+[INFO]	2023-02-13 14:50:58	Testing connection to land, attempt 2
+[INFO]	2023-02-13 14:51:09	Testing connection to land, attempt 3
+[WARN]	2023-02-13 14:51:10	No connection to land
+[ERROR]	2023-02-13 14:51:10	Hydrophone is not available
+[INFO]	2023-02-13 15:33:14	Verified user permission
+[INFO]	2023-02-13 15:33:14	Verified GPIO is available
+[INFO]	2023-02-13 15:33:14	Testing connection to land, attempt 1
+[INFO]	2023-02-13 15:33:15	Testing connection to land, attempt 2
+[INFO]	2023-02-13 15:33:16	Testing connection to land, attempt 3
+[WARN]	2023-02-13 15:33:16	No connection to land
+[ERROR]	2023-02-13 15:33:16	Hydrophone is not available
+[INFO]	2023-02-13 15:35:18	Verified user permission
+[INFO]	2023-02-13 15:35:18	Verified GPIO is available
+[INFO]	2023-02-13 15:35:18	Testing connection to land, attempt 1
+[INFO]	2023-02-13 15:35:19	Testing connection to land, attempt 2
+[INFO]	2023-02-13 15:35:20	Testing connection to land, attempt 3
+[WARN]	2023-02-13 15:35:30	No connection to land
+[ERROR]	2023-02-13 15:35:30	Hydrophone is not available
+[INFO]	2023-02-13 15:35:30	open socket
+[FATAL]	2023-02-13 15:35:30	Couldn't bind to socket
+[INFO]	2023-02-13 15:36:09	Verified user permission
+[INFO]	2023-02-13 15:36:09	Verified GPIO is available
+[INFO]	2023-02-13 15:36:09	Testing connection to land, attempt 1
+[INFO]	2023-02-13 15:36:10	Testing connection to land, attempt 2
+[INFO]	2023-02-13 15:36:11	Testing connection to land, attempt 3
+[WARN]	2023-02-13 15:36:11	No connection to land
+[ERROR]	2023-02-13 15:36:11	Hydrophone is not available
+[INFO]	2023-02-13 15:36:11	open socket
+[INFO]	2023-02-13 15:36:11	bound socket
+[INFO]	2023-02-13 15:36:11	waiting socket
+[INFO]	2023-02-13 15:40:18	Verified user permission
+[INFO]	2023-02-13 15:40:18	Verified GPIO is available
+[INFO]	2023-02-13 15:40:18	Testing connection to land, attempt 1
+[INFO]	2023-02-13 15:40:19	Testing connection to land, attempt 2
+[INFO]	2023-02-13 15:40:20	Testing connection to land, attempt 3
+[WARN]	2023-02-13 15:40:20	No connection to land
+[ERROR]	2023-02-13 15:40:20	Hydrophone is not available
+[INFO]	2023-02-13 15:40:20	open socket
+[FATAL]	2023-02-13 15:40:20	Couldn't bind to socket
+[INFO]	2023-02-13 15:40:40	Verified user permission
+[INFO]	2023-02-13 15:40:40	Verified GPIO is available
+[INFO]	2023-02-13 15:40:40	Testing connection to land, attempt 1
+[INFO]	2023-02-13 15:40:41	Testing connection to land, attempt 2
+[INFO]	2023-02-13 15:40:42	Testing connection to land, attempt 3
+[WARN]	2023-02-13 15:40:42	No connection to land
+[ERROR]	2023-02-13 15:40:42	Hydrophone is not available
+[INFO]	2023-02-13 15:40:42	open socket
+[INFO]	2023-02-13 15:40:42	bound socket
+[INFO]	2023-02-13 15:40:42	waiting socket

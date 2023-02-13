@@ -56,8 +56,6 @@ void GPIO::setval(long val)
 
 int GPIO::getval()
 {
-    if (this->direction & GPIO_OUTPUT) throw GPIOError("Trying to read input value from an output");
-
     // Open the value file for gpio
     std::string getval_str = "/sys/class/gpio/gpio" + std::to_string(this->gpionum) + "/value";
     std::ifstream ifs(getval_str.c_str());

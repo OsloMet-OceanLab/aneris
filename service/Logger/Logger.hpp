@@ -16,6 +16,7 @@ enum
 
 static std::string getCurrentTime();
 void log(long level, std::string logMsg);
+void clearLog();
 
 } // end namespace Logger
 

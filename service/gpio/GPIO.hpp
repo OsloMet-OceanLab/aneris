@@ -24,6 +24,7 @@ public:
     int getval(); // Get GPIO Value
     int get_gpionum();
     long get_direction();
+    int get_state();
     
 private:
     int gpionum; // GPIO number associated with the instance of an object

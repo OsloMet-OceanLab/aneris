@@ -3,22 +3,21 @@
 #include <stdlib.h>
 #include <csignal>
 #include <cstring>
-#include <netinet/in.h>
 #include <sys/socket.h>
-#include <arpa/inet.h>
+#include <sys/un.h>
 
 #include "gpio/GPIO.hpp"
 #include "Logger/Logger.hpp"
 
 #define WEB_SERVER_PORT 5000
-#define COMMAND_PORT 5001
+
+#define SOCKET_PATH "/var/run/aneris.socket"
+#define COMMAND_SIZE 4
 
 #define GPIO_LIGHTS 4
 #define GPIO_TEST 17
 #define GPIO_HYDROPHONE 19
 #define GPIO_WIPER 21
-
-#define COMMAND_BUFFER_SIZE 4
 
 void handler(const int signum);
 
@@ -88,153 +87,133 @@ int main(void)
 	}
 	
 	// start command listener
-	struct sockaddr_in address;
-	int server_fd, sock, valread, opt = 1, addrlen = sizeof(address);
-	char buffer[COMMAND_BUFFER_SIZE] = { 0 };
+	int command = 2;
+	int sock, len;
+	struct sockaddr_un addr, peer_sock;
+	char buf[COMMAND_SIZE];
+	memset(&sock, 0, sizeof(struct sockaddr_un));
+	memset(buf, 0, COMMAND_SIZE);
 	
-	server_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if(server_fd < 0)
+	sock = socket(AF_UNIX, SOCK_DGRAM, 0);
+	if(sock < 0)
 	{
-		Logger::log(Logger::LOG_FATAL, "Can't create socket");
-		return 0; //system("reboot")
-	}
+		Logger::log(Logger::LOG_FATAL, "Couldn't open socket");
+		return 0;
+	} else Logger::log(Logger::LOG_INFO, "open socket");
 	
-	if(setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
+	strcpy(addr.sun_path, SOCKET_PATH);
+	addr.sun_family = AF_UNIX;
+	
+	len = sizeof(addr);
+	
+	if(bind(sock, (struct sockaddr*) &addr, len))
 	{
-		Logger::log(Logger::LOG_FATAL, "Can't attach socket to port");
-		return 0; //system("reboot")
-	}
-	
-	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = INADDR_ANY;
-	address.sin_port = htons(COMMAND_PORT);
-	
-	int bound = bind(server_fd, (struct sockaddr*)&address, sizeof(address));
-	if(bound)
-	{
-		Logger::log(Logger::LOG_FATAL, "Can't bind to port");
-		return 0; //system("reboot")
-	}
-	
-	if(listen(server_fd, 3) < 0)
-	{
-		Logger::log(Logger::LOG_FATAL, "Can't listen to port");
-		return 0; //system("reboot")
-	}
+		Logger::log(Logger::LOG_FATAL, "Couldn't bind to socket");
+		goto end;
+	} else Logger::log(Logger::LOG_INFO, "bound socket");
 	
 	// start log web browser
 	// start python web browser
 	//create new thread for the web servers
-	
-	uint8_t command = 2;
-	std::string msg = "";
 
 	while (true)
 	{
 		// logic to receive command
-		msg = "";
-		memset(buffer, 0, COMMAND_BUFFER_SIZE);
-		sock = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
-		if(socket < 0)
+		Logger::log(Logger::LOG_INFO, "waiting socket");
+		if(recvfrom(sock, buf, COMMAND_SIZE, 0, (struct sockaddr *) &peer_sock, (socklen_t*) &len) < 0)
 		{
-			Logger::log(Logger::LOG_FATAL, "Can't accept new connections");
-			return 0; //system("reboot")
+			Logger::log(Logger::LOG_FATAL, "Couldn't receive data");
+			goto end;
 		}
-		
-		valread = read(sock, buffer, COMMAND_BUFFER_SIZE);
-		buffer[valread] = '\0';
-		command = atoi(buffer);
+		command = atoi(buf);
 		
 		switch(command)
 		{
 			case 0: // shutdown
 			{
-				msg = "Received shutdown command";
-				Logger::log(Logger::LOG_INFO, msg);
-				send(sock, msg.c_str(), strlen(msg.c_str()), 0);
-				
-				close(sock);
-				shutdown(server_fd, SHUT_RDWR);
+				Logger::log(Logger::LOG_INFO, "Received shutdown command");
+
+				// temporary
+				goto end;
+
 				system("poweroff");
 				break;
 			}
 			case 1: // reboot
 			{
-				msg = "Received reboot command";
-				Logger::log(Logger::LOG_INFO, msg);
-				send(sock, msg.c_str(), strlen(msg.c_str()), 0);
+				Logger::log(Logger::LOG_INFO, "Received reboot command");
 
-				close(sock);
-				shutdown(server_fd, SHUT_RDWR);
+				// temporary
+				goto end;
+				
 				system("reboot");
 				break;
 			}
 			case 2: // turn lights on/off
 			{
+				gpio::GPIO *lights = nullptr;
 				try
 				{
-					gpio::GPIO *lights = new gpio::GPIO(GPIO_LIGHTS, gpio::GPIO_OUTPUT);
+					lights = new gpio::GPIO(GPIO_LIGHTS, gpio::GPIO_OUTPUT);
 					if(!lights) throw gpio::GPIOError("Couldn't allocate memory for 'lights' variable");
 					if(lights->getval())
 					{
-						msg = "Disabled lights";
 						lights->setval(gpio::GPIO_LOW);
-						Logger::log(Logger::LOG_INFO, msg);
+						Logger::log(Logger::LOG_INFO, "Disabled lights");
 					}
 					else
 					{
-						msg = "Enabled lights";
 						lights->setval(gpio::GPIO_HIGH);
-						Logger::log(Logger::LOG_INFO, msg);
+						Logger::log(Logger::LOG_INFO, "Enabled lights");
 					}
 				}
 				catch(gpio::GPIOError& e)
 				{
 					Logger::log(Logger::LOG_ERROR, e.what());
-					msg = std::string(e.what());
 				}
 				delete lights;
-				send(sock, msg.c_str(), strlen(msg.c_str()), 0);
 				break;
 			}
 			case 3: // turn wipers on/off
 			{
+				gpio::GPIO *wiper = nullptr;
 				try
 				{
-					gpio::GPIO *wiper = new gpio::GPIO(GPIO_WIPER, gpio::GPIO_OUTPUT);
+					wiper = new gpio::GPIO(GPIO_WIPER, gpio::GPIO_OUTPUT);
 					if(!wiper) throw gpio::GPIOError("Couldn't allocate memory for 'wiper' variable");
 					if(wiper->getval())
 					{
-						msg = "Disabled wiper";
 						wiper->setval(gpio::GPIO_LOW);
-						Logger::log(Logger::LOG_INFO, msg);
+						Logger::log(Logger::LOG_INFO, "Disabled wiper");
 					}
 					else
 					{
-						msg = "Enabled wiper";
 						wiper->setval(gpio::GPIO_HIGH);
-						Logger::log(Logger::LOG_INFO, msg);
+						Logger::log(Logger::LOG_INFO, "Enabled wiper");
 					}
 				}
 				catch(gpio::GPIOError& e)
 				{
 					Logger::log(Logger::LOG_ERROR, e.what());
-					msg = std::string(e.what());
 				}
 				delete wiper;
-				send(sock, msg.c_str(), strlen(msg.c_str()), 0);
 				break;
 			}
-			case 4: {} // clean up log file
+			case 4: // clean up log file
+			{
+				Logger::clearLog();
+				break;
+			}
 			case 5: {}
 			case 6: {}
 			default: // return that command is invalid
 			{
-				Logger::log(Logger::LOG_INFO, "Receiven an invalid command");
+				Logger::log(Logger::LOG_INFO, "Received an invalid command");
+end:
+				close(sock);
 				return 0;
 			}
 		}
-		close(sock);
 	}
 }
 

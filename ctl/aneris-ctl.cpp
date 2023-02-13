@@ -1,5 +1,11 @@
 #include <iostream>
 #include <unistd.h>
+#include <cstring>
+#include <sys/socket.h>
+#include <sys/un.h>
+
+#define SOCKET_PATH "/var/run/aneris.socket"
+#define COMMAND_SIZE 4
 
 int main(int argc, char **argv)
 {
@@ -9,16 +15,17 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 	
-	char inbuf[32];
-	int p[2], i;
+	int sock;
+	struct sockaddr_un serv;
+	char buf[COMMAND_SIZE];
+	memset(&serv, 0, sizeof(struct sockaddr_un));
 	
-	if (pipe(p) < 0) exit(2);
+	sock = socket(AF_UNIX, SOCK_DGRAM, 0);
+	serv.sun_family = AF_UNIX;
+	strcpy(serv.sun_path, SOCKET_PATH);
 	
-	for (int i = 0; i < argc; ++i) write(p[1], argv[i], 32);
-	for (int i = 0; i < argc; ++i)
-	{
-		read(p[0], inbuf, 32);
-		printf("%s\n", inbuf);
-	}
+	strncpy(buf, argv[1], COMMAND_SIZE);
+	sendto(sock, buf, strlen(buf), 0, (struct sockaddr *) &serv, sizeof(serv));
+	close(sock);
 	return 0;
 }

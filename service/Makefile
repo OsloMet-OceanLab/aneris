@@ -20,3 +20,5 @@ Logger.o: Logger/Logger.cpp
 
 clean:
 	$(RM) $(TARGET)
+	
+remake: clean $(TARGET)

@@ -33,4 +33,11 @@ void log(long level, std::string logMsg)
 	ofs.close();
 }
 
+void clearLog()
+{
+	std::ofstream ofs(FILEPATH, std::ios_base::out | std::ios_base::trunc);
+	ofs.close();
+	log(LOG_INFO, "Cleared out log file");
+}
+
 } // end namespace Logger
