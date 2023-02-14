@@ -20,15 +20,15 @@
 #include "Logger/Logger.hpp"
 #include "Web_Server/Web_Server.hpp"
 
-#define WEB_SERVER_PORT 5000
+#define WEB_SERVER_PORT 	5000
 
-#define SOCKET_PATH "/var/run/aneris.sock"
-#define COMMAND_SIZE 2
+#define SOCKET_PATH 		"/var/run/aneris.sock"
+#define COMMAND_SIZE 		2
 
-#define GPIO_LIGHTS 4
-#define GPIO_TEST 17
-#define GPIO_HYDROPHONE 19
-#define GPIO_WIPER 21
+#define GPIO_LIGHTS			4
+#define GPIO_TEST			17
+#define GPIO_HYDROPHONE		19
+#define GPIO_WIPER			21
 
 void handler(const int signum);
 
