@@ -13,8 +13,8 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-#define SERVER_PATH "tpf_unix_sock.server"
-#define DATA "Hello from client\n"
+#define SERVER_PATH "/var/run/aneris.sock"
+#define DATA "9"
 
 int main(int argc, char **argv)
 {
