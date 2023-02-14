@@ -14,7 +14,6 @@ enum
 	LOG_FATAL =		0x8 // fatal to the whole program (e.g. can't start the web server)
 };
 
-static std::string getCurrentTime();
 void log(long level, std::string logMsg);
 void clearLog();
 

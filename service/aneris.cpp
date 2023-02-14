@@ -15,14 +15,16 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <Python.h>
 
 #include "gpio/GPIO.hpp"
 #include "Logger/Logger.hpp"
 
 #define WEB_SERVER_PORT 5000
+#define PY_SSIZE_T_CLEAN
 
 #define SOCKET_PATH "/var/run/aneris.sock"
-#define COMMAND_SIZE 16
+#define COMMAND_SIZE 2
 
 #define GPIO_LIGHTS 4
 #define GPIO_TEST 17
@@ -30,6 +32,7 @@
 #define GPIO_WIPER 21
 
 void handler(const int signum);
+int web_server(const int port);
 
 int main(void)
 {
@@ -49,7 +52,7 @@ int main(void)
 	if(geteuid())
 	{
 		Logger::log(Logger::LOG_FATAL, "This program needs to be run as root");
-		return 0;//system("reboot");
+		//return 0;//system("reboot");
 	} else Logger::log(Logger::LOG_INFO, "Verified user permission");
 	
 	/****************************/
@@ -121,14 +124,10 @@ int main(void)
 	/**************************/
 	/* start command listener */
 	/**************************/
-	int command = 2;
-
-    int sock, len, rc;
-    int bytes_rec = 0;
+    int sock, len;
     struct sockaddr_un server_sockaddr, peer_sock;
     char buf[COMMAND_SIZE];
     memset(&server_sockaddr, 0, sizeof(struct sockaddr_un));
-    memset(buf, 0, COMMAND_SIZE);
     
     sock = socket(AF_UNIX, SOCK_DGRAM, 0);
     if (sock < 0)
@@ -142,37 +141,39 @@ int main(void)
     len = sizeof(server_sockaddr);
     unlink(SOCKET_PATH);
 
-    if (bind(sock, (struct sockaddr *) &server_sockaddr, len) < 0)
+    if (bind(sock, (struct sockaddr*) &server_sockaddr, len) < 0)
     {
         Logger::log(Logger::LOG_FATAL, "Couldn't bind to socket");
         goto end;
     }
 
-	// start python web browser in new thread
 	/******************************************/
 	/* start python web browser in new thread */
 	/******************************************/
+	web_server(WEB_SERVER_PORT);
+	Logger::log(Logger::LOG_INFO, "Started web server");
 
+	/*******************/
+	/* begin main loop */
+	/*******************/
+	Logger::log(Logger::LOG_INFO, "Listening to socket");
 	while (true)
 	{
-		// logic to receive command
-		Logger::log(Logger::LOG_INFO, "waiting socket");
 		memset(buf, 0, COMMAND_SIZE);
-		printf("waiting to recvfrom...\n");
-		bytes_rec = recvfrom(sock, buf, COMMAND_SIZE, 0, (struct sockaddr *) &peer_sock, (socklen_t*)&len);
-		if (bytes_rec == -1){
+		if (recvfrom(sock, buf, COMMAND_SIZE, 0, (struct sockaddr*) &peer_sock, (socklen_t*) &len) < 0)
+		{
 			Logger::log(Logger::LOG_FATAL, "Couldn't receive data");
 			goto end;
 		}
-		else {
-			printf("DATA RECEIVED = %s\n", buf);
-		}
 		
-		command = atoi(buf);
-		
-		switch(command)
+		switch(atoi(buf))
 		{
-			case 0: // shutdown
+			case 0: // handle received commands that are not numerical and/or atoi() errors
+			{
+				Logger::log(Logger::LOG_ERROR, "Non numerical command received");
+				break;
+			}
+			case 1: // shutdown
 			{
 				Logger::log(Logger::LOG_INFO, "Received shutdown command");
 
@@ -182,7 +183,7 @@ int main(void)
 				system("poweroff");
 				break;
 			}
-			case 1: // reboot
+			case 2: // reboot
 			{
 				Logger::log(Logger::LOG_INFO, "Received reboot command");
 
@@ -192,7 +193,7 @@ int main(void)
 				system("reboot");
 				break;
 			}
-			case 2: // turn lights on/off
+			case 3: // turn lights on/off
 			{
 				gpio::GPIO *lights = nullptr;
 				try
@@ -217,7 +218,7 @@ int main(void)
 				delete lights;
 				break;
 			}
-			case 3: // turn wipers on/off
+			case 4: // turn wipers on/off
 			{
 				gpio::GPIO *wiper = nullptr;
 				try
@@ -242,17 +243,17 @@ int main(void)
 				delete wiper;
 				break;
 			}
-			case 4: // clean up log file
+			case 5: // clean up log file
 			{
 				Logger::clearLog();
 				break;
 			}
-			case 5: {}
 			case 6: {}
+			case 7: {}
 			default: // return that command is invalid
 			{
 				Logger::log(Logger::LOG_INFO, "Received an invalid command");
-end:
+end: // temporary
 				close(sock);
 				return 0;
 			}
@@ -263,4 +264,22 @@ end:
 void handler(const int signum)
 {
 	exit(signum);
+}
+
+int web_server(const int port)
+{
+	PyObject *pName, *pModule, *pFunc;
+	PyObject *pArgs, *pValue;
+	int i;
+	
+	Py_Initialize();
+	pName = PyUnicode_DecodeFSDefault("web_server");
+	pModule = PyImport_Import(pName);
+	Py_DECREF(pName);
+	if(pModule)
+	{
+		pFunc = PyObject_GetAttrString(pModule, "start");
+		if(pFunc && PyCallable
+
+	return port;
 }

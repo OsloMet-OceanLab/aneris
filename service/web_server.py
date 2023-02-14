@@ -140,7 +140,7 @@ class StreamingServer(ThreadingMixIn, HTTPServer):
 
 output = StreamingOutput()
 
-def main():
+def start():
 	if len(argv) != 2 or not argv[1].isdigit():
 		print(f"Usage: python3 {argv[0]} <port>")
 		exit(1)
@@ -164,4 +164,4 @@ def main():
 		exit(0)
 
 if __name__ == "__main__":
-	main()
+	start()
