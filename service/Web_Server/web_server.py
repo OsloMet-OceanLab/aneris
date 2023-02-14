@@ -2,20 +2,19 @@
 # make sure the legacy camera stack is enabled if it doesn't work
 # include copyright notice here
 
-try:
-	from io import BytesIO
-	from picamera import PiCamera
-	from logging import warning
-	from socketserver import ThreadingMixIn
-	from threading import Condition
-	from http.server import BaseHTTPRequestHandler, HTTPServer
-	from sys import exit, argv
-	from urllib.parse import urlsplit
-	#from datetime import datetime
-except ImportError as e:
-	print("Error: couldn't import all modules")
-	print(f"Additional information: {str(e)}")
-	exit(0)
+
+from io import BytesIO
+from picamera import PiCamera
+from logging import warning
+from socketserver import ThreadingMixIn
+from threading import Condition
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import urlsplit
+#from datetime import datetime
+
+WEB_DIR =	'/home/pi/Desktop/aneris-bachelorprosjekt/service/web/'
+DOCS_DIR =	WEB_DIR + 'docs/'
+LOG_FILE =	'/home/pi/Desktop/aneris-bachelorprosjekt/service/aneris.log'
 
 class StreamingOutput:
 	def __init__(self):
@@ -92,9 +91,9 @@ class StreamingHandler(BaseHTTPRequestHandler):
 				self.send_error(418)
 				self.end_headers()
 
-		elif path == '/log':
+		elif path == '/logs':
 			try:
-				with open('/home/pi/Desktop/log.txt', 'rb') as log:
+				with open(LOG_FILE, 'rb') as log:
 					self.send_response(200)
 					self.send_header('Content-Type', 'text/plain')
 					self.end_headers()
@@ -113,9 +112,8 @@ class StreamingHandler(BaseHTTPRequestHandler):
 			self.send_error(418)
 			self.end_headers()
 			
-		elif path == '/docs':
-			self.send_error(418)
-			self.end_headers()
+		elif path == '/docs' or path == '/docs/index.html':
+			self.show_docs(self.path)
 			
 		else:
 			self.send_error(404)
@@ -123,7 +121,20 @@ class StreamingHandler(BaseHTTPRequestHandler):
 			
 	def show_index(self):
 		try:
-			with open('index.html', 'rb') as index:
+			with open(WEB_DIR + 'index.html', 'rb') as index:
+				self.send_response(200)
+				self.send_header('Content-Type', 'text/html')
+				self.end_headers()
+				self.wfile.write(index.read())
+		except FileNotFoundError as e:
+			self.send_response(404)
+			self.send_header('Content-type', 'text/plain')
+			self.end_headers()
+			self.wfile.write('Error: index.html does not exist'.encode())
+			
+	def show_docs(self, doc):
+		try:
+			with open(DOCS_DIR + 'index.html', 'rb') as index:
 				self.send_response(200)
 				self.send_header('Content-Type', 'text/html')
 				self.end_headers()
@@ -140,28 +151,22 @@ class StreamingServer(ThreadingMixIn, HTTPServer):
 
 output = StreamingOutput()
 
-def start():
-	if len(argv) != 2 or not argv[1].isdigit():
-		print(f"Usage: python3 {argv[0]} <port>")
-		exit(1)
+def start(port = 0):
+	if port <= 0 and not port.isdigit():
+		return 1
 	
 	global output
 	with PiCamera(resolution='1280x720', framerate=30) as camera:
 		camera.start_recording(output, format='mjpeg') # this type of format uses lossy compression so it might or might not be suited to opencv image analysis
 		try:
-			address = ('', int(argv[1])) # ip, port
+			address = ('', int(port)) # ip, port
 			server = StreamingServer(address, StreamingHandler)
 			print('Stream started successfully')
 			server.serve_forever()
-		except KeyboardInterrupt:
-			print('Received Keyboard Interrupt, quitting...')
 		except Exception as e:
 			print('Couldn\'t start stream')
 			print(f'Additional information: {str(e)}')
 			camera.stop_recording()
-			exit(2)
+			return 2
 		camera.stop_recording()
-		exit(0)
-
-if __name__ == "__main__":
-	start()
+		return 0

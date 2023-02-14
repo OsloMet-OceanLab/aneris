@@ -5,12 +5,12 @@ TARGET := aneris
 
 default: $(TARGET)
 
-$(TARGET): $(TARGET).o GPIO.o Logger.o
-	$(CPP) -o $(TARGET) $(TARGET).o GPIO.o Logger.o $(CFLAGS) $(LIBS)
+$(TARGET): $(TARGET).o GPIO.o Logger.o Web_Server.o
+	$(CPP) -o $(TARGET) $(TARGET).o GPIO.o Logger.o Web_Server.o $(CFLAGS) $(LIBS)
 	$(RM) *.o
 
 $(TARGET).o: $(TARGET).cpp
-	$(CPP) -c $(TARGET).cpp $(CFLAGS) $(LIBS)
+	$(CPP) -c $(TARGET).cpp $(CFLAGS)
 	
 GPIO.o: gpio/GPIO.cpp
 	$(CPP) -c gpio/GPIO.cpp $(CFLAGS)
@@ -18,7 +18,10 @@ GPIO.o: gpio/GPIO.cpp
 Logger.o: Logger/Logger.cpp
 	$(CPP) -c Logger/Logger.cpp $(CFLAGS)
 
+Web_Server.o: Web_Server/Web_Server.cpp
+	$(CPP) -c Web_Server/Web_Server.cpp $(CFLAGS) $(LIBS)
+
 clean:
-	$(RM) $(TARGET)
+	$(RM) $(TARGET) *.o
 	
 remake: clean $(TARGET)

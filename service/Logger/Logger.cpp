@@ -3,7 +3,7 @@
 #include <time.h>
 #include <string>
 
-#define FILEPATH "log.txt"
+#define FILEPATH "aneris.log"
 //#define FILEPATH "/var/log/aneris/aneris.log"
 
 namespace Logger
