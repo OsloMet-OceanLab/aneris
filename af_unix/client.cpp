@@ -11,11 +11,12 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <unistd.h>
 
 #define SERVER_PATH "tpf_unix_sock.server"
 #define DATA "Hello from client\n"
 
-int main(void)
+int main(int argc, char **argv)
 {
     int client_socket, rc;
     struct sockaddr_un remote; 
@@ -27,7 +28,7 @@ int main(void)
     /****************************************/
     client_socket = socket(AF_UNIX, SOCK_DGRAM, 0);
     if (client_socket == -1) {
-        printf("SOCKET ERROR = %d\n", sock_errno());
+        printf("SOCKET ERROR\n");
         exit(1);
     }
 
@@ -43,12 +44,12 @@ int main(void)
     /* Copy the data to be sent to the     */
     /* buffer and send it to the server.   */
     /***************************************/
-    strcpy(buf, DATA);
+    strcpy(buf, argc > 1 ? argv[1] : DATA);
     printf("Sending data...\n");
     rc = sendto(client_socket, buf, strlen(buf), 0, (struct sockaddr *) &remote, sizeof(remote));
     if (rc == -1) {
-        printf("SENDTO ERROR = %d\n", sock_errno());
-        close(client_sock);
+        printf("SENDTO ERROR\n");
+        close(client_socket);
         exit(1);
     }   
     else {
@@ -58,7 +59,7 @@ int main(void)
     /*****************************/
     /* Close the socket and exit */
     /*****************************/
-    rc = close(client_sock);
+    rc = close(client_socket);
 
     return 0;
 }

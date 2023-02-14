@@ -13,7 +13,7 @@ client.o: client.cpp
 	$(CPP) -c client.cpp $(CFLAGS)
 
 server.o: server.cpp
-	$(CPP) -c client.cpp $(CFLAGS)
+	$(CPP) -c server.cpp $(CFLAGS)
 	
 remake: clean client server
 

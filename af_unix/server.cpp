@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <unistd.h>
 
 #define SOCK_PATH "tpf_unix_sock.server"
 
@@ -28,7 +29,7 @@ int main(void){
     /****************************************/
     server_sock = socket(AF_UNIX, SOCK_DGRAM, 0);
     if (server_sock == -1){
-        printf("SOCKET ERROR = %d", sock_errno());
+        printf("SOCKET ERROR");
         exit(1);
     }
     
@@ -46,7 +47,7 @@ int main(void){
     unlink(SOCK_PATH);
     rc = bind(server_sock, (struct sockaddr *) &server_sockaddr, len);
     if (rc == -1){
-        printf("BIND ERROR = %d", sock_errno());
+        printf("BIND ERROR");
         close(server_sock);
         exit(1);
     }
@@ -55,16 +56,20 @@ int main(void){
     /* Read data on the server from clients */
     /* and print the data that was read.    */
     /****************************************/
-    printf("waiting to recvfrom...\n");
-    bytes_rec = recvfrom(server_sock, buf, 256, 0, (struct sockaddr *) &peer_sock, &len);
-    if (bytes_rec == -1){
-        printf("RECVFROM ERROR = %d", sock_errno());
-        close(server_sock);
-        exit(1);
-    }
-    else {
-       printf("DATA RECEIVED = %s\n", buf);
-    }
+    do
+    {
+		memset(buf, 0, sizeof(buf));
+		printf("waiting to recvfrom...\n");
+		bytes_rec = recvfrom(server_sock, buf, 256, 0, (struct sockaddr *) &peer_sock, (socklen_t*)&len);
+		if (bytes_rec == -1){
+			printf("RECVFROM ERROR");
+			close(server_sock);
+			exit(1);
+		}
+		else {
+		printf("DATA RECEIVED = %s\n", buf);
+		}
+	} while (strcmp(buf, "quit"));
     
     /*****************************/
     /* Close the socket and exit */
