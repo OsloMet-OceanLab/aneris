@@ -122,28 +122,28 @@ int main(void)
 	/**************************/
 	/* start command listener */
 	/**************************/
-    int sock, len;
-    struct sockaddr_un server_sockaddr, peer_sock;
-    char buf[COMMAND_SIZE];
-    memset(&server_sockaddr, 0, sizeof(struct sockaddr_un));
-    
-    sock = socket(AF_UNIX, SOCK_DGRAM, 0);
-    if (sock < 0)
-    {
-        Logger::log(Logger::LOG_FATAL, "Couldn't create socket");
-        goto end;
-    }
+	int sock, len;
+	struct sockaddr_un server_sockaddr, peer_sock;
+	char buf[COMMAND_SIZE];
+	memset(&server_sockaddr, 0, sizeof(struct sockaddr_un));
 
-    server_sockaddr.sun_family = AF_UNIX;
-    strcpy(server_sockaddr.sun_path, SOCKET_PATH); 
-    len = sizeof(server_sockaddr);
-    unlink(SOCKET_PATH);
+	sock = socket(AF_UNIX, SOCK_DGRAM, 0);
+	if (sock < 0)
+	{
+		Logger::log(Logger::LOG_FATAL, "Couldn't create socket");
+		goto end;
+	}
 
-    if (bind(sock, (struct sockaddr*) &server_sockaddr, len) < 0)
-    {
-        Logger::log(Logger::LOG_FATAL, "Couldn't bind to socket");
-        goto end;
-    }
+	server_sockaddr.sun_family = AF_UNIX;
+	strcpy(server_sockaddr.sun_path, SOCKET_PATH); 
+	len = sizeof(server_sockaddr);
+	unlink(SOCKET_PATH);
+
+	if (bind(sock, (struct sockaddr*) &server_sockaddr, len) < 0)
+	{
+		Logger::log(Logger::LOG_FATAL, "Couldn't bind to socket");
+		goto end;
+	}
 
 	/***************************************************/
 	/* start python web server (TBD, in new thread)    */
