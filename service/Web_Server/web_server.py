@@ -12,9 +12,10 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlsplit
 #from datetime import datetime
 
-WEB_DIR =	'/home/pi/Desktop/aneris-bachelorprosjekt/service/web/'
+HOME_DIR = '/home/pi/Desktop/aneris-bachelorprosjekt/service/'
+WEB_DIR =	HOME_DIR + 'web/'
 DOCS_DIR =	WEB_DIR + 'docs/'
-LOG_FILE =	'/home/pi/Desktop/aneris-bachelorprosjekt/service/aneris.log'
+LOG_FILE =	HOME_DIR + 'aneris.log'
 
 class StreamingOutput:
 	def __init__(self):
@@ -151,7 +152,7 @@ class StreamingServer(ThreadingMixIn, HTTPServer):
 
 output = StreamingOutput()
 
-def start(port = 0):
+def serve(port = 0):
 	if port <= 0 and not port.isdigit():
 		return 1
 	

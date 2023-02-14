@@ -4,7 +4,7 @@
 
 #define PY_SSIZE_T_CLEAN
 #define PY_MODULE_NAME "web_server"
-#define PY_FUNC_NAME "start"
+#define PY_FUNC_NAME "serve"
 
 namespace Web_Server
 {

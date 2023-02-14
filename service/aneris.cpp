@@ -34,9 +34,9 @@ void handler(const int signum);
 
 int main(void)
 {
-	/***************************/
-	/* register signal handler */
-	/***************************/
+	/****************************/
+	/* register signal handlers */
+	/****************************/
 	signal(SIGINT, handler);
 	signal(SIGTERM, handler);
 	signal(SIGABRT, handler);
@@ -145,10 +145,13 @@ int main(void)
         goto end;
     }
 
-	/************************************************/
-	/* start python web server (TBD, in new thread) */
-	/************************************************/
-	setenv("PYTHONPATH", "./Web_Server", 1); // do not modify, python GIL requires this to be set to work
+	/***************************************************/
+	/* start python web server (TBD, in new thread)    */
+	/*                                                 */
+	/* N.B. do NOT modify the 'PYTHONPATH' environment */
+	/* variable, it WILL break the program             */
+	/***************************************************/
+	setenv("PYTHONPATH", "./Web_Server", 1);
 	Web_Server::serve(WEB_SERVER_PORT);
 	Logger::log(Logger::LOG_INFO, "Started web server");
 
