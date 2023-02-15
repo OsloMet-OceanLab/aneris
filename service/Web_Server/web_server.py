@@ -16,6 +16,7 @@ HOME_DIR = '/home/pi/Desktop/aneris-bachelorprosjekt/service/'
 WEB_DIR =	HOME_DIR + 'web/'
 DOCS_DIR =	WEB_DIR + 'docs/'
 LOG_FILE =	HOME_DIR + 'aneris.log'
+SOCKET = '/var/run/aneris.sock'
 
 class StreamingOutput:
 	def __init__(self):
