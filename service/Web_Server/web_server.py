@@ -10,6 +10,7 @@ from socketserver import ThreadingMixIn
 from threading import Condition
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlsplit
+from socket import socket, AF_UNIX, SOCK_DGRAM
 #from datetime import datetime
 
 HOME_DIR = '/home/pi/Desktop/aneris-bachelorprosjekt/service/'
@@ -127,10 +128,15 @@ class StreamingHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.end_headers()
 			serve_console()
+			if 'command' not in post:
+				pass
             self.wfile.write('This is POST request. '.encode())
             self.wfile.write('Received: '.encode())
             for x in post:
                 self.wfile.write(f"{x}: {post[x]}".encode())
+			with socket(AF_UNIX, SOCK_DGRAM) as sock:
+				sock.connect(SOCKET)
+				sock.sendall(post['command'])
 
 		else:
 			self.send_error(404)
