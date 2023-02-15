@@ -1,7 +1,12 @@
 <html>
-    <body>
-        <form action="" method="post">
-            <input type="submit" name="enable/disable lights" value="Enable/disable lights" />
-        </form>
-    </body>
+  <body>
+    <div style="text-align:center;">
+      <h1>Console page</h1>
+      <p>Use this page to control the device</p>
+      <form method="POST" action="/console">
+        <input name="command" type="text" placeholder="Write a command here"/>
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
+  </body>
 </html>

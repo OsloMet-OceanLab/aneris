@@ -46,7 +46,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
 							'timestamp': 'false'}
 
 		if path == '/' or path == '/index.html' or path == '/index':
-			self.show_index()
+			self.serve_index()
 			
 		# Get params for stream:
 		# content: video, audio, videoaudio, default: videoaudio
@@ -110,17 +110,32 @@ class StreamingHandler(BaseHTTPRequestHandler):
 			self.end_headers()
 			
 		elif path == '/console':
-			self.send_error(418)
-			self.end_headers()
+			self.serve_console();
 			
 		elif path == '/docs' or path == '/docs/index.html':
-			self.show_docs(self.path)
+			self.serve_docs(path)
 			
 		else:
 			self.send_error(404)
 			self.end_headers()
+
+	def do_POST():
+		if self.path == '/console':
+			content_length = int(self.headers['Content-Length'])
+            post = dict(x.split(b'=') for x in self.rfile.read(content_length).split(b';'))
+            self.send_response(200)
+            self.end_headers()
+			serve_console()
+            self.wfile.write('This is POST request. '.encode())
+            self.wfile.write('Received: '.encode())
+            for x in post:
+                self.wfile.write(f"{x}: {post[x]}".encode())
+
+		else:
+			self.send_error(404)
+			self.end_headers()
 			
-	def show_index(self):
+	def serve_index(self):
 		try:
 			with open(WEB_DIR + 'index.html', 'rb') as index:
 				self.send_response(200)
@@ -133,7 +148,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
 			self.end_headers()
 			self.wfile.write('Error: index.html does not exist'.encode())
 			
-	def show_docs(self, doc):
+	def serve_docs(self, doc):
 		try:
 			with open(DOCS_DIR + 'index.html', 'rb') as index:
 				self.send_response(200)
@@ -145,6 +160,20 @@ class StreamingHandler(BaseHTTPRequestHandler):
 			self.send_header('Content-type', 'text/plain')
 			self.end_headers()
 			self.wfile.write('Error: index.html does not exist'.encode())
+
+	def serve_console(self):
+		try:
+			with open(WEB_DIR + 'console.html', 'rb') as index:
+				self.send_response(200)
+				self.send_header('Content-Type', 'text/html')
+				self.end_headers()
+				self.wfile.write(index.read())
+		except FileNotFoundError as e:
+			self.send_response(404)
+			self.send_header('Content-type', 'text/plain')
+			self.end_headers()
+			self.wfile.write('Error: console.html does not exist'.encode())
+
 
 class StreamingServer(ThreadingMixIn, HTTPServer):
 	allow_reuse_address = True
