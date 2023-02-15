@@ -124,14 +124,14 @@ class StreamingHandler(BaseHTTPRequestHandler):
 	def do_POST():
 		if self.path == '/console':
 			content_length = int(self.headers['Content-Length'])
-            post = dict(x.split(b'=') for x in self.rfile.read(content_length).split(b';'))
-            self.send_response(200)
-            self.end_headers()
+			post = dict(x.split(b'=') for x in self.rfile.read(content_length).split(b';'))
+			self.send_response(200)
+			self.end_headers()
 			serve_console()
-            self.wfile.write('This is POST request. '.encode())
-            self.wfile.write('Received: '.encode())
-            for x in post:
-                self.wfile.write(f'{x}: {post[x]}'.encode())
+			self.wfile.write('This is POST request. '.encode())
+			self.wfile.write('Received: '.encode())
+			for x in post:
+				self.wfile.write(f'{x}: {post[x]}'.encode())
 			if 'command' in post:
 				with socket(AF_UNIX, SOCK_DGRAM) as sock:
 					sock.connect(SOCKET)
