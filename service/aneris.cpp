@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <unistd.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <csignal>
 #include <cstring>
 #include <sys/types.h>
