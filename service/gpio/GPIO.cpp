@@ -51,11 +51,14 @@ void GPIO::setval(long val)
     // Write the value to value file
     if (val & GPIO_HIGH) ofs << 1;
     else if (val & GPIO_LOW) ofs << 0;
+    else throw GPIOError("Invalid value chosen");
     ofs.close();
 }
 
 int GPIO::getval()
 {
+    if (this->direction & GPIO_OUTPUT) throw GPIOError("Trying to read an input value on an output");
+    
     // Open the value file for gpio
     std::string getval_str = "/sys/class/gpio/gpio" + std::to_string(this->gpionum) + "/value";
     std::ifstream ifs(getval_str.c_str());

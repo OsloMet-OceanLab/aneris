@@ -121,21 +121,19 @@ class StreamingHandler(BaseHTTPRequestHandler):
 			self.send_error(404)
 			self.end_headers()
 
-	def do_POST():
+	def do_POST(self):
 		if self.path == '/console':
 			content_length = int(self.headers['Content-Length'])
 			post = dict(x.split(b'=') for x in self.rfile.read(content_length).split(b';'))
-			self.send_response(200)
-			self.end_headers()
-			serve_console()
+			self.serve_console()
 			self.wfile.write('This is POST request. '.encode())
 			self.wfile.write('Received: '.encode())
 			for x in post:
 				self.wfile.write(f'{x}: {post[x]}'.encode())
-			if 'command' in post:
+			if b'command' in post:
 				with socket(AF_UNIX, SOCK_DGRAM) as sock:
 					sock.connect(SOCKET)
-					sock.sendall(post['command'])
+					sock.sendall(post[b'command'])
 			else:
 				self.wfile.write('Invalid command sent'.encode())
 
@@ -208,3 +206,6 @@ def serve(port = 0):
 			return 2
 		camera.stop_recording()
 		return 0
+
+if __name__ == "__main__":
+	serve(5000)

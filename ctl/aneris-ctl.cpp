@@ -4,7 +4,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#define SOCKET_PATH "/var/run/aneris.socket"
+#define SOCKET_PATH "/var/run/aneris.sock"
 #define COMMAND_SIZE 4
 
 int main(int argc, char **argv)

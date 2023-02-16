@@ -27,8 +27,8 @@
 
 #define GPIO_LIGHTS 4
 #define GPIO_TEST 17
-#define GPIO_HYDROPHONE 19
-#define GPIO_WIPER 21
+#define GPIO_HYDROPHONE 27
+#define GPIO_WIPER 22
 
 void handler(const int signum);
 
@@ -151,8 +151,8 @@ int main(void)
 	/* N.B. do NOT modify the 'PYTHONPATH' environment */
 	/* variable, it WILL break the program             */
 	/***************************************************/
-	setenv("PYTHONPATH", "./Web_Server", 1);
-	Web_Server::serve(WEB_SERVER_PORT);
+	//setenv("PYTHONPATH", "./Web_Server", 1);
+	//Web_Server::serve(WEB_SERVER_PORT);
 	Logger::log(Logger::LOG_INFO, "Started web server");
 
 	/*******************/
@@ -195,23 +195,15 @@ int main(void)
 				system("reboot");
 				break;
 			}
-			case 3: // turn lights on/off
+			case 3: // turn lights on
 			{
 				gpio::GPIO *lights = nullptr;
 				try
 				{
 					lights = new gpio::GPIO(GPIO_LIGHTS, gpio::GPIO_OUTPUT);
 					if(!lights) throw gpio::GPIOError("Couldn't allocate memory for 'lights' variable");
-					if(lights->getval())
-					{
-						lights->setval(gpio::GPIO_LOW);
-						Logger::log(Logger::LOG_INFO, "Disabled lights");
-					}
-					else
-					{
-						lights->setval(gpio::GPIO_HIGH);
-						Logger::log(Logger::LOG_INFO, "Enabled lights");
-					}
+					lights->setval(gpio::GPIO_HIGH);
+					Logger::log(Logger::LOG_INFO, "Enabled lights");
 				}
 				catch(gpio::GPIOError& e)
 				{
@@ -220,7 +212,24 @@ int main(void)
 				delete lights;
 				break;
 			}
-			case 4: // turn wipers on/off
+			case 4: // turn lights off
+			{
+				gpio::GPIO *lights = nullptr;
+				try
+				{
+					lights = new gpio::GPIO(GPIO_LIGHTS, gpio::GPIO_OUTPUT);
+					if(!lights) throw gpio::GPIOError("Couldn't allocate memory for 'lights' variable");
+					lights->setval(gpio::GPIO_LOW);
+					Logger::log(Logger::LOG_INFO, "Disabled lights");
+				}
+				catch(gpio::GPIOError& e)
+				{
+					Logger::log(Logger::LOG_ERROR, e.what());
+				}
+				delete lights;
+				break;
+			}
+			case 5: // turn wipers on/off
 			{
 				gpio::GPIO *wiper = nullptr;
 				try
@@ -245,13 +254,13 @@ int main(void)
 				delete wiper;
 				break;
 			}
-			case 5: // clean up log file
+			case 6: // clean up log file
 			{
 				Logger::clearLog();
 				break;
 			}
-			case 6: {}
 			case 7: {}
+			case 8: {}
 			default: // return that command is invalid
 			{
 				Logger::log(Logger::LOG_INFO, "Received an invalid command");
