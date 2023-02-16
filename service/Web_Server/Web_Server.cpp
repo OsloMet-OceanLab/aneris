@@ -69,9 +69,9 @@ void *serve(void *port)
 	Py_DECREF(pValue);
 	Py_XDECREF(pFunc);
 	Py_DECREF(pModule);
-    Py_FinalizeEx();
+	Py_FinalizeEx();
 
-    pthread_exit(&ret);
+	pthread_exit(&ret);
 }
 
 } // end namespace Web_Server
