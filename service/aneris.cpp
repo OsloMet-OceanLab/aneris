@@ -152,14 +152,14 @@ int main(void)
 	/* N.B. do NOT modify the 'PYTHONPATH' environment */
 	/* variable, it WILL break the program             */
 	/***************************************************/
-	/*setenv("PYTHONPATH", "./Web_Server", 1);
-	int ws_port = WEB_SERVER_PORT;
-	Web_Server::serve(WEB_SERVER_PORT);
+	setenv("PYTHONPATH", "./Web_Server", 1);
 	pthread_t ws_thread;
-	pthread_create(&ws_thread, ThreadAttr, FunctionName, FunctionArgs);
-	pthread_create(&ws_thread, NULL, Web_Server::serve, &ws_port);
-	*/
-	Logger::log(Logger::LOG_INFO, "Started web server");
+	int ws_port = WEB_SERVER_PORT;
+	if (pthread_create(&ws_thread, NULL, &Web_Server::serve, &ws_port))
+	{
+		Logger::log(Logger::LOG_FATAL, "Couldn't start web server process");
+		return 0; //system("reboot");
+	} else Logger::log(Logger::LOG_INFO, "Started web server process");
 
 	/*******************/
 	/* begin main loop */
@@ -274,8 +274,20 @@ int main(void)
 				Logger::clearLog();
 				break;
 			}
-			case 8: {}
-			case 9: {}
+			case 8: // start web server process
+			{
+				if (pthread_create(&ws_thread, NULL, &Web_Server::serve, &ws_port))
+				{
+					Logger::log(Logger::LOG_FATAL, "Couldn't start web server process");
+					return 0; //system("reboot");
+				} else Logger::log(Logger::LOG_INFO, "Started web server process");
+			}
+			case 9: // end web server process
+			{
+				Logger::log(Logger::LOG_INFO, "Ending web server process");
+				if (pthread_cancel(ws_thread)) Logger::log(Logger::LOG_ERROR, "Couldn't start web server process");
+				else Logger::log(Logger::LOG_INFO, "Ended web server process");
+			}
 			default: // return that command is invalid
 			{
 				Logger::log(Logger::LOG_INFO, "Received an invalid command");
