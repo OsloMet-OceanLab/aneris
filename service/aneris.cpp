@@ -147,7 +147,7 @@ int main(void)
 	}
 
 	/***************************************************/
-	/* start python web server (TBD, in new thread)    */
+	/* start python web server                         */
 	/*                                                 */
 	/* N.B. do NOT modify the 'PYTHONPATH' environment */
 	/* variable, it WILL break the program             */
