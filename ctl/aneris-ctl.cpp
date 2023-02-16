@@ -9,7 +9,7 @@
 
 int main(int argc, char **argv)
 {
-	if (argc != 2 || !strncmp("--help", argv[1]))
+	if (argc != 2 || !strncmp("--help", argv[1], 6))
 	{
 		printf("Usage: %s <option>\n", argv[0]);
 		printf("Possible choices:\n");
