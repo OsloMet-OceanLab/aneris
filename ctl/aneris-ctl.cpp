@@ -5,7 +5,7 @@
 #include <sys/un.h>
 
 #define SOCKET_PATH "/var/run/aneris.sock"
-#define COMMAND_SIZE 4
+#define COMMAND_SIZE 2
 
 int main(int argc, char **argv)
 {
