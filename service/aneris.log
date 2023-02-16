@@ -72,3 +72,30 @@
 [ERROR]	2023-02-16 13:06:42	Hydrophone is not available
 [INFO]	2023-02-16 13:06:42	Started web server
 [INFO]	2023-02-16 13:06:42	Listening to socket
+[INFO]	2023-02-16 13:22:19	Verified user permission
+[INFO]	2023-02-16 13:22:19	Verified GPIO is available
+[INFO]	2023-02-16 13:22:19	Ping disabled
+[WARN]	2023-02-16 13:22:19	No connection to land
+[ERROR]	2023-02-16 13:22:19	Hydrophone is not available
+[INFO]	2023-02-16 13:22:19	Started web server
+[INFO]	2023-02-16 13:22:19	Listening to socket
+[INFO]	2023-02-16 13:23:03	Enabled lights
+[INFO]	2023-02-16 13:23:05	Disabled lights
+[INFO]	2023-02-16 13:23:11	Enabled lights
+[INFO]	2023-02-16 13:23:20	Disabled lights
+[INFO]	2023-02-16 13:24:02	Received an invalid command
+[INFO]	2023-02-16 13:42:16	Verified user permission
+[INFO]	2023-02-16 13:42:16	Verified GPIO is available
+[INFO]	2023-02-16 13:42:16	Ping disabled
+[WARN]	2023-02-16 13:42:16	No connection to land
+[ERROR]	2023-02-16 13:42:16	Hydrophone is not available
+[INFO]	2023-02-16 13:42:16	Started web server
+[INFO]	2023-02-16 13:42:16	Listening to socket
+[INFO]	2023-02-16 13:58:40	Verified user permission
+[INFO]	2023-02-16 13:58:40	Verified GPIO is available
+[INFO]	2023-02-16 13:58:40	Ping disabled
+[WARN]	2023-02-16 13:58:40	No connection to land
+[ERROR]	2023-02-16 13:58:40	Hydrophone is not available
+[INFO]	2023-02-16 13:58:40	Started web server
+[INFO]	2023-02-16 13:58:40	Listening to socket
+[INFO]	2023-02-16 13:58:44	Received SIGINT signal

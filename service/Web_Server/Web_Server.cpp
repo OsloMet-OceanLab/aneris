@@ -8,11 +8,11 @@
 
 namespace Web_Server
 {
-	
-int serve(const int port)
+
+void *serve(const int port)
 {
 	PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
-	long ret;
+	long *ret;
 
 	Py_Initialize();
 	pName = PyUnicode_DecodeFSDefault(PY_MODULE_NAME);
@@ -32,7 +32,7 @@ int serve(const int port)
 			
 			pValue = PyObject_CallObject(pFunc, pArgs);
 			if (pValue == NULL) throw WS_Err("Call to function failed");
-			ret = PyLong_AsLong(pValue);
+			*ret = PyLong_AsLong(pValue);
 		}
 	}
 	catch(WS_Err& e)

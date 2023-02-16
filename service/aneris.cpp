@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <pthread.h>
 
 #include "gpio/GPIO.hpp"
 #include "Logger/Logger.hpp"
@@ -151,8 +152,13 @@ int main(void)
 	/* N.B. do NOT modify the 'PYTHONPATH' environment */
 	/* variable, it WILL break the program             */
 	/***************************************************/
-	//setenv("PYTHONPATH", "./Web_Server", 1);
-	//Web_Server::serve(WEB_SERVER_PORT);
+	/*setenv("PYTHONPATH", "./Web_Server", 1);
+	int ws_port = WEB_SERVER_PORT;
+	Web_Server::serve(WEB_SERVER_PORT);
+	pthread_t ws_thread;
+	pthread_create(&ws_thread, ThreadAttr, FunctionName, FunctionArgs);
+	pthread_create(&ws_thread, NULL, Web_Server::serve, &ws_port);
+	*/
 	Logger::log(Logger::LOG_INFO, "Started web server");
 
 	/*******************/
@@ -229,23 +235,15 @@ int main(void)
 				delete lights;
 				break;
 			}
-			case 5: // turn wipers on/off
+			case 5: // turn wipers on
 			{
 				gpio::GPIO *wiper = nullptr;
 				try
 				{
 					wiper = new gpio::GPIO(GPIO_WIPER, gpio::GPIO_OUTPUT);
 					if(!wiper) throw gpio::GPIOError("Couldn't allocate memory for 'wiper' variable");
-					if(wiper->getval())
-					{
-						wiper->setval(gpio::GPIO_LOW);
-						Logger::log(Logger::LOG_INFO, "Disabled wiper");
-					}
-					else
-					{
-						wiper->setval(gpio::GPIO_HIGH);
-						Logger::log(Logger::LOG_INFO, "Enabled wiper");
-					}
+					wiper->setval(gpio::GPIO_HIGH);
+					Logger::log(Logger::LOG_INFO, "Enabled wiper");
 				}
 				catch(gpio::GPIOError& e)
 				{
@@ -254,13 +252,30 @@ int main(void)
 				delete wiper;
 				break;
 			}
-			case 6: // clean up log file
+			case 6: // turn wipers off
+			{
+				gpio::GPIO *wiper = nullptr;
+				try
+				{
+					wiper = new gpio::GPIO(GPIO_WIPER, gpio::GPIO_OUTPUT);
+					if(!wiper) throw gpio::GPIOError("Couldn't allocate memory for 'wiper' variable");
+					wiper->setval(gpio::GPIO_LOW);
+					Logger::log(Logger::LOG_INFO, "Disabled wiper");
+				}
+				catch(gpio::GPIOError& e)
+				{
+					Logger::log(Logger::LOG_ERROR, e.what());
+				}
+				delete wiper;
+				break;
+			}
+			case 7: // clean up log file
 			{
 				Logger::clearLog();
 				break;
 			}
-			case 7: {}
 			case 8: {}
+			case 9: {}
 			default: // return that command is invalid
 			{
 				Logger::log(Logger::LOG_INFO, "Received an invalid command");
@@ -274,5 +289,17 @@ end: // temporary
 
 void handler(const int signum)
 {
+	switch(signum)
+	{
+		case 0: {}
+		case 1: {}
+		case 2:
+		{
+			Logger::log(Logger::LOG_INFO, "Received SIGINT signal");
+			break;
+		}
+		case 3: {}
+		default: {}
+	}
 	exit(signum);
 }

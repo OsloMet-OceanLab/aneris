@@ -6,7 +6,7 @@
 namespace Web_Server
 {
 	
-int serve(const int port);
+void *serve(const int port);
 
 class WS_Err : std::exception
 {
