@@ -77,23 +77,19 @@ int main(void)
 	/* 0 on successful ping, any other        */
 	/* integer otherwise                      */
 	/******************************************/
-	int counter = 0, tether_up = 1;
+	int ping_counter = 0, tether_up = 1;
 	std::string attempt = "";
 	do
 	{
-		// this has been temporarily disabled, reenable when deploying to prod
-		Logger::log(Logger::LOG_INFO, "Ping disabled");
-		break;
-		/*
 		attempt = "Testing connection to land, attempt " + std::to_string(counter + 1);
 		Logger::log(Logger::LOG_INFO, attempt);
-		tether_up = system("ping -c 1 192.168.2.1");
+		tether_up = system("ping -c 1 10.44.6.51");
 
-		if(tether_up && counter < 2)
+		if(tether_up && ping_counter < 2)
 		{
-			++counter;
+			++ping_counter;
 			sleep(3);
-		} else break;*/
+		} else break;
 	} while(true);
 	
 	if(tether_up) Logger::log(Logger::LOG_WARN, "No connection to land");
@@ -158,7 +154,7 @@ int main(void)
 	if (pthread_create(&ws_thread, NULL, &Web_Server::serve, &ws_port))
 	{
 		Logger::log(Logger::LOG_FATAL, "Couldn't start web server process");
-		return 0; //system("reboot");
+		goto end; //system("reboot");
 	} else Logger::log(Logger::LOG_INFO, "Started web server process");
 
 	/*******************/
@@ -279,7 +275,7 @@ int main(void)
 				if (pthread_create(&ws_thread, NULL, &Web_Server::serve, &ws_port))
 				{
 					Logger::log(Logger::LOG_FATAL, "Couldn't start web server process");
-					return 0; //system("reboot");
+					goto end; //system("reboot");
 				} else Logger::log(Logger::LOG_INFO, "Started web server process");
 			}
 			case 9: // end web server process
