@@ -1,0 +1,4 @@
+# exclude __pycache__ folder and aneris.log file
+service/__pycache__
+service/aneris.log
+
