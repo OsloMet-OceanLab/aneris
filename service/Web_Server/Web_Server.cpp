@@ -9,10 +9,15 @@
 namespace Web_Server
 {
 
+static void cleanup_handler(void *ret);
+
+PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
+
 void *serve(void *port)
 {
-	PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
-	long ret;
+	long ret = 0;
+
+	pthread_cleanup_push(&cleanup_handler, &ret);
 
 	Py_Initialize();
 	pName = PyUnicode_DecodeFSDefault(PY_MODULE_NAME);
@@ -33,29 +38,6 @@ void *serve(void *port)
 			pValue = PyObject_CallObject(pFunc, pArgs);
 			if (pValue == NULL) throw WS_Err("Call to function failed");
 			ret = PyLong_AsLong(pValue);
-			
-			switch(ret)
-			{
-				case 0:
-				{
-					Logger:log(Logger::LOG_INFO, "Web server process ended correctly");
-					break;
-				}
-				case 1:
-				{
-					Logger:log(Logger::LOG_ERROR, "Port parameter is invalid");
-					break;
-				}
-				case 2:
-				{
-					Logger:log(Logger::LOG_ERROR, "Exception raised in web server");
-					break;
-				}
-				default:
-				{
-					Logger:log(Logger::LOG_WARN, "Unknown value returned by process");
-				}
-			}
 		}
 	}
 	catch(WS_Err& e)
@@ -64,14 +46,43 @@ void *serve(void *port)
 		Logger::log(Logger::LOG_ERROR, e.what());
 		ret = -1;
 	}
-	
+
+	pthread_cleanup_pop(1);
+
+	pthread_exit(&ret);
+}
+
+static void cleanup_handler(void *ret)
+{
+	switch(*(int*)ret)
+	{
+		case 0:
+		{
+			Logger::log(Logger::LOG_INFO, "Web server process ended correctly");
+			break;
+		}
+		case 1:
+		{
+			Logger::log(Logger::LOG_ERROR, "Port parameter is invalid");
+			break;
+		}
+		case 2:
+		{
+			Logger::log(Logger::LOG_ERROR, "Exception raised in web server");
+			break;
+		}
+		default:
+		{
+			Logger::log(Logger::LOG_WARN, "Unknown value returned by process");
+		}
+	}
 	Py_DECREF(pArgs);
 	Py_DECREF(pValue);
 	Py_XDECREF(pFunc);
 	Py_DECREF(pModule);
 	Py_FinalizeEx();
-
-	pthread_exit(&ret);
+	
+	return;
 }
 
 } // end namespace Web_Server

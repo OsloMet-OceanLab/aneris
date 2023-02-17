@@ -2,19 +2,9 @@
 #include <pthread.h>
 #include <unistd.h>
 
-void *fun(void *arg)
-{
-        int ret = 7 + *(int*)arg, i = 0;
-        printf("in thread, param: %d\n", *(int*)arg);
-        while(true)
-        {
-                printf("in thread, i: %d\n", i++);
-                ret += i;
-                sleep(1);
-        }
+void cleanup_handler(void *arg);
 
-        pthread_exit(&ret); // ret becomes available by using pthread_join()
-}
+void *fun(void *arg);
 
 int main()
 {
@@ -29,4 +19,28 @@ int main()
         printf("cancelled thread, ret: %d\n", ret);
 
         return 0;
+}
+
+void cleanup_handler(void *arg)
+{
+        printf("in cleanup, %d\n", *(int*)arg);
+}
+
+void *fun(void *arg)
+{
+        int ret = 7 + *(int*)arg, i = 0;
+        printf("in thread, param: %d\n", *(int*)arg);
+        
+        pthread_cleanup_push(&cleanup_handler, &ret);
+        
+        while(true)
+        {
+                printf("in thread, i: %d\n", i++);
+                ret += i;
+                sleep(1);
+        }
+
+        pthread_cleanup_pop(0);
+
+        pthread_exit(&ret); // ret becomes available by using pthread_join()
 }

@@ -31,19 +31,19 @@
 #define GPIO_HYDROPHONE 27
 #define GPIO_WIPER 22
 
-void handler(const int signum);
+void sig_handler(int signum);
 
 int main(void)
 {
-	/****************************/
-	/* register signal handlers */
-	/****************************/
-	signal(SIGINT, handler);
-	signal(SIGTERM, handler);
-	signal(SIGABRT, handler);
-	signal(SIGSEGV, handler);
-	signal(SIGFPE, handler);
-	signal(SIGBUS, handler);
+	/***************************/
+	/* register signal handler */
+	/***************************/
+	std::signal(SIGINT, sig_handler);
+	std::signal(SIGTERM, sig_handler);
+	std::signal(SIGABRT, sig_handler);
+	std::signal(SIGSEGV, sig_handler);
+	std::signal(SIGFPE, sig_handler);
+	std::signal(SIGILL, sig_handler);
 	
 	/***********************/
 	/* verify user is root */
@@ -51,7 +51,7 @@ int main(void)
 	if(geteuid())
 	{
 		Logger::log(Logger::LOG_FATAL, "This program needs to be run as root");
-		return 0;//system("reboot");
+		exit(1);
 	} else Logger::log(Logger::LOG_INFO, "Verified user permission");
 	
 	/****************************/
@@ -81,7 +81,7 @@ int main(void)
 	std::string attempt = "";
 	do
 	{
-		attempt = "Testing connection to land, attempt " + std::to_string(counter + 1);
+		attempt = "Testing connection to land, attempt " + std::to_string(ping_counter + 1);
 		Logger::log(Logger::LOG_INFO, attempt);
 		tether_up = system("ping -c 1 10.44.6.51");
 
@@ -128,7 +128,7 @@ int main(void)
 	if (sock < 0)
 	{
 		Logger::log(Logger::LOG_FATAL, "Couldn't create socket");
-		goto end;
+		exit(2);
 	}
 
 	server_sockaddr.sun_family = AF_UNIX;
@@ -139,7 +139,8 @@ int main(void)
 	if (bind(sock, (struct sockaddr*) &server_sockaddr, len) < 0)
 	{
 		Logger::log(Logger::LOG_FATAL, "Couldn't bind to socket");
-		goto end;
+		close(sock);
+		exit(2);
 	}
 
 	/***************************************************/
@@ -148,13 +149,14 @@ int main(void)
 	/* N.B. do NOT modify the 'PYTHONPATH' environment */
 	/* variable, it WILL break the program             */
 	/***************************************************/
-	setenv("PYTHONPATH", "./Web_Server", 1);
+	setenv("PYTHONPATH", ".", 1);
 	pthread_t ws_thread;
 	int ws_port = WEB_SERVER_PORT;
 	if (pthread_create(&ws_thread, NULL, &Web_Server::serve, &ws_port))
 	{
 		Logger::log(Logger::LOG_FATAL, "Couldn't start web server process");
-		goto end; //system("reboot");
+		close(sock);
+		exit(3); //system("reboot");
 	} else Logger::log(Logger::LOG_INFO, "Started web server process");
 
 	/*******************/
@@ -167,7 +169,7 @@ int main(void)
 		if (recvfrom(sock, buf, COMMAND_SIZE, 0, (struct sockaddr*) &peer_sock, (socklen_t*) &len) < 0)
 		{
 			Logger::log(Logger::LOG_FATAL, "Couldn't receive data");
-			goto end;
+			exit(2);
 		}
 		
 		switch(atoi(buf))
@@ -180,21 +182,13 @@ int main(void)
 			case 1: // shutdown
 			{
 				Logger::log(Logger::LOG_INFO, "Received shutdown command");
-
-				// temporary
-				goto end;
-
-				system("poweroff");
+				//system("poweroff");
 				break;
 			}
 			case 2: // reboot
 			{
 				Logger::log(Logger::LOG_INFO, "Received reboot command");
-
-				// temporary
-				goto end;
-				
-				system("reboot");
+				//system("reboot");
 				break;
 			}
 			case 3: // turn lights on
@@ -275,39 +269,67 @@ int main(void)
 				if (pthread_create(&ws_thread, NULL, &Web_Server::serve, &ws_port))
 				{
 					Logger::log(Logger::LOG_FATAL, "Couldn't start web server process");
-					goto end; //system("reboot");
+					exit(3);
 				} else Logger::log(Logger::LOG_INFO, "Started web server process");
+				break;
 			}
 			case 9: // end web server process
 			{
 				Logger::log(Logger::LOG_INFO, "Ending web server process");
 				if (pthread_cancel(ws_thread)) Logger::log(Logger::LOG_ERROR, "Couldn't start web server process");
 				else Logger::log(Logger::LOG_INFO, "Ended web server process");
+				break;
 			}
 			default: // return that command is invalid
 			{
 				Logger::log(Logger::LOG_INFO, "Received an invalid command");
-end: // temporary
 				close(sock);
-				return 0;
+				exit(0);
 			}
 		}
 	}
 }
 
-void handler(const int signum)
+void sig_handler(int signum)
 {
 	switch(signum)
 	{
-		case 0: {}
-		case 1: {}
 		case 2:
 		{
 			Logger::log(Logger::LOG_INFO, "Received SIGINT signal");
 			break;
 		}
-		case 3: {}
-		default: {}
+		case 3:
+		{
+			Logger::log(Logger::LOG_INFO, "Received SIGILL signal");
+			break;
+		}
+		case 6:
+		{
+			Logger::log(Logger::LOG_INFO, "Received SIGABRT signal");
+			break;
+		}
+		case 8:
+		{
+			Logger::log(Logger::LOG_INFO, "Received SIGFPE signal");
+			break;
+		}
+		case 11:
+		{
+			Logger::log(Logger::LOG_INFO, "Received SIGSEGV signal");
+			break;
+		}
+		case 15:
+		{
+			Logger::log(Logger::LOG_INFO, "Received SIGTERM signal");
+			break;
+		}
+		default:
+		{
+			Logger::log(Logger::LOG_INFO, "Received unknown signal");
+			break;
+		}
 	}
+
 	exit(signum);
 }

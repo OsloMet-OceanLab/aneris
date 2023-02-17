@@ -1,10 +1,18 @@
 CPP := g++
-CFLAGS := -g -Wall
+CFLAGS := -g -Wall -O3
 PYTHON_LIB := -I/usr/include/python3.9 -lpython3.9
 THREAD_LIB := -lpthread
 TARGET := aneris
+INSTALL_DIR := /etc/$(TARGET)
 
 default: $(TARGET)
+
+install:
+	mkdir $(INSTALL_DIR)
+	cp $(TARGET) web_server.py $(INSTALL_DIR)
+	cp -r web/ $(INSTALL_DIR)
+	cp $(TARGET).service /etc/systemd/system/
+	systemctl daemon-reload
 
 $(TARGET): $(TARGET).o GPIO.o Logger.o Web_Server.o
 	$(CPP) -o $(TARGET) $(TARGET).o GPIO.o Logger.o Web_Server.o $(CFLAGS) $(THREAD_LIB) $(PYTHON_LIB)

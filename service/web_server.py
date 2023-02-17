@@ -2,7 +2,6 @@
 # make sure the legacy camera stack is enabled if it doesn't work
 # include copyright notice here
 
-
 from io import BytesIO
 from picamera import PiCamera
 from logging import warning
@@ -106,11 +105,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
 				self.send_header('Content-type', 'text/plain')
 				self.end_headers()
 				self.wfile.write('Error: log file does not exist'.encode())
-				
-		elif path == '/metadata':
-			self.send_error(418)
-			self.end_headers()
-			
+
 		elif path == '/console':
 			self.serve_console();
 			
