@@ -1,5 +1,5 @@
 CPP := g++
-CFLAGS := -g -Wall -O3
+CFLAGS := -O3 -Wpedantic -Wall -Wextra -Wconversion -Wshadow -Werror
 PYTHON_LIB := -I/usr/include/python3.9 -lpython3.9
 THREAD_LIB := -lpthread
 TARGET := aneris
