@@ -1,7 +1,6 @@
 #ifndef GPIO_HPP
 #define GPIO_HPP
 
-#include <string>
 #include <exception>
 
 namespace gpio
