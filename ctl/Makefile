@@ -1,5 +1,5 @@
 CPP := g++
-CFLAGS := -g -Wall
+CFLAGS := -O3 -Wpedantic -Wall -Wextra -Wconversion -Wshadow -Werror
 TARGET := aneris-ctl
 
 default: $(TARGET)
