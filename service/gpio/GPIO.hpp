@@ -2,6 +2,7 @@
 #define GPIO_HPP
 
 #include <string>
+#include <exception>
 
 namespace gpio
 {
