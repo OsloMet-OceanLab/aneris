@@ -276,7 +276,7 @@ int main(void)
 			case 9: // end web server process
 			{
 				Logger::log(Logger::LOG_INFO, "Ending web server process");
-				if (pthread_cancel(ws_thread)) Logger::log(Logger::LOG_ERROR, "Couldn't start web server process");
+				if (pthread_cancel(ws_thread)) Logger::log(Logger::LOG_ERROR, "Couldn't stop web server process");
 				else Logger::log(Logger::LOG_INFO, "Ended web server process");
 				break;
 			}
