@@ -15,7 +15,7 @@ install:
 	systemctl daemon-reload
 
 $(TARGET): $(TARGET).o GPIO.o Logger.o Web_Server.o
-	$(CPP) -o $(TARGET) $(TARGET).o GPIO.o Logger.o Web_Server.o $(CFLAGS) $(THREAD_LIB) $(PYTHON_LIB)
+	$(CPP) -o $(TARGET).out $(TARGET).o GPIO.o Logger.o Web_Server.o $(CFLAGS) $(THREAD_LIB) $(PYTHON_LIB)
 	$(RM) *.o
 
 $(TARGET).o: $(TARGET).cpp

@@ -5,7 +5,7 @@ TARGET := aneris-ctl
 default: $(TARGET)
 
 $(TARGET): $(TARGET).o
-	$(CPP) -o $(TARGET) $(TARGET).o $(CFLAGS)
+	$(CPP) -o $(TARGET).out $(TARGET).o $(CFLAGS)
 	$(RM) *.o
 
 $(TARGET).o: $(TARGET).cpp

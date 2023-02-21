@@ -30,7 +30,7 @@ GPIO::GPIO(int pin, long dir)
     setdir.close();
 }
 
-GPIO::~GPIO()
+GPIO::~GPIO() noexcept(false)
 {
     // Unexport the pin
     std::ofstream ofs("/sys/class/gpio/unexport", std::ofstream::out);

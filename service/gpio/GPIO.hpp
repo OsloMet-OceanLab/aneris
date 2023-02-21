@@ -19,7 +19,7 @@ class GPIO
 {
 public:
     explicit GPIO(int pin = 4, long dir = GPIO_INPUT);
-    virtual ~GPIO();
+    virtual ~GPIO() noexcept(false);
     void setval(long val); // Set GPIO Value (high/low)
     int getval(); // Get GPIO Value
     int get_gpionum();

@@ -132,7 +132,7 @@ int main(void)
 	}
 
 	server_sockaddr.sun_family = AF_UNIX;
-	strcpy(server_sockaddr.sun_path, SOCKET_PATH); 
+	memcpy(server_sockaddr.sun_path, SOCKET_PATH, strlen(SOCKET_PATH));
 	len = sizeof(server_sockaddr);
 	unlink(SOCKET_PATH);
 

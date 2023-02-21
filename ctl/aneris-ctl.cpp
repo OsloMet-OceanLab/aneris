@@ -32,9 +32,9 @@ int main(int argc, char **argv)
 	
 	sock = socket(AF_UNIX, SOCK_DGRAM, 0);
 	serv.sun_family = AF_UNIX;
-	strcpy(serv.sun_path, SOCKET_PATH);
+	memcpy(serv.sun_path, SOCKET_PATH, strlen(SOCKET_PATH));
 	
-	strncpy(buf, argv[1], COMMAND_SIZE);
+	memcpy(buf, argv[1], COMMAND_SIZE);
 	sendto(sock, buf, strlen(buf), 0, (struct sockaddr *) &serv, sizeof(serv));
 	close(sock);
 	return 0;
