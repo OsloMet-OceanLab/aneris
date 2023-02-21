@@ -1,15 +1,23 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Feb 21 13:32:39 2023
+
+@author: OceanLab
+"""
+
 from socket import socket, AF_INET, SOCK_DGRAM
 import sys, wave
 
 HOST, PORT = '', 5453
 
-d = ''
+d = b''
 i = 0
+raw_size = 0
 
 def genHeader(sampleRate, bitsPerSample, channels, samples):
-    datasize = 10240000 #samples * channels * bitsPerSample // 8
+    datasize = samples #* channels * bitsPerSample // 8
     endian = 'little'
-    sign = False
+    sign = True
     o = bytes("RIFF", 'ascii')
     o += (datasize + 36).to_bytes(4, endian, signed = sign)
     o += bytes("WAVE", 'ascii')
@@ -24,6 +32,24 @@ def genHeader(sampleRate, bitsPerSample, channels, samples):
     o += bytes("data", 'ascii')
     o += (datasize).to_bytes(4, endian, signed = sign)
     return o
+
+import numpy as np
+
+def signaltonoise(a, axis=0, ddof=0):
+    a = np.asanyarray(a)
+    m = a.mean(axis)
+    sd = a.std(axis=axis, ddof=ddof)
+    return np.where(sd == 0, 0, m/sd)
+
+def noise(d):
+    data = np.frombuffer(bytearray(d), dtype=np.int16)
+    #norm = data / (max(np.amax(data), -1 * np.amin(data)))
+    #return signaltonoise(norm)
+    data //= 2
+    for i, x in np.ndenumerate(data):
+        if x < -3000 or x > 7000:
+            data[i] = 0
+    return data
 
 with socket(AF_INET, SOCK_DGRAM) as sock:
     sock.bind((HOST, PORT))
@@ -44,6 +70,7 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
                 dtype = 'DAQ'
             elif message.hex()[8:10] == '02':
                 dtype = 'Noise'
+                continue
             #print(f"Data type: {dtype}")
 
             data = message[5:size]
@@ -66,15 +93,17 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             raw = data[13:(3*scnt*chmap)+13]
             #print(raw.hex())
             
-            d += raw.hex()
+            d += raw
+            raw_size += scnt * 3
             
-            if i % 2500 == 0:
-                header = genHeader(96000, 16, 1, 1)
-                wavfile = header + bytes.fromhex(d)
+            if i % 500 == 0:
+                print(raw_size)
+                header = genHeader(96_000, 16, 1, raw_size)
+                wavfile = header + d#noise(d).tobytes()
                 
                 break
         
-        with open('test.wav', 'wb') as stream:
+        with open('C:\\Users\\OceanLab\\Onedrive - OsloMet\\Skrivebord\\test2.wav', 'wb') as stream:
             stream.write(wavfile)
 
     except KeyboardInterrupt:
