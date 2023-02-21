@@ -8,7 +8,7 @@ i = 0
 
 def genHeader(sampleRate, bitsPerSample, channels, samples):
     datasize = 10240000 #samples * channels * bitsPerSample // 8
-    endian = 'big'
+    endian = 'little'
     sign = False
     o = bytes("RIFF", 'ascii')
     o += (datasize + 36).to_bytes(4, endian, signed = sign)
@@ -69,7 +69,7 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             d += raw.hex()
             
             if i % 2500 == 0:
-                header = genHeader(7799040, 16, 1, 1)
+                header = genHeader(96000, 16, 1, 1)
                 wavfile = header + bytes.fromhex(d)
                 
                 break
