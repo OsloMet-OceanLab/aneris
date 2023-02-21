@@ -6,6 +6,23 @@ HOST, PORT = '', 5453
 d = ''
 i = 0
 
+def genHeader(sampleRate, bitsPerSample, channels, samples):
+    datasize = 10240000 # samples * channels * bitsPerSample // 8
+    o = bytes("RIFF", 'ascii')
+    o += (datasize + 36).to_bytes(4, 'little')
+    o += bytes("WAVE", 'ascii')
+    o += bytes("fmt ", 'ascii')
+    o += (16).to_bytes(4, 'little')
+    o += (1).to_bytes(2, 'little')
+    o += (channels).to_bytes(2, 'little')
+    o += (sampleRate).to_bytes(4, 'little')
+    o += (sampleRate * channels * bitsPerSample // 8).to_bytes(4, 'little')
+    o += (channels * bitsPerSample // 8).to_bytes(2, 'little')
+    o += (bitsPerSample).to_bytes(2, 'little')
+    o += bytes("data", 'ascii')
+    o += (datasize).to_bytes(4, 'little')
+    return o
+
 with socket(AF_INET, SOCK_DGRAM) as sock:
     sock.bind((HOST, PORT))
     print("Bound")
@@ -49,21 +66,13 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             d += raw.hex()
             
             if i % 2500 == 0:
-                header = '52494646 totsize 57415645666d742010000000010001000077010000ee02000200100064617461 filsize '
-
-                length = len(d)
-                header = header.replace(' totsize ', hex(length+44*2-8*2)[2:])
-                print(hex(length+44*2-8*2)[2:])
-                header = header.replace(' filsize ', hex(length)[2:])
-                print(hex(length)[2:])
-                print(header, len(header)/2)
-
-                wavfile = header + d
+                header = genHeader(96000, 24, 1, 0)
+                wavfile = header + bytes.fromhex(d)
                 
                 break
         
         with open('test.wav', 'wb') as stream:
-            stream.write(bytes.fromhex(wavfile))
+            stream.write(wavfile)
 
     except KeyboardInterrupt:
         print("Done")

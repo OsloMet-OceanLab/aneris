@@ -31,6 +31,6 @@ Web_Server.o: Web_Server/Web_Server.cpp
 	$(CPP) -c Web_Server/Web_Server.cpp $(CFLAGS) $(PYTHON_LIB)
 
 clean:
-	$(RM) $(TARGET) *.o
+	$(RM) $(TARGET).out *.o
 	
 remake: clean $(TARGET)

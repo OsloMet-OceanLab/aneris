@@ -19,7 +19,7 @@ class GPIO
 {
 public:
     explicit GPIO(int pin = 4, long dir = GPIO_INPUT);
-    virtual ~GPIO() noexcept(false);
+    virtual ~GPIO() noexcept(false); // N.B. allowing the dtor to throw exceptions is not recommended, but should be fine as they're handled
     void setval(long val); // Set GPIO Value (high/low)
     int getval(); // Get GPIO Value
     int get_gpionum();

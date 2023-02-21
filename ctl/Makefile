@@ -12,6 +12,6 @@ $(TARGET).o: $(TARGET).cpp
 	$(CPP) -c $(TARGET).cpp $(CFLAGS)
 
 clean:
-	$(RM) $(TARGET) *.o
+	$(RM) $(TARGET).out *.o
 
 remake: clean $(TARGET)
