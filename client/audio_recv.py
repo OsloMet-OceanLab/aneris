@@ -7,9 +7,9 @@ d = ''
 i = 0
 
 def genHeader(sampleRate, bitsPerSample, channels, samples):
-    datasize = samples * channels * bitsPerSample // 8
+    datasize = 10240000 #samples * channels * bitsPerSample // 8
     endian = 'little'
-    sign = True
+    sign = False
     o = bytes("RIFF", 'ascii')
     o += (datasize + 36).to_bytes(4, endian, signed = sign)
     o += bytes("WAVE", 'ascii')
@@ -31,7 +31,8 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
     try:
         while True:
             i += 1
-            print(i)
+            if i % 100 == 0:
+                print(i)
             message, address = sock.recvfrom(4096)
             sync = message.hex()[0:4]
             #print(f"Sync: {sync}")
@@ -68,7 +69,7 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             d += raw.hex()
             
             if i % 2500 == 0:
-                header = genHeader(sr, scnt, chmap, 1)
+                header = genHeader(sr, 24, chmap, 1)
                 wavfile = header + bytes.fromhex(d)
                 
                 break
