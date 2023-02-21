@@ -8,7 +8,7 @@ i = 0
 
 def genHeader(sampleRate, bitsPerSample, channels, samples):
     datasize = 10240000 # samples * channels * bitsPerSample // 8
-    endian = 'big'
+    endian = 'little'
     o = bytes("RIFF", 'ascii')
     o += (datasize + 36).to_bytes(4, endian)
     o += bytes("WAVE", 'ascii')
