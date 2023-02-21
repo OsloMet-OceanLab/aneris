@@ -68,7 +68,7 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             d += raw.hex()
             
             if i % 2500 == 0:
-                header = genHeader(96000, 24, 1, 0)
+                header = genHeader(96000, 16, 1, 0)
                 wavfile = header + bytes.fromhex(d)
                 
                 break
