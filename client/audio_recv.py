@@ -9,19 +9,20 @@ i = 0
 def genHeader(sampleRate, bitsPerSample, channels, samples):
     datasize = 10240000 # samples * channels * bitsPerSample // 8
     endian = 'little'
+    sign = True
     o = bytes("RIFF", 'ascii')
-    o += (datasize + 36).to_bytes(4, endian)
+    o += (datasize + 36).to_bytes(4, endian, signed = sign)
     o += bytes("WAVE", 'ascii')
     o += bytes("fmt ", 'ascii')
-    o += (16).to_bytes(4, endian)
-    o += (1).to_bytes(2, endian)
-    o += (channels).to_bytes(2, endian)
-    o += (sampleRate).to_bytes(4, endian)
-    o += (sampleRate * channels * bitsPerSample // 8).to_bytes(4, endian)
-    o += (channels * bitsPerSample // 8).to_bytes(2, endian)
-    o += (bitsPerSample).to_bytes(2, endian)
+    o += (16).to_bytes(4, endian, signed = sign)
+    o += (1).to_bytes(2, endian, signed = sign)
+    o += (channels).to_bytes(2, endian, signed = sign)
+    o += (sampleRate).to_bytes(4, endian, signed = sign)
+    o += (sampleRate * channels * bitsPerSample // 8).to_bytes(4, endian, signed = sign)
+    o += (channels * bitsPerSample // 8).to_bytes(2, endian, signed = sign)
+    o += (bitsPerSample).to_bytes(2, endian, signed = sign)
     o += bytes("data", 'ascii')
-    o += (datasize).to_bytes(4, endian)
+    o += (datasize).to_bytes(4, endian, signed = sign)
     return o
 
 with socket(AF_INET, SOCK_DGRAM) as sock:
