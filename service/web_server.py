@@ -40,58 +40,36 @@ class StreamingHandler(BaseHTTPRequestHandler):
 			get_params = dict(query.split('=') for query in query.split('&'))
 			if 'content' not in get_params:
 				get_params['content'] = 'video'
-			if 'timestamp' not in get_params:
-				get_params['timestamp'] = 'false'
+			#if 'timestamp' not in get_params:
+				#get_params['timestamp'] = 'false'
 		except ValueError:
-			get_params = {'content': 'video',
-							'timestamp': 'false'}
+			get_params = {'content': 'video'}
 
 		if path == '/' or path == '/index.html' or path == '/index':
-			self.serve_index()
-			
-		# Get params for stream:
-		# content: video, audio, videoaudio, default: videoaudio
-		# timestamp: true, false (ignored when content: audio), default: true
-		# N.B. timestamp has been temporarily disabled
+			try:
+				with open(WEB_DIR + 'index.html', 'rb') as index:
+					self.send_response(200)
+					self.send_header('Content-Type', 'text/html')
+					self.end_headers()
+					self.wfile.write(index.read())
+			except FileNotFoundError as e:
+				self.send_response(404)
+				self.send_header('Content-type', 'text/plain')
+				self.end_headers()
+				self.wfile.write('Error: index.html does not exist'.encode())
 			
 		elif path == '/stream':
 			if get_params['content'] == 'video':
-				global output
-				self.send_response(200)
-				self.send_header('Age', 0)
-				self.send_header('Cache-Control', 'no-cache, private')
-				self.send_header('Pragma', 'no-cache')
-				self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
-				self.end_headers()
-				try:
-					while True:
-						# lets us annotate time on top of the frame, but
-						# this choice is forced on all users
-						#if get_params['timestamp'] == 'true':
-							#camera.annotate_text = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-						#else:
-							#camera.annotate_text = ""
-						with output.condition:
-							output.condition.wait()
-							frame = output.frame
-						self.wfile.write(b'--FRAME\r\n')
-						self.send_header('Content-Type', 'image/jpeg')
-						self.send_header('Content-Length', len(frame))
-						self.end_headers()
-						self.wfile.write(frame)
-						self.wfile.write(b'\r\n')
-				except Exception as e:
-					warning(
-						'Removed streaming client %s: %s',
-						self.client_address, str(e))
-							
-			elif get_params['content'] == 'videoaudio':
-				self.send_error(418)
-				self.end_headers()
-				
+				self.serve_video()
+
 			elif get_params['content'] == 'audio':
-				self.send_error(418)
-				self.end_headers()
+				self.stream_audio()
+
+		elif path == '/video':
+			self.serve_video()
+
+		elif path == '/audio':
+			self.serve_audio()
 
 		elif path == '/logs':
 			try:
@@ -107,10 +85,10 @@ class StreamingHandler(BaseHTTPRequestHandler):
 				self.wfile.write('Error: log file does not exist'.encode())
 
 		elif path == '/console':
-			self.serve_console();
+			self.serve_console('GET');
 			
 		elif path == '/docs' or path == '/docs/index.html':
-			self.serve_docs(path)
+			self.serve_docs(path, query)
 			
 		else:
 			self.send_error(404)
@@ -120,7 +98,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
 		if self.path == '/console':
 			content_length = int(self.headers['Content-Length'])
 			post = dict(x.split(b'=') for x in self.rfile.read(content_length).split(b';'))
-			self.serve_console()
+			self.serve_console('POST', post)
 			self.wfile.write('This is POST request. '.encode())
 			self.wfile.write('Received: '.encode())
 			for x in post:
@@ -130,26 +108,50 @@ class StreamingHandler(BaseHTTPRequestHandler):
 					sock.connect(SOCKET)
 					sock.sendall(post[b'command'])
 			else:
-				self.wfile.write('Invalid command sent'.encode())
+				self.wfile.write('Invalid post sent'.encode())
 
 		else:
 			self.send_error(404)
 			self.end_headers()
-			
-	def serve_index(self):
+
+	# Get params for stream:
+	# content: video, audio, videoaudio, default: videoaudio
+	# timestamp: true, false (ignored when content: audio), default: true
+	# N.B. timestamp has been temporarily disabled
+
+	def serve_video(self):
+		global output
+		self.send_response(200)
+		self.send_header('Age', 0)
+		self.send_header('Cache-Control', 'no-cache, private')
+		self.send_header('Pragma', 'no-cache')
+		self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
+		self.end_headers()
 		try:
-			with open(WEB_DIR + 'index.html', 'rb') as index:
-				self.send_response(200)
-				self.send_header('Content-Type', 'text/html')
+			while True:
+				# lets us annotate time on top of the frame, but
+				# latest choice is forced on all users
+				#if get_params['timestamp'] == 'true':
+					#camera.annotate_text = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+				#else:
+					#camera.annotate_text = ""
+				with output.condition:
+					output.condition.wait()
+					frame = output.frame
+				self.wfile.write(b'--FRAME\r\n')
+				self.send_header('Content-Type', 'image/jpeg')
+				self.send_header('Content-Length', len(frame))
 				self.end_headers()
-				self.wfile.write(index.read())
-		except FileNotFoundError as e:
-			self.send_response(404)
-			self.send_header('Content-type', 'text/plain')
-			self.end_headers()
-			self.wfile.write('Error: index.html does not exist'.encode())
+				self.wfile.write(frame)
+				self.wfile.write(b'\r\n')
+		except Exception as e:
+			warning('Removed streaming client %s: %s', self.client_address, str(e))
+
+	def serve_audio(self):
+		self.send_error(418)
+		self.end_headers()
 			
-	def serve_docs(self, doc):
+	def serve_docs(self, docs, query):
 		try:
 			with open(DOCS_DIR + 'index.html', 'rb') as index:
 				self.send_response(200)
@@ -162,7 +164,9 @@ class StreamingHandler(BaseHTTPRequestHandler):
 			self.end_headers()
 			self.wfile.write('Error: index.html does not exist'.encode())
 
-	def serve_console(self):
+	def serve_console(self, method, post = None):
+		if method == 'POST':
+			pass
 		try:
 			with open(WEB_DIR + 'console.html', 'rb') as index:
 				self.send_response(200)
