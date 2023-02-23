@@ -151,13 +151,16 @@ int main(void)
 	/***************************************************/
 	setenv("PYTHONPATH", ".", 1);
 	pthread_t ws_thread;
+	bool thread_running;
 	int ws_port = WEB_SERVER_PORT;
 	if (pthread_create(&ws_thread, NULL, &Web_Server::serve, &ws_port))
 	{
 		Logger::log(Logger::LOG_FATAL, "Couldn't start web server process");
 		close(sock);
 		exit(3); //system("reboot");
-	} else Logger::log(Logger::LOG_INFO, "Started web server process");
+	}
+	Logger::log(Logger::LOG_INFO, "Started web server process");
+	thread_running = true;
 
 	/*******************/
 	/* begin main loop */
@@ -266,19 +269,26 @@ int main(void)
 			}
 			case 8: // start web server process
 			{
-				if (pthread_create(&ws_thread, NULL, &Web_Server::serve, &ws_port))
+				if(!thread_running)
 				{
-					Logger::log(Logger::LOG_FATAL, "Couldn't start web server process");
-					exit(3);
-				} else Logger::log(Logger::LOG_INFO, "Started web server process");
-				break;
+					if (pthread_create(&ws_thread, NULL, &Web_Server::serve, &ws_port))
+					{
+						Logger::log(Logger::LOG_FATAL, "Couldn't start web server process");
+						exit(3);
+					}
+					Logger::log(Logger::LOG_INFO, "Started web server process");
+					break;
+				}
 			}
 			case 9: // end web server process
 			{
-				Logger::log(Logger::LOG_INFO, "Ending web server process");
-				if (pthread_cancel(ws_thread)) Logger::log(Logger::LOG_ERROR, "Couldn't stop web server process");
-				else Logger::log(Logger::LOG_INFO, "Ended web server process");
-				break;
+				if(thread_running)
+				{
+					Logger::log(Logger::LOG_INFO, "Ending web server process");
+					if (pthread_cancel(ws_thread)) Logger::log(Logger::LOG_ERROR, "Couldn't stop web server process");
+					else Logger::log(Logger::LOG_INFO, "Ended web server process");
+					break;
+				}
 			}
 			default: // return that command is invalid
 			{
