@@ -11,7 +11,7 @@ from scipy.io.wavfile import read, write
 #from IPython.display import Audio
 from numpy.fft import fft, ifft
 
-rate, data = read('C:\\Users\\OceanLab\\Onedrive - OsloMet\\Skrivebord\\test2.wav')
+rate, data = read('test2.wav')
 
 #data = data[:,0] # make audio mono, not needed here
 
@@ -37,4 +37,4 @@ plt.ylabel('Amplitude')
 plt.title('Waveform (reduced)')
 plt.show()
 
-write('C:\\Users\\OceanLab\\Onedrive - OsloMet\\Skrivebord\\test4.wav', rate, reduced_noise)
+write('test4.wav', rate, reduced_noise)

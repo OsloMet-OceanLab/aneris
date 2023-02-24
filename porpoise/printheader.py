@@ -1,9 +1,9 @@
 
-with open('C:\\Users\\OceanLab\\Onedrive - OsloMet\\Skrivebord\\test3.wav', 'rb') as file:
+with open('test3.wav', 'rb') as file:
     read = file.read()[:44]
 
 
-with open('C:\\Users\\OceanLab\\Onedrive - OsloMet\\Skrivebord\\test3.wav', 'rb') as file:
+with open('test3.wav', 'rb') as file:
     import numpy as np
     print(np.frombuffer(file.read()[44:], dtype=np.int16))
     #print(file.read()[4444:4488].hex())

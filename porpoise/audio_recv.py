@@ -128,7 +128,7 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
                 
                 break
         
-        with open('C:\\Users\\OceanLab\\Onedrive - OsloMet\\Skrivebord\\test2.wav', 'wb') as stream:
+        with open('test2.wav', 'wb') as stream:
             stream.write(wavfile)
 
     except KeyboardInterrupt:
