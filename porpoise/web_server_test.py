@@ -75,33 +75,26 @@ class StreamingHandler(BaseHTTPRequestHandler):
         self.send_header('Pragma', 'no-cache')
         self.send_header('Content-Type', 'audio/x-wav')
         self.end_headers()
-        
-        HOST, PORT = '', 5453
+
         d = b''
         i = 0
         raw_size = 0
+        
+        self.wfile.write(genHeader(96_000, 16, 1, 1024000))
+        
         with socket(AF_INET, SOCK_DGRAM) as sock:
-            sock.bind((HOST, PORT))
+            sock.bind(('', 5453))
             print("Bound")
             try:
                 while True:
                     raw, scnt = parse(sock)
                     d += raw
                     raw_size += scnt * 3
-                    print(len(d.hex())/2)
                     i += 1
-                    
-                    if i % 100 == 0:
-                        print(f'i: {i}')
-                    
+
                     if i % 6 == 0:
-                        print(raw_size)
-                        header = genHeader(96_000, 16, 1, raw_size)
-                        wavfile = header + d
-                        
-                        print(wavfile)
-                        
-                        break
+                        self.wfile.write(d)
+                        d = b''
 
             except KeyboardInterrupt:
                 print("Done")
@@ -119,11 +112,12 @@ def serve(port = 0):
         server = StreamingServer(address, StreamingHandler)
         print('Stream started successfully')
         server.serve_forever()
-    except Exception as e:
+    except KeyboardInterrupt as e:
         print('Couldn\'t start stream')
         print(f'Additional information: {str(e)}')
+        server.server_close()
         return 2
     return 0
 
 if __name__ == "__main__":
-    serve(5000)
+    serve(80)
