@@ -146,7 +146,7 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
                 
                 sys.exit(0)
             
-            if i % 500 == 0:
+            if i % 1000 == 0:
                 print(raw_size)
                 header = genHeader(96_000, 16, 1, raw_size)
                 wavfile = header + d#noise(d).tobytes()
@@ -155,10 +155,10 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
         
         import pywav, wave
         
-        #with open('test2.wav', 'wb') as stream:
-            #stream.write(wavfile)
-        with pywav.WavWrite('test2.wav', 1, 96000, 16, 1) as file:
-            file.write(wavfile)
+        with open('test2.wav', 'wb') as stream:
+            stream.write(wavfile)
+        #with pywav.WavWrite('test2.wav', 1, 96000, 16, 1) as file:
+            #file.write(wavfile)
 
     except KeyboardInterrupt:
         print("Done")
