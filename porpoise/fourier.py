@@ -7,7 +7,7 @@ Created on Mon Feb 27 11:07:57 2023
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
+import pandas as pd # substitute panda loading csv with numpy array from data
 import datetime
 import pywt
 #from scipy import signal
@@ -38,3 +38,4 @@ plt.rcParams['lines.linewidth'] = 2
 plt.rcParams['lines.markersize'] = 8
 colors = ['xkcd:pale orange', 'xkcd:sea blue', 'xkcd:pale red', 'xkcd:sage green', 'xkcd:terra cotta', 'xkcd:dull purple', 'xkcd:teal', 'xkcd: goldenrod', 'xkcd:cadet blue',
 'xkcd:scarlet']
+
