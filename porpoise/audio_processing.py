@@ -22,7 +22,7 @@ with open('test.wav', 'rb') as file:
 
 #Audio(data, rate=Fs)
 
-print(data.dtype)
+#print(data.dtype)
 
 plt.figure()
 plt.plot(data)
