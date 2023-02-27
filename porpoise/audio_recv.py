@@ -2,7 +2,7 @@
 """
 Created on Wed Feb 22 10:11:51 2023
 
-@author: OceanLab
+@author: salve
 """
 
 from socket import socket, AF_INET, SOCK_DGRAM
@@ -79,18 +79,24 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             if i % 100 == 0:
                 print(i)
             
-            if False:#i % 6 == 0:
-                import struct
-                d = struct.pack(f'<{raw_size//2}h', *struct.unpack(f'>{raw_size//2}h', d)) # it's possible i'm encoding this big endian audio as little endian
-                print(d[:8].hex())
-                print(raw[:8].hex())
+            if i % 600 == 0:
+                import matplotlib.pyplot as plt, numpy as np
+                
+                plt.figure()
+                d2 = np.frombuffer(d, dtype=np.int32)
+                plt.plot(d2)
+                print(d2)
+                plt.xlabel('Sample index')
+                plt.ylabel('Amplitude')
+                plt.title('Waveform')
+                plt.show()
                 sys.exit(0)
             
             if i % 1000 == 0:
                 print(raw_size)
                 header = genHeader(96_000, 16, 1, raw_size)
                 import struct
-                d = struct.pack(f'<{raw_size//2}h', *struct.unpack(f'>{raw_size//2}h', d)) # it's possible i'm encoding this big endian audio as little endian
+                #d = struct.pack(f'<{raw_size//2}h', *struct.unpack(f'>{raw_size//2}h', d)) # it's possible i'm encoding this big endian audio as little endian
                 wavfile = header + d
                 
                 break

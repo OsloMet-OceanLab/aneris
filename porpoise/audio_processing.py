@@ -2,7 +2,7 @@
 """
 Created on Wed Feb 22 10:14:30 2023
 
-@author: OceanLab
+@author: salve
 """
 
 import numpy as np
@@ -11,13 +11,18 @@ from scipy.io.wavfile import read, write
 #from IPython.display import Audio
 from numpy.fft import fft, ifft
 
-rate, data = read('test2.wav')
+#rate, data = read('test.wav')
+with open('test.wav', 'rb') as file:
+    data = file.read()
+    data = np.frombuffer(data[44:], np.int32)
 
 #data = data[:,0] # make audio mono, not needed here
 
-print(f'Sampling frequency is {rate}')
+#print(f'Sampling frequency is {rate}')
 
 #Audio(data, rate=Fs)
+
+print(data.dtype)
 
 plt.figure()
 plt.plot(data)
@@ -26,6 +31,7 @@ plt.ylabel('Amplitude')
 plt.title('Waveform')
 plt.show()
 
+"""
 import noisereduce as nr
 
 reduced_noise = nr.reduce_noise(y=data, sr=rate)
@@ -37,4 +43,5 @@ plt.ylabel('Amplitude')
 plt.title('Waveform (reduced)')
 plt.show()
 
-write('test4.wav', rate, reduced_noise)
+#write('test4.wav', rate, reduced_noise)
+"""
