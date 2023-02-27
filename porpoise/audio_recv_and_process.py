@@ -29,7 +29,7 @@ def genHeader(sampleRate, bitsPerSample, channels, samples):
 
 HOST, PORT = '', 5453
 
-d = b''
+d = bytearray()
 i = 0
 raw_size = 0
 
@@ -40,16 +40,16 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
         while True:
             message, address = sock.recvfrom(1536)
             sync = message.hex()[0:4]
-            #print(f"Sync: {sync}")
-            size = int(message.hex()[4:8], 16)
-            #print(f"Size: {size}")
+            print(f"Sync: {sync}")
+            size = int.from_bytes(message[2:4], 'big')
+            print(f"Size: {size}")
             if message.hex()[8:10] == '00':
                 dtype = 'Unknown'
             elif message.hex()[8:10] == '01':
                 dtype = 'DAQ'
             elif message.hex()[8:10] == '02':
                 dtype = 'Noise'
-            #print(f"Data type: {dtype}")
+            print(f"Data type: {dtype}")
 
             data = message[5:size]
 
@@ -59,17 +59,18 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
                 dformat = 'PCM16'
             elif data.hex()[0:2] == '02':
                 dformat = 'PCM24'
-            #print(f"Data format: {dformat}")
+            print(f"Data format: {dformat}")
             seq = data.hex()[2:6]
-            #print(f"Sequence number: {seq}")
-            sr = int(data.hex()[6:14], 16)
-            #print(f"Sample rate: {sr}")
-            chmap = int(data.hex()[14:22], 16)
-            #print(f"Enabled channels: {chmap}")
-            scnt = int(data.hex()[22:26], 16)
-            #print(f"Samples per channel: {scnt}")
+            print(f"Sequence number: {seq}")
+            sr = int.from_bytes(message[3:7], 'big')
+            print(f"Sample rate: {sr}")
+            chmap = int.from_bytes(message[7:11], 'big')
+            print(f"Enabled channels: {chmap}")
+            scnt = int.from_bytes(message[11:13], 'big')
+            print(f"Samples per channel: {scnt}")
             raw = data[13:(3*scnt*chmap)+13]
-            #print(raw.hex())
+            print(raw.hex())
+            sys.exit()
             
             d += raw
             raw_size += scnt * 3
