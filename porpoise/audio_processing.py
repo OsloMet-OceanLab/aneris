@@ -24,6 +24,11 @@ with open('test.wav', 'rb') as file:
 
 #print(data.dtype)
 
+print(data)
+print(max(data))
+print(min(data))
+print(min(abs(data)))
+
 plt.figure()
 plt.plot(data)
 plt.xlabel('Sample index')

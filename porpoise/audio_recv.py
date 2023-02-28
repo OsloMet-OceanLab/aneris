@@ -38,7 +38,7 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
     print("Bound")
     try:
         while True:
-            message, address = sock.recvfrom(1536)
+            message, _ = sock.recvfrom(1536)
             sync = message.hex()[0:4]
             #print(f"Sync: {sync}")
             size = int(message.hex()[4:8], 16)
@@ -68,10 +68,12 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             #print(f"Enabled channels: {chmap}")
             scnt = int(data.hex()[22:26], 16)
             #print(f"Samples per channel: {scnt}")
-            raw = data[13:(3*scnt*chmap)+13]
+            raw = data[13:]#(3*scnt*chmap)+13]
             #print(raw.hex())
             
-
+            #for j in range(0, len(raw), 2):
+                #d += int.from_bytes(raw[j:j+2], 'little', signed=True).to_bytes(2, byteorder='little', signed=True)
+                
             d += raw
             raw_size += scnt * 3
             i += 1
@@ -86,6 +88,9 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
                 d2 = np.frombuffer(d, dtype=np.int32)
                 plt.plot(d2)
                 print(d2)
+                print(max(d2))
+                print(min(d2))
+                print(min(abs(d2)))
                 plt.xlabel('Sample index')
                 plt.ylabel('Amplitude')
                 plt.title('Waveform')
@@ -95,7 +100,7 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             if i % 1000 == 0:
                 print(raw_size)
                 header = genHeader(96_000, 16, 1, raw_size)
-                import struct
+                #import struct
                 #d = struct.pack(f'<{raw_size//2}h', *struct.unpack(f'>{raw_size//2}h', d)) # it's possible i'm encoding this big endian audio as little endian
                 wavfile = header + d
                 
