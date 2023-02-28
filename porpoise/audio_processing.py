@@ -14,7 +14,7 @@ from numpy.fft import fft, ifft
 #rate, data = read('test.wav')
 with open('test.wav', 'rb') as file:
     data = file.read()
-    data = np.frombuffer(data[44:], np.int32)
+    data = np.frombuffer(data[44:512+44], np.int32)
 
 #data = data[:,0] # make audio mono, not needed here
 
