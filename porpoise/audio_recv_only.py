@@ -63,6 +63,7 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             data = message[5:]
 
             scnt = int(data.hex()[22:26], 16)
+            print(data.hex()[22:26])
             raw = data[13:]
             
             d += raw#[:scnt * 3 - 1]
@@ -73,8 +74,10 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
 
             import matplotlib.pyplot as plt, numpy as np
 
-            import struct
+            #import struct
             #d = struct.pack(f'<{raw_size//2}h', *struct.unpack(f'>{raw_size//2}h', d)) # it's possible i'm encoding this big endian audio as little endian
+
+            
 
             d2 = np.frombuffer(d[:512], dtype=np.int32)
             #d2 = d3[np.abs(d3) < 20_000_000]
