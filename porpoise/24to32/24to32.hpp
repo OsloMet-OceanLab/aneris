@@ -1,13 +1,14 @@
 #ifndef _24to32_HPP
 #define _24to32_HPP
 
-#include <cstdint>
-#include <array>
-
 typedef char byte;
 
-byte* _24to16(const byte *buf, size_t len, bool invertEndianess);
-static inline int32_t _24to32(std::array<uint8_t, 3> byteArray);
-byte* parseNum(byte* buf, size_t len);
+namespace _24bit_converter
+{
+
+byte* numto16(const byte *buf, size_t len, bool invertEndianness);
+byte* numto32(const byte* buf, size_t len);
+
+} // end namespace _24bit_converter
 
 #endif

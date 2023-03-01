@@ -4,17 +4,29 @@
 #include <cstdint>
 #include <vector>
 
-byte* _24to16(const byte* buf, size_t len, bool invertEndianess)
+namespace _24bit_converter
+{
+
+static inline int16_t _24to16(const byte[] byteArray, bool invertEndianness)
+{
+    return invertEndianness ?
+            (((uint16_t) (byteArray[2] << 8)) | (uint8_t) byteArray[1]) :
+            (((uint16_t) (byteArray[1] << 8)) | (uint8_t) byteArray[2])
+}
+
+byte* numto16(const byte* buf, size_t len, bool invertEndianness)
 {
     std::vector<int16_t> tmparr2;
 
     byte* newbuf = (byte*)malloc(sizeof(byte)*2*len/3);
 
     for (size_t i = 0; i < len; i += 3)
-        tmparr2.push_back( invertEndianess ?
+        tmparr2.push_back( invertEndianness ?
                           (((uint16_t) (buf[i+2] << 8)) | (uint8_t) buf[i+1]) :
                           (((uint16_t) (buf[i+1] << 8)) | (uint8_t) buf[i+2])
                           );
+
+        //tmparr2.push_back(_24to16(buf[i]), invertEndianness);
 
     for (size_t i = 0; i < 2*len/3; i += 2)
     {
@@ -31,7 +43,7 @@ static inline int32_t _24to32(std::array<uint8_t, 3> byteArray)
             ((int32_t)(byteArray[2]) << 8)) >> 8;
 }
 
-byte* parseNum(const byte* buf, size_t len)
+byte* numto32(const byte* buf, size_t len)
 {
     std::array<uint8_t, 3> tmparr;
     std::vector<int32_t> tmparr2;
@@ -56,3 +68,5 @@ byte* parseNum(const byte* buf, size_t len)
     }
     return newbuf;
 }
+
+} // end namespace _24bit_converter
