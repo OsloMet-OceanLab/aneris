@@ -1,7 +1,28 @@
 #include "24to32.hpp"
 
-#include <cstdint>
 #include <array>
+#include <cstdint>
+#include <vector>
+
+byte* _24to16(const byte* buf, size_t len, bool invertEndianess)
+{
+    std::vector<int16_t> tmparr2;
+
+    byte* newbuf = (byte*)malloc(sizeof(byte)*2*len/3);
+
+    for (size_t i = 0; i < len; i += 3)
+        tmparr2.push_back( invertEndianess ?
+                          (((uint16_t) (buf[i+2] << 8)) | (uint8_t) buf[i+1]) :
+                          (((uint16_t) (buf[i+1] << 8)) | (uint8_t) buf[i+2])
+                          );
+
+    for (size_t i = 0; i < 2*len/3; i += 2)
+    {
+        *(newbuf + i) =       0xFF & (tmparr2[i/2] >> 8);
+        *(newbuf + i + 1) =   0xFF & (tmparr2[i/2]);
+    }
+    return newbuf;
+}
 
 static inline int32_t _24to32(std::array<uint8_t, 3> byteArray)
 {
@@ -13,6 +34,8 @@ static inline int32_t _24to32(std::array<uint8_t, 3> byteArray)
 byte* parseNum(const byte* buf, size_t len)
 {
     std::array<uint8_t, 3> tmparr;
+    std::vector<int32_t> tmparr2;
+
     byte* newbuf = (byte*)malloc(sizeof(byte)*4*len/3);
 
     for (size_t i = 0; i < len; i += 3)
@@ -21,12 +44,15 @@ byte* parseNum(const byte* buf, size_t len)
         tmparr[1] = (uint8_t) buf[i+1];
         tmparr[2] = (uint8_t) buf[i+2];
 
-        int32_t tmpint = _24to32(tmparr);
+        tmparr2.push_back(_24to32(tmparr));
+    }
 
-        newbuf[i] =     (byte) (tmpint & (0xFF << 24));
-        newbuf[i+1] =   (byte) (tmpint & (0xFF << 16));
-        newbuf[i+2] =   (byte) (tmpint & (0xFF << 8));
-        newbuf[i+3] =   (byte) (tmpint & (0xFF << 0));
+    for (size_t i = 0; i < 4*len/3; i += 4)
+    {
+        *(newbuf + i) =       0xFF & (tmparr2[i/4] >> 24);
+        *(newbuf + i + 1) =   0xFF & (tmparr2[i/4] >> 16);
+        *(newbuf + i + 2) =   0xFF & (tmparr2[i/4] >> 8);
+        *(newbuf + i + 3) =   0xFF & (tmparr2[i/4]);
     }
     return newbuf;
 }

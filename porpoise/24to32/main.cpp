@@ -39,14 +39,17 @@ byte* parseNum(const byte* buf, size_t len)
     return newbuf;
 }
 
-byte* _24to16(const byte* buf, size_t len)
+byte* _24to16(const byte* buf, size_t len, bool invertEndianess)
 {
     std::vector<int16_t> tmparr2;
 
     byte* newbuf = (byte*)malloc(sizeof(byte)*2*len/3);
 
     for (size_t i = 0; i < len; i += 3)
-        tmparr2.push_back(((uint16_t) buf[i+1] << 8) | (uint8_t) buf[i+2]);
+        tmparr2.push_back( invertEndianess ?
+                          (((uint16_t) (buf[i+2] << 8)) | (uint8_t) buf[i+1]) :
+                          (((uint16_t) (buf[i+1] << 8)) | (uint8_t) buf[i+2])
+                          );
 
     for (size_t i = 0; i < 2*len/3; i += 2)
     {
@@ -72,7 +75,6 @@ int main()
     memcpy(buffer2, buffer+18, 999);
 
     byte *buf3 = parseNum(buffer2, 999);
-    byte *buf4 = _24to16(buffer2, 999);
 
     for (int i = 0; i < 12; ++i)
         printf("%c ", isprint(buf3[i]) ? buf3[i] : '.');
@@ -81,9 +83,15 @@ int main()
     ofs.write(buf3, 999/3*4);
     ofs.close();
 
+    byte *buf4 = _24to16(buffer2, 999, false);
     std::ofstream ofs2("packet-16", std::ios::out | std::ios::binary);
     ofs2.write(buf4, 999/3*2);
     ofs2.close();
+
+    byte *buf5 = _24to16(buffer2, 999, true);
+    std::ofstream ofs3("packet-16-little", std::ios::out | std::ios::binary);
+    ofs3.write(buf5, 999/3*2);
+    ofs3.close();
 
     return 0;
 }
