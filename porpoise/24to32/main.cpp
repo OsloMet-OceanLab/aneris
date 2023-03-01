@@ -2,6 +2,7 @@
 #include <fstream>
 #include <array>
 #include <cstdint>
+#include <vector>
 
 typedef char byte;
 
@@ -15,6 +16,8 @@ static inline int32_t _24to32(std::array<uint8_t, 3> byteArray)
 byte* parseNum(const byte* buf, size_t len)
 {
     std::array<uint8_t, 3> tmparr;
+    std::vector<int32_t> tmparr2;
+
     byte* newbuf = (byte*)malloc(sizeof(byte)*4*len/3);
 
     for (size_t i = 0; i < len; i += 3)
@@ -23,13 +26,34 @@ byte* parseNum(const byte* buf, size_t len)
         tmparr[1] = (uint8_t) buf[i+1];
         tmparr[2] = (uint8_t) buf[i+2];
 
-        int32_t tmpint = _24to32(tmparr);
-        printf("%d\n", tmpint);
+        tmparr2.push_back(_24to32(tmparr));
+    }
 
-        *(newbuf + i) =       (tmpint >> 24) & 0xFF;
-        *(newbuf + i + 1) =   (tmpint >> 16) & 0xFF;
-        *(newbuf + i + 2) =   (tmpint >> 8) & 0xFF;
-        *(newbuf + i + 3) =   tmpint & 0xFF;
+    for (size_t i = 0; i < 4*len/3; i += 4)
+    {
+        *(newbuf + i) =       0xFF & (tmparr2[i/4] >> 24);
+        *(newbuf + i + 1) =   0xFF & (tmparr2[i/4] >> 16);
+        *(newbuf + i + 2) =   0xFF & (tmparr2[i/4] >> 8);
+        *(newbuf + i + 3) =   0xFF & (tmparr2[i/4]);
+    }
+    return newbuf;
+}
+
+byte* _24to16(const byte* buf, size_t len)
+{
+    std::vector<int16_t> tmparr2;
+
+    byte* newbuf = (byte*)malloc(sizeof(byte)*2*len/3);
+
+    for (size_t i = 0; i < len; i += 3)
+    {
+        tmparr2.push_back((buf[i+1] << 8) | buf[i+2]);
+    }
+
+    for (size_t i = 0; i < 2*len/3; i += 2)
+    {
+        *(newbuf + i) =       0xFF & (tmparr2[i/2] >> 8);
+        *(newbuf + i + 1) =   0xFF & (tmparr2[i/2]);
     }
     return newbuf;
 }
@@ -50,14 +74,18 @@ int main()
     memcpy(buffer2, buffer+18, 999);
 
     byte *buf3 = parseNum(buffer2, 999);
+    byte *buf4 = _24to16(buffer2, 999);
 
     for (int i = 0; i < 12; ++i)
         printf("%c ", isprint(buf3[i]) ? buf3[i] : '.');
 
     std::ofstream ofs("packet-32", std::ios::out | std::ios::binary);
-
-    ofs.write(buf3, 999);
+    ofs.write(buf3, 999/3*4);
     ofs.close();
+
+    std::ofstream ofs2("packet-16", std::ios::out | std::ios::binary);
+    ofs2.write(buf4, 999/3*2);
+    ofs2.close();
 
     return 0;
 }
