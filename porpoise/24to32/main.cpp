@@ -46,9 +46,7 @@ byte* _24to16(const byte* buf, size_t len)
     byte* newbuf = (byte*)malloc(sizeof(byte)*2*len/3);
 
     for (size_t i = 0; i < len; i += 3)
-    {
-        tmparr2.push_back((buf[i+1] << 8) | buf[i+2]);
-    }
+        tmparr2.push_back(((uint16_t) buf[i+1] << 8) | (uint8_t) buf[i+2]);
 
     for (size_t i = 0; i < 2*len/3; i += 2)
     {
