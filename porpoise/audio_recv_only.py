@@ -19,68 +19,23 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
     try:
         while True:
             message, _ = sock.recvfrom(1536)
-            """
-            with open('packet', 'wb') as file:
-                file.write(message)
-                break
-            "
-            sync = message.hex()[0:4]
-            print(f"Sync: {sync}")
-            size = int(message.hex()[4:8], 16)
-            print(f"Size: {size}")
-            if message.hex()[8:10] == '00':
-                dtype = 'Unknown'
-            elif message.hex()[8:10] == '01':
-                dtype = 'DAQ'
-            elif message.hex()[8:10] == '02':
-                dtype = 'Noise'
-            print(f"Data type: {dtype}")
-
-            data = message[5:size]
-
-            if data.hex()[0:2] == '00':
-                dformat = 'Unknown'
-            elif data.hex()[0:2] == '01':
-                dformat = 'PCM16'
-            elif data.hex()[0:2] == '02':
-                dformat = 'PCM24'
-            print(f"Data format: {dformat}")
-            seq = data.hex()[2:6]
-            print(f"Sequence number: {seq}")
-            sr = int(data.hex()[6:14], 16)
-            print(f"Sample rate: {sr}")
-            chmap = int(data.hex()[14:22], 16)
-            print(f"Enabled channels: {chmap}")
-            scnt = int(data.hex()[22:26], 16)
-            print(f"Samples per channel: {scnt}")
-            
-            print(message[:18].hex())
-            
-            break
-
-            """
-            
             data = message[5:]
 
             scnt = int(data.hex()[22:26], 16)
-            print(data.hex()[22:26])
             raw = data[13:]
             
-            d += raw#[:scnt * 3 - 1]
+            d += raw
             raw_size += scnt * 3
-            #i += 1
-
-            #if i % 6 == 0:
-
-            import matplotlib.pyplot as plt, numpy as np
-
-            #import struct
-            #d = struct.pack(f'<{raw_size//2}h', *struct.unpack(f'>{raw_size//2}h', d)) # it's possible i'm encoding this big endian audio as little endian
-
             
+            import matplotlib.pyplot as plt, numpy as np
+            
+            d3 = b''
+            
+            for i in range(0, scnt, 3):
+                tmpint = _24to32(d[i:i+3])
+                d3 += tmpint.to_bytes(4, 'little', signed=True)
 
             d2 = np.frombuffer(d[:512], dtype=np.int32)
-            #d2 = d3[np.abs(d3) < 20_000_000]
             x = np.arange(1, d2.size + 1)
             print(d2)
             
