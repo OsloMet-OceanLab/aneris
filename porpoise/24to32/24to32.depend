@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1677674774 source:c:\users\salve\aneris-bachelorprosjekt\porpoise\24to32\24to32.cpp
+	"24to32.hpp"
+	<cstdint>
+	<array>
+
+1677669447 c:\users\salve\aneris-bachelorprosjekt\porpoise\24to32\24to32.hpp
+	<cstdint>
+	<array>
+
+1677676519 source:c:\users\salve\aneris-bachelorprosjekt\porpoise\24to32\main.cpp
+	<iostream>
+	"24to32.hpp"
+
