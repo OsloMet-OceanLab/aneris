@@ -26,7 +26,7 @@ byte* numto16(const byte* buf, size_t len, bool invertEndianness)
                           (((uint16_t) (buf[i+1] << 8)) | (uint8_t) buf[i+2])
                           );
 
-        //tmparr2.push_back(_24to16(buf[i]), invertEndianness);
+        //tmparr2.push_back(_24to16(buf+i), invertEndianness);
 
     for (size_t i = 0; i < 2*len/3; i += 2)
     {
