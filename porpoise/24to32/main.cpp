@@ -26,10 +26,10 @@ byte* parseNum(const byte* buf, size_t len)
         int32_t tmpint = _24to32(tmparr);
         printf("%d\n", tmpint);
 
-        newbuf[i] =     (byte) (tmpint & (0xFF << 24));
-        newbuf[i+1] =   (byte) (tmpint & (0xFF << 16));
-        newbuf[i+2] =   (byte) (tmpint & (0xFF << 8));
-        newbuf[i+3] =   (byte) (tmpint & (0xFF << 0));
+        *(newbuf + i) =       (tmpint >> 24) & 0xFF;
+        *(newbuf + i + 1) =   (tmpint >> 16) & 0xFF;
+        *(newbuf + i + 2) =   (tmpint >> 8) & 0xFF;
+        *(newbuf + i + 3) =   tmpint & 0xFF;
     }
     return newbuf;
 }
@@ -41,17 +41,23 @@ int main()
     byte *buffer = (byte*)malloc(sizeof(byte)*1017);
 
     ifs.read(buffer, 1017);
+    ifs.close();
 
     printf("%02X %02X\n", (uint8_t)buffer[0], (uint8_t)buffer[1]);
 
     byte *buffer2 = (byte*)malloc(sizeof(byte)*999);
 
-    memcpy(buffer2, buffer, 999);
+    memcpy(buffer2, buffer+18, 999);
 
     byte *buf3 = parseNum(buffer2, 999);
 
     for (int i = 0; i < 12; ++i)
-        printf("%02X ", (uint8_t)buf3[i]);
+        printf("%c ", isprint(buf3[i]) ? buf3[i] : '.');
+
+    std::ofstream ofs("packet-32", std::ios::out | std::ios::binary);
+
+    ofs.write(buf3, 999);
+    ofs.close();
 
     return 0;
 }
