@@ -10,7 +10,7 @@ from socket import socket, AF_INET, SOCK_DGRAM
 HOST, PORT = '', 5453
 
 d = b''
-#i = 0
+i = 0
 raw_size = 0
 
 with socket(AF_INET, SOCK_DGRAM) as sock:
@@ -18,6 +18,7 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
     print("Bound")
     try:
         while True:
+            i += 1
             message, _ = sock.recvfrom(1536)
             data = message[5:]
 
@@ -27,14 +28,16 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             d += raw
             raw_size += scnt * 3
             
+            if i % 1000 == 0:
+                with open('test', 'wb') as file:
+                    file.write(d)
+                    break
+            
+            """
             import matplotlib.pyplot as plt, numpy as np
             
             d3 = b''
             
-            for i in range(0, scnt, 3):
-                tmpint = _24to32(d[i:i+3])
-                d3 += tmpint.to_bytes(4, 'little', signed=True)
-
             d2 = np.frombuffer(d[:512], dtype=np.int32)
             x = np.arange(1, d2.size + 1)
             print(d2)
@@ -47,6 +50,7 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             plt.show()
             
             break
+            """
 
     except KeyboardInterrupt:
         print("Done")

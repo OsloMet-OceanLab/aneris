@@ -81,7 +81,7 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             if i % 100 == 0:
                 print(i)
             
-            if i % 600 == 0:
+            if False:# i % 600 == 0:
                 import matplotlib.pyplot as plt, numpy as np
                 
                 plt.figure()

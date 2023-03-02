@@ -12,7 +12,7 @@ from scipy.io.wavfile import read, write
 from numpy.fft import fft, ifft
 
 #rate, data = read('test.wav')
-with open('packet-16', 'rb') as file:
+with open('24to32//packet-16-little', 'rb') as file:
     data = file.read()
     #data = np.frombuffer(data[44:512+44], np.int32)
     data = np.frombuffer(data[:512], np.int16)

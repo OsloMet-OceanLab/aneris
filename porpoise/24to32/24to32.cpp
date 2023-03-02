@@ -7,11 +7,11 @@
 namespace _24bit_converter
 {
 
-static inline int16_t _24to16(const byte[] byteArray, bool invertEndianness)
+static inline int16_t _24to16(const byte byteArray[], bool invertEndianness)
 {
     return invertEndianness ?
             (((uint16_t) (byteArray[2] << 8)) | (uint8_t) byteArray[1]) :
-            (((uint16_t) (byteArray[1] << 8)) | (uint8_t) byteArray[2])
+            (((uint16_t) (byteArray[1] << 8)) | (uint8_t) byteArray[2]);
 }
 
 byte* numto16(const byte* buf, size_t len, bool invertEndianness)

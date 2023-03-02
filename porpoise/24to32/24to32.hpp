@@ -1,6 +1,8 @@
 #ifndef _24to32_HPP
 #define _24to32_HPP
 
+#include <cstdint>
+
 typedef char byte;
 
 namespace _24bit_converter
@@ -12,3 +14,4 @@ byte* numto32(const byte* buf, size_t len);
 } // end namespace _24bit_converter
 
 #endif
+
