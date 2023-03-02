@@ -4,20 +4,37 @@
     <div style="text-align:center;">
         <h1>Console page</h1>
         <p>Use this page to control the device</p>
+        
+            <form method="POST" action="/console">
+                <button name="lightsOn" value=3 type="submit"> Lights On</button>
+            </form>
+       
+            <form method="POST" action="/console">
+                <button name="lightsOff" value=4 type="submit"> Lights Off</button>
+            </form>
+       
+            <form method="POST" action="/console">
+                <button name="wipersOn" value=5 type="submit"> Wipers on</button>
+            </form>
+       
+            <form method="POST" action="/console">
+                <button name="wipersOff" value=6 type="submit"> Wipers off</button>
+            </form>
+      
+            <form method="POST" action="/console">
+                <button name="CleanLog" value=7 type="submit"> Clean up log files</button>
+            </form>
+       
+        <!--
+         <form method="POST" action="/console">
+        <input name="command" type="text" placeholder="Write a command here" />
+        <input type="submit" value="Submit" />
+    </form>
+    -->
 
-        <form method="POST" action="/console">
-            <input name="command" type="text" placeholder="Write a command here" />
-            <input type="submit" value="Submit" />
-        </form>
+
     </div>
-    <ul>
-        <li>
-            <button onclick="sendCommand(3)">Lights On/Off</button>
-        </li>
-        <li>
-            <button onclick="sendCommand()">Hydrophone On/Off</button>
-        </li>
-    </ul>
+ 
     <script>
         function sendCommand(data) {
             return data;
