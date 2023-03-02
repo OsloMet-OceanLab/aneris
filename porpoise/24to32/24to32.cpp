@@ -43,7 +43,7 @@ static inline int32_t _24to32(std::array<uint8_t, 3> byteArray)
             ((int32_t)(byteArray[2]) << 8)) >> 8;
 }
 
-byte* numto32(const byte* buf, size_t len)
+byte* numto32(const byte* buf, size_t len, bool invertEndianness)
 {
     std::array<uint8_t, 3> tmparr;
     std::vector<int32_t> tmparr2;
