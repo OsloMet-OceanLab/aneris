@@ -24,11 +24,30 @@
                     </div>
                 </div>
             </li>
+
             <li>
-                <button onclick="document.location='/logs'">System logs</button>
+                <button onclick="openLogModal()">System logs</button>
+                <div id="logsModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <iframe src="/logs" title="logs" class="modal-child"></iframe>
+                        <p>
+                            <a href="/logs" style="text-align:center;"> System logs</a>
+                        </p>
+                    </div>
+                </div>
             </li>
             <li>
-                <button onclick="document.location='/docs'">Helpful docs</button>
+                <button onclick="openDocumentModal()">Helpful docs</button>
+                <div id="docsModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <iframe src="/docs" title="docs" class="modal-child"></iframe>
+                        <p>
+                            <a href="/docs" style="text-align:center;"> Helpful documents</a>
+                        </p>
+                    </div>
+                </div>
             </li>
             <li>
                 <button onclick="openConsoleModal()">Get Console</button>
@@ -36,10 +55,7 @@
                 <div id="consoleModal" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <iframe src="console.html" title="jajaja" style="width:100%;"></iframe>
-
-
-
+                        <iframe src="console.html" title="Console" class="modal-child"></iframe>
                         <p>
                             <a href="console.html" style="text-align:center;">Console</a>
                         </p>
@@ -48,22 +64,7 @@
             </li>
         </ul>
     </div>
-
-    <div id="rawurls">
-        <ul>
-
-            <li>
-                <a href="/logs" style="text-align:center;">System logs</a>
-            </li>
-            <li>
-                <a href="/docs" style="text-align:center;">Helpful docs</a>
-            </li>
-
-        </ul>
-
-    </div>
     <style>
-
         .modal {
             display: none; /* Hidden by default */
             position: fixed; /* Stay in place */
@@ -102,36 +103,51 @@
                 text-decoration: none;
                 cursor: pointer;
             }
+        .modal-child {
+            width:100%;
+            height:80%;
+        }
     </style>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
-        function openStreamModal() {
-            var modal = document.getElementById("streamModal");
-            var span = document.getElementsByClassName("close")[0];
-            modal.style.display = "block";
+        function genModal(ModalId,i) {
+            var span = document.getElementsByClassName("close")[i];
+            ModalId.style.display = "block";
             span.onclick = function () {
-                modal.style.display = "none";
+                ModalId.style.display = "none";
             }
             window.onclick = function (event) {
-                if (event.target == modal) {
-                    modal.style.display = "none";
+                if (event.target == ModalId) {
+                    ModalId.style.display = "none";
                 }
             }
         }
+
+        function openStreamModal() {//Remember, every modal and id has to be unique. 
+            var modal = document.getElementById("streamModal");
+            var id = 0;
+            genModal(modal, id);
+        }
+        function openLogModal() {
+            var modal = document.getElementById("logsModal");
+            var id = 1;
+            genModal(modal, id);
+        }
         
+      
+        function openDocumentModal() {
+            var modal = document.getElementById("docsModal");
+            var id = 2;
+            genModal(modal, id);
+          
+        }
         function openConsoleModal() {
             var modal = document.getElementById("consoleModal");
-            var span = document.getElementsByClassName("close")[1];
-            modal.style.display = "block";
-            span.onclick = function () {
-                modal.style.display = "none";
-            }
-            window.onclick = function (event) {
-                if (event.target == modal) {
-                    modal.style.display = "none";
-                }
-            }
+            var id = 3;
+            genModal(modal, id);
+
+
         }
     </script>
 </body>
