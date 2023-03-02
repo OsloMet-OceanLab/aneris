@@ -1,12 +1,28 @@
 <html>
-  <body>
+<body>
+
     <div style="text-align:center;">
-      <h1>Console page</h1>
-      <p>Use this page to control the device</p>
-      <form method="POST" action="/console">
-        <input name="command" type="text" placeholder="Write a command here"/>
-        <input type="submit" value="Submit" />
-      </form>
+        <h1>Console page</h1>
+        <p>Use this page to control the device</p>
+
+        <form method="POST" action="/console">
+            <input name="command" type="text" placeholder="Write a command here" />
+            <input type="submit" value="Submit" />
+        </form>
     </div>
-  </body>
+    <ul>
+        <li>
+            <button onclick="sendCommand(3)">Lights On/Off</button>
+        </li>
+        <li>
+            <button onclick="sendCommand()">Hydrophone On/Off</button>
+        </li>
+    </ul>
+    <script>
+        function sendCommand(data) {
+            return data;
+        }
+
+    </script>
+</body>
 </html>
