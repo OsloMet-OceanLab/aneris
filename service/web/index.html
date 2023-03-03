@@ -7,10 +7,8 @@
         <h1 style="text-align:center;">This is the index page</h1>
         <h2 style="text-align:center;">Find your way to another page:</h2>
     </div>
-    <div id="popups">
-        <ul>
-
-            <li>
+    <div id="popups" class="container">
+            <div>
                 <button onclick="openStreamModal()">Video stream</button>
                 <div id="streamModal" class="modal">
                     <div class="modal-content">
@@ -23,9 +21,9 @@
                         </p>
                     </div>
                 </div>
-            </li>
+            </div>
 
-            <li>
+            <div>
                 <button onclick="openLogModal()">System logs</button>
                 <div id="logsModal" class="modal">
                     <div class="modal-content">
@@ -36,8 +34,8 @@
                         </p>
                     </div>
                 </div>
-            </li>
-            <li>
+            </div>
+            <div>
                 <button onclick="openDocumentModal()">Helpful docs</button>
                 <div id="docsModal" class="modal">
                     <div class="modal-content">
@@ -48,8 +46,8 @@
                         </p>
                     </div>
                 </div>
-            </li>
-            <li>
+            </div>
+            <div>
                 <button onclick="openConsoleModal()">Get Console</button>
                 
                 <div id="consoleModal" class="modal">
@@ -61,10 +59,24 @@
                         </p>
                     </div>
                 </div>
-            </li>
-        </ul>
+            </div>
+       
     </div>
     <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            
+            justify-content: center;
+        }
+
+            .container > div {
+                margin: 0.1em;
+                text-align: center;
+                line-height: 75px;
+                font-size: 30px;
+            }
+
         .modal {
             display: none; /* Hidden by default */
             position: fixed; /* Stay in place */
