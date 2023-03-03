@@ -6,15 +6,15 @@
 
 typedef char byte;
 
+namespace py = pybind11;
+
 namespace bit_converter
 {
 
-byte* numto16(const byte *buf = nullptr, size_t len = 0, bool invertEndianness = true);
-byte* numto32(const byte *buf = nullptr, size_t len = 0, bool invertEndianness = true);
+py::bytes numto16(const byte *buf = nullptr, size_t len = 0, bool invertEndianness = true);
+py::bytes numto32(const byte *buf = nullptr, size_t len = 0, bool invertEndianness = true);
 
 } // end namespace bit_converter
-
-namespace py = pybind11;
 
 PYBIND11_MODULE(bit_converter, m)
 {
