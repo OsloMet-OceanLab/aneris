@@ -28,10 +28,10 @@ int main()
     //ofs.write(buf3, 999/3*4);
     //ofs.close();
 
-    //byte *buf4 = _24bit_converter::numto16(buffer2, 999, false);
-    //std::ofstream ofs2("packet-16", std::ios::out | std::ios::binary);
-    //ofs2.write(buf4, 999/3*2);
-    //ofs2.close();
+    byte *buf4 = _24bit_converter::numto32(buffer, 960156, true);
+    std::ofstream ofs2("packet-32-little", std::ios::out | std::ios::binary);
+    ofs2.write(buf4, 960156/3*4);
+    ofs2.close();
 
     byte *buf5 = _24bit_converter::numto16(buffer, 960156, true);
     std::ofstream ofs3("test-16-little", std::ios::out | std::ios::binary);

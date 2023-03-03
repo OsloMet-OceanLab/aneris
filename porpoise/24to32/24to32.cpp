@@ -14,18 +14,20 @@ static inline int16_t _24to16(const byte byteArray[])
 
 byte* numto16(const byte *buf, size_t len, bool invertEndianness)
 {
-    int16_t *tmp_arr = new int16_t[len/3];//(int16_t*)malloc(sizeof(int16_t)*len/3);
-    byte* newbuf = new byte[2*len/3];//(byte*)malloc(sizeof(byte)*2*len/3);
+    int16_t *tmp_arr = (int16_t*)malloc(sizeof(int16_t)*len/3);
+    byte* newbuf = (byte*)malloc(sizeof(byte)*2*len/3);
+    //std::vector<int16_t> tmp_arr;
 
     for (size_t i = 0; i < len; i += 3)
-        *(tmp_arr + (i/2)) = _24to16(buf+i);
+        //tmp_arr.push_back(_24to16(buf+i));
+        *(tmp_arr + (i/3)) = _24to16(buf+i);
 
     for (size_t i = 0; i < 2*len/3; i += 2)
     {
         *(newbuf + i) =       0xFF & (tmp_arr[i/2] >> (invertEndianness ? 0 : 8));
         *(newbuf + i + 1) =   0xFF & (tmp_arr[i/2] >> (invertEndianness ? 8 : 0));
     }
-    
+
     delete[] tmp_arr;
 
     return newbuf;
@@ -40,10 +42,10 @@ static inline int32_t _24to32(std::array<uint8_t, 3> byteArray)
 
 byte* numto32(const byte *buf, size_t len, bool invertEndianness)
 {
-    int32_t *tmp_int_arr = new int32_t[len/3];
+    int32_t *tmp_int_arr = (int32_t*)malloc(sizeof(int32_t)*len/3);
     std::array<uint8_t, 3> tmparr;
     //std::vector<int32_t> tmparr2;
-    byte* newbuf = new byte[4*len/3];//(byte*)malloc(sizeof(byte)*4*len/3);
+    byte* newbuf = (byte*)malloc(sizeof(byte)*4*len/3);
 
     for (size_t i = 0; i < len; i += 3)
     {
@@ -57,10 +59,10 @@ byte* numto32(const byte *buf, size_t len, bool invertEndianness)
 
     for (size_t i = 0; i < 4*len/3; i += 4)
     {
-        *(newbuf + i) =       0xFF & (tmparr2[i/4] >> (invertEndianness ? 0 : 24));
-        *(newbuf + i + 1) =   0xFF & (tmparr2[i/4] >> (invertEndianness ? 8 : 16));
-        *(newbuf + i + 2) =   0xFF & (tmparr2[i/4] >> (invertEndianness ? 16 : 8));
-        *(newbuf + i + 3) =   0xFF & (tmparr2[i/4] >> (invertEndianness ? 24 : 0));
+        *(newbuf + i) =       0xFF & (tmp_int_arr[i/4] >> (invertEndianness ? 0 : 24));
+        *(newbuf + i + 1) =   0xFF & (tmp_int_arr[i/4] >> (invertEndianness ? 8 : 16));
+        *(newbuf + i + 2) =   0xFF & (tmp_int_arr[i/4] >> (invertEndianness ? 16 : 8));
+        *(newbuf + i + 3) =   0xFF & (tmp_int_arr[i/4] >> (invertEndianness ? 24 : 0));
     }
 
     delete[] tmp_int_arr;
