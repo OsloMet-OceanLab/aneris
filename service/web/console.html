@@ -4,41 +4,55 @@
     <div style="text-align:center;">
         <h1>Console page</h1>
         <p>Use this page to control the device</p>
-        
+        <div class="flex-container">
             <form method="POST" action="/console">
                 <button name="lightsOn" value=3 type="submit"> Lights On</button>
             </form>
-       
+
+
             <form method="POST" action="/console">
                 <button name="lightsOff" value=4 type="submit"> Lights Off</button>
             </form>
-       
+
             <form method="POST" action="/console">
                 <button name="wipersOn" value=5 type="submit"> Wipers on</button>
             </form>
-       
+
             <form method="POST" action="/console">
                 <button name="wipersOff" value=6 type="submit"> Wipers off</button>
             </form>
-      
+
             <form method="POST" action="/console">
                 <button name="CleanLog" value=7 type="submit"> Clean up log files</button>
             </form>
-       
+        </div>
+
+
         <!--
-         <form method="POST" action="/console">
-        <input name="command" type="text" placeholder="Write a command here" />
-        <input type="submit" value="Submit" />
-    </form>
-    -->
+             <form method="POST" action="/console">
+            <input name="command" type="text" placeholder="Write a command here" />
+            <input type="submit" value="Submit" />
+        </form>
+        -->
 
 
     </div>
- 
-    <script>
-        function sendCommand(data) {
-            return data;
+    <style>
+        .flex-container {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: center;
         }
+
+            .flex-container > form {
+                margin: 0.1em;
+                text-align: center;
+                line-height: 75px;
+                font-size: 30px;
+            }
+    </style>
+    <script>
+
 
     </script>
 </body>
