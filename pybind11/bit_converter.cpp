@@ -76,6 +76,8 @@ py::bytes numto32(const byte *buf, size_t len, bool invertEndianness)
 
 py::bytes invertEndianness24(const byte *buf, size_t len)
 {
+    if (!buf || !len) return nullptr;
+
     byte *newbuf = (byte*)malloc(sizeof(byte)*len);
 
     for (int i = 0; i < len; i += 3)
