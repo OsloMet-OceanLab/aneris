@@ -86,7 +86,7 @@ py::bytes invertEndianness24(const byte *buf, size_t len)
         *(newbuf + i + 1) = *(buf + i + 1);
         *(newbuf + i + 2) = *(buf + i);
     }
-    return newbuf;
+    return py::bytes(newbuf);
 }
 
 } // end namespace bit_converter
