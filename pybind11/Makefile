@@ -1,16 +1,15 @@
 CPP := g++
-FLAGS := -Wall -shared -O3
-PYBIND := -fPIC $(python3 -m pybind11 --includes) 
-TARGET := header
-ENDTARGET := $(TARGET)$(python3-config --extension-suffix)
-LIBS := -I /home/giorgio/.local/lib/python3.10/site-packages/pybind11/include/
-PYTHON_LIB := -I/usr/include/python3.10 -lpython3.10
+CFLAGS := -Wall -shared -O3 -fPIC
+PYBIND := $(shell python3 -m pybind11 --includes)
+TARGET := bit_extension
+EXTENSION := $(shell python3-config --extension-suffix)
 
 default: $(TARGET)
 
 $(TARGET):
-	$(CPP) $(FLAGS) $(PYBIND) $(TARGET).h -o $(ENDTARGET) $(LIBS) $(PYTHON_LIB)
+        $(CPP) $(CFLAGS) $(PYBIND) $(TARGET).cpp -o $(TARGET)$(EXTENSION)
 
 clean:
-	$(RM) $(TARGET)
+        $(RM) $(TARGET)$(EXTENSION)
 
+remake: clean $(TARGET)
