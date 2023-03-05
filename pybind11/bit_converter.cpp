@@ -74,4 +74,17 @@ py::bytes numto32(const byte *buf, size_t len, bool invertEndianness)
     return py::bytes(newbuf);
 }
 
+py::bytes invertEndianness24(const byte *buf, size_t len)
+{
+    byte *newbuf = (byte*)malloc(sizeof(byte)*len);
+
+    for (int i = 0; i < len; i += 3)
+    {
+        *(newbuf + i) = *(buf + i + 2);
+        *(newbuf + i + 1) = *(buf + i + 1);
+        *(newbuf + i + 2) = *(buf + i);
+    }
+    return newbuf;
+}
+
 } // end namespace bit_converter
