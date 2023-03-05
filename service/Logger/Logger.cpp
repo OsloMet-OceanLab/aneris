@@ -20,7 +20,7 @@ static std::string getCurrentTime()
 
 void log(long level, std::string logMsg)
 {
-	std::string strLevel = "";
+	std::string strLevel = "[]";
 	
 	if(level & LOG_INFO) strLevel = "[INFO]";
 	else if(level & LOG_WARN) strLevel = "[WARN]";
