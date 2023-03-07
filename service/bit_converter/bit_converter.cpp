@@ -12,7 +12,7 @@ static inline int16_t _24to16(const char byteArray[])
     return (((uint16_t) (byteArray[1] << 8)) | (uint8_t) byteArray[2]);
 }
 
-py::bytes numto16(const char *buf, size_t len, bool invertEndianness)
+py::bytes bytes_to_16(const char *buf, size_t len, bool invertEndianness)
 {
     if (!buf || !len) return nullptr;
 
@@ -40,7 +40,7 @@ static inline int32_t _24to32(std::array<uint8_t, 3> byteArray)
             ((int32_t)(byteArray[2]) << 8)) >> 8;
 }
 
-py::bytes numto32(const char *buf, size_t len, bool invertEndianness)
+py::bytes bytes_to_32(const char *buf, size_t len, bool invertEndianness)
 {
     if (!buf || !len) return nullptr;
 	
@@ -70,7 +70,7 @@ py::bytes numto32(const char *buf, size_t len, bool invertEndianness)
     return py::bytes(newbuf);
 }
 
-py::bytes invertEndianness24(const char *buf, size_t len)
+py::bytes invert_endianness_24(const char *buf, size_t len)
 {
     if (!buf || !len) return nullptr;
 	
@@ -84,16 +84,6 @@ py::bytes invertEndianness24(const char *buf, size_t len)
     }
 
     return py::bytes(newbuf);
-}
-
-py::bytes return_bytes(char *buf, size_t len)
-{
-	std::string newbuf;
-	
-	for (size_t i = 0; i < len; ++i)
-		newbuf += ++buf[i];
-	
-	return py::bytes(newbuf);
 }
 
 } // end namespace bit_converter
