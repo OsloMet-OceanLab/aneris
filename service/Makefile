@@ -13,7 +13,7 @@ INSTALL_DIR := /etc/$(TARGET)
 default: $(TARGET)
 
 $(TARGET): $(TARGET).o GPIO.o Logger.o Web_Server.o Cpython
-	$(CPP) -o $(TARGET).out $(TARGET).o GPIO.o Logger.o Web_Server.o $(CFLAGS) $(THREAD_LIB) $(PYTHON_LIB)
+	$(CPP) -o $(TARGET) $(TARGET).o GPIO.o Logger.o Web_Server.o $(CFLAGS) $(THREAD_LIB) $(PYTHON_LIB)
 	$(RM) *.o
 
 $(TARGET).o: $(TARGET).cpp
