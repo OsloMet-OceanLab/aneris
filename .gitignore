@@ -2,3 +2,4 @@
 service/__pycache__
 service/aneris.log
 *.out
+*.cpython*
