@@ -1,20 +1,18 @@
 CPP := g++
 CFLAGS := -O3 -Wpedantic -Wall -Wextra -Wconversion -Wshadow -Werror
-PYTHON_LIB := -I/usr/include/python3.9 -lpython3.9
+#PYTHON_LIB := -I/usr/include/python3.9 -lpython3.9
+PYTHON_LIB := $(shell python3-config --includes)
 THREAD_LIB := -lpthread
+
+PYBIND_LIB := $(shell python3 -m pybind11 --includes)
+CPYTHON_EXTENSION := $(shell python3-config --extension-suffix)
+
 TARGET := aneris
 INSTALL_DIR := /etc/$(TARGET)
 
 default: $(TARGET)
 
-install:
-	mkdir $(INSTALL_DIR)
-	cp $(TARGET) web_server.py $(INSTALL_DIR)
-	cp -r web/ $(INSTALL_DIR)
-	cp $(TARGET).service /etc/systemd/system/
-	systemctl daemon-reload
-
-$(TARGET): $(TARGET).o GPIO.o Logger.o Web_Server.o
+$(TARGET): $(TARGET).o GPIO.o Logger.o Web_Server.o Cpython
 	$(CPP) -o $(TARGET).out $(TARGET).o GPIO.o Logger.o Web_Server.o $(CFLAGS) $(THREAD_LIB) $(PYTHON_LIB)
 	$(RM) *.o
 
@@ -30,7 +28,17 @@ Logger.o: Logger/Logger.cpp
 Web_Server.o: Web_Server/Web_Server.cpp
 	$(CPP) -c Web_Server/Web_Server.cpp $(CFLAGS) $(PYTHON_LIB)
 
+Cpython: bit_converter/bit_converter.cpp
+	$(CPP) -shared -O3 -Wall -fPIC $(PYBIND_LIB) bit_converter/bit_converter.cpp -o bit_converter$(CPYTHON_EXTENSION)
+
+install:
+	mkdir $(INSTALL_DIR)
+	cp $(TARGET) web_server.py bit_converter$(CPYTHON_EXTENSION) $(INSTALL_DIR)
+	cp -r web/ $(INSTALL_DIR)
+	cp $(TARGET).service /etc/systemd/system/
+	systemctl daemon-reload
+
 clean:
-	$(RM) $(TARGET).out *.o
+	$(RM) $(TARGET).out *.o bit_converter$(CPYTHON_EXTENSION)
 	
 remake: clean $(TARGET)

@@ -27,6 +27,15 @@ def genHeader(sampleRate, bitsPerSample, channels, samples):
     o += (datasize).to_bytes(4, endian, signed = sign)
     return o
 
+def fix_bytes(buf):
+    d = b''
+    for i in range(0, len(buf), 3):
+        d += buf[i+2].to_bytes(2, 'little', signed = True)
+        print(buf[i+2])
+        d += buf[i+1].to_bytes(2, 'little', signed = True)
+        
+    return d
+
 HOST, PORT = '', 5453
 
 d = b''
@@ -74,14 +83,19 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             #for j in range(0, len(raw), 2):
                 #d += int.from_bytes(raw[j:j+2], 'little', signed=True).to_bytes(2, byteorder='little', signed=True)
                 
-            d += raw
+            d += fix_bytes(raw)
             raw_size += scnt * 3
             i += 1
+            
+            print(raw[:3])
+            print(d[:3])
+            
+            sys.exit(0)
             
             if i % 100 == 0:
                 print(i)
             
-            if False:# i % 600 == 0:
+            if i % 600 == 0:
                 import matplotlib.pyplot as plt, numpy as np
                 
                 plt.figure()
