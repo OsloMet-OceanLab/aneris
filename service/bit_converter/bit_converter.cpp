@@ -26,7 +26,7 @@ py::bytes bytes_to_16(const char *buf, size_t len, bool invertEndianness)
     {
         newbuf += 0xFF & (tmp_arr[i/2] >> (invertEndianness ? 0 : 8));
         newbuf += 0xFF & (tmp_arr[i/2] >> (invertEndianness ? 8 : 0));
-	}
+    }
 
     delete[] tmp_arr;
 
