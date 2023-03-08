@@ -7,24 +7,22 @@
 #define SOCKET_PATH "/var/run/aneris.sock"
 #define COMMAND_SIZE 2
 
+void printHelp();
+
 int main(int argc, char **argv)
 {
-	if (argc != 2 || !strncmp("--help", argv[1], 6))
+	if (argc != 2)
 	{
-		printf("Usage: %s <option>\n", argv[0]);
-		printf("Possible choices:\n");
-		printf("1\tpower device off\n");
-		printf("2\treboot device\n");
-		printf("3\tturn lights on\n");
-		printf("4\tturn lights off\n");
-		printf("5\tturn wipers on\n");
-		printf("6\tturn wipers off\n");
-		printf("7\tclear log file\n");
-		printf("8\tstart web server\n");
-		printf("9\tterminate web server\n");
-		exit(argc != 2 ? 1 : 0);
+		printHelp(argv[0]);
+		exit(1);
 	}
 	
+	if (!strncmp("--help", argv[1], 6))
+	{
+		printHelp(argv[0]);
+		exit(0);
+	}
+
 	int sock;
 	struct sockaddr_un serv;
 	char buf[COMMAND_SIZE];
@@ -38,4 +36,21 @@ int main(int argc, char **argv)
 	sendto(sock, buf, strlen(buf), 0, (struct sockaddr *) &serv, sizeof(serv));
 	close(sock);
 	return 0;
+}
+
+void printHelp(char *pName)
+{
+	printf("Usage: %s <option>\n", pName);
+	printf("Possible choices:\n");
+	printf("1\tPower device off\n");
+	printf("2\tReboot device\n");
+	printf("3\tTurn lights on\n");
+	printf("4\tTurn lights off\n");
+	printf("5\tTurn wipers on\n");
+	printf("6\tTurn wipers off\n");
+	printf("7\tTurn porpoise on\n");
+	printf("8\tTurn wipers off\n");
+	printf("9\tClear log file\n");
+	printf("10\tStart web server\n");
+	printf("11\tTerminate web server\n");
 }
