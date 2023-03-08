@@ -32,25 +32,6 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
                 with open('test', 'wb') as file:
                     file.write(d)
                     break
-            
-            """
-            import matplotlib.pyplot as plt, numpy as np
-            
-            d3 = b''
-            
-            d2 = np.frombuffer(d[:512], dtype=np.int32)
-            x = np.arange(1, d2.size + 1)
-            print(d2)
-            
-            plt.figure()
-            plt.plot(x, d2)
-            plt.xlabel('Sample index')
-            plt.ylabel('Amplitude')
-            plt.title('Waveform')
-            plt.show()
-            
-            break
-            """
 
     except KeyboardInterrupt:
         print("Done")

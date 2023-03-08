@@ -27,15 +27,6 @@ def genHeader(sampleRate, bitsPerSample, channels, samples):
     o += (datasize).to_bytes(4, endian, signed = sign)
     return o
 
-def fix_bytes(buf):
-    d = b''
-    for i in range(0, len(buf), 3):
-        d += buf[i+2].to_bytes(2, 'little', signed = True)
-        print(buf[i+2])
-        d += buf[i+1].to_bytes(2, 'little', signed = True)
-        
-    return d
-
 HOST, PORT = '', 5453
 
 d = b''
@@ -49,16 +40,16 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
         while True:
             message, _ = sock.recvfrom(1536)
             sync = message.hex()[0:4]
-            #print(f"Sync: {sync}")
+            print(f"Sync: {sync}")
             size = int(message.hex()[4:8], 16)
-            #print(f"Size: {size}")
+            print(f"Size: {size}")
             if message.hex()[8:10] == '00':
                 dtype = 'Unknown'
             elif message.hex()[8:10] == '01':
                 dtype = 'DAQ'
             elif message.hex()[8:10] == '02':
                 dtype = 'Noise'
-            #print(f"Data type: {dtype}")
+            print(f"Data type: {dtype}")
 
             data = message[5:size]
 
@@ -68,17 +59,19 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
                 dformat = 'PCM16'
             elif data.hex()[0:2] == '02':
                 dformat = 'PCM24'
-            #print(f"Data format: {dformat}")
+            print(f"Data format: {dformat}")
             seq = data.hex()[2:6]
-            #print(f"Sequence number: {seq}")
+            print(f"Sequence number: {seq}")
             sr = int(data.hex()[6:14], 16)
-            #print(f"Sample rate: {sr}")
+            print(f"Sample rate: {sr}")
             chmap = int(data.hex()[14:22], 16)
-            #print(f"Enabled channels: {chmap}")
+            print(f"Enabled channels: {chmap}")
             scnt = int(data.hex()[22:26], 16)
-            #print(f"Samples per channel: {scnt}")
+            print(f"Samples per channel: {scnt}")
             raw = data[13:]#(3*scnt*chmap)+13]
-            #print(raw.hex())
+            print(raw.hex())
+            
+            sys.exit(0)
             
             #for j in range(0, len(raw), 2):
                 #d += int.from_bytes(raw[j:j+2], 'little', signed=True).to_bytes(2, byteorder='little', signed=True)

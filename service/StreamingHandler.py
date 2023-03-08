@@ -1,13 +1,12 @@
-# original version from https://picamera.readthedocs.io/en/latest/recipes2.html#web-streaming
-# make sure the legacy camera stack is enabled if it doesn't work
-# include copyright notice here
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Mar  8 13:26:40 2023
 
-from io import BytesIO
-from picamera import PiCamera
+@author: salve
+"""
+
 from logging import warning
-from socketserver import ThreadingMixIn
-from threading import Condition
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlsplit
 from socket import socket, AF_UNIX, SOCK_DGRAM
 from bit_converter import bytes_to_16
@@ -18,21 +17,6 @@ WEB_DIR =	HOME_DIR + 'web/'
 DOCS_DIR =	WEB_DIR + 'docs/'
 LOG_FILE =	HOME_DIR + 'aneris.log'
 SOCKET =	'/var/run/aneris.sock'
-
-class VideoStreamOutput:
-    def __init__(self):
-        self.frame = None
-        self.buffer = BytesIO()
-        self.condition = Condition()
-
-    def write(self, buf):
-        if buf.startswith(b'\xff\xd8'):
-            self.buffer.truncate()
-            with self.condition:
-                self.frame = self.buffer.getvalue()
-                self.condition.notify_all()
-            self.buffer.seek(0)
-        return self.buffer.write(buf)
 
 class StreamingHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -68,6 +52,9 @@ class StreamingHandler(BaseHTTPRequestHandler):
 
         elif path == '/video':
             self.serve_video()
+
+        elif path == '/audio':
+            self.serve_audio()
 
         elif path == '/logs':
             try:
@@ -145,6 +132,25 @@ class StreamingHandler(BaseHTTPRequestHandler):
         except Exception as e:
             warning('Removed streaming client %s: %s', self.client_address, str(e))
 
+    def serve_audio(self): # might not work, needs testing
+        global audioOutput
+        self.send_response(200)
+        self.send_header('Age', 0)
+        self.send_header('Cache-Control', 'no-cache, private')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Content-Type', 'audio/x-wav')
+        self.end_headers()
+        try:
+            while True:
+                with audioOutput.condition:
+                    audioOutput.condition.wait()
+                    frame = audioOutput.frame
+                self.send_header('Content-Type', 'audio/x-wav')
+                self.end_headers()
+                self.wfile.write(frame)
+        except Exception as e:
+            warning('Removed streaming client %s: %s', self.client_address, str(e))
+
     def serve_docs(self, docs, query):
         try:
             with open(DOCS_DIR + 'index.html', 'rb') as index:
@@ -172,33 +178,3 @@ class StreamingHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
             self.wfile.write('Error: console.html does not exist'.encode())
-
-class StreamingServer(ThreadingMixIn, HTTPServer):
-    allow_reuse_address = True
-    daemon_threads = True
-
-videoOutput = VideoStreamOutput()
-
-def serve(port = 0):
-    if port <= 0 and not port.isdigit():
-        return 1
-	
-    global videoOutput
-    with PiCamera(resolution='1280x720', framerate=30) as camera:
-        camera.start_recording(videoOutput, format='mjpeg') # this type of format uses lossy compression so it might or might not be suited to opencv image analysis
-        try:
-            return_int = 0
-            address = ('', int(port)) # ip, port
-            server = StreamingServer(address, StreamingHandler)
-            print('Stream started successfully')
-            server.serve_forever()
-        except Exception as e:
-            print('Couldn\'t start stream')
-            print(f'Additional information: {str(e)}')
-            return_int = 2
-        finally:
-            camera.stop_recording()
-            return return_int
-
-if __name__ == "__main__":
-    serve(5000)

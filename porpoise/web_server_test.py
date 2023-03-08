@@ -8,43 +8,24 @@ Created on Fri Feb 24 12:16:15 2023
 from socket import socket, AF_INET, SOCK_DGRAM
 from socketserver import ThreadingMixIn
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from io import BytesIO
+from threading import Condition
 
-def parse(sock):
-    message, address = sock.recvfrom(1536)
-    sync = message.hex()[0:4]
-    #print(f"Sync: {sync}")
-    size = int(message.hex()[4:8], 16)
-    #print(f"Size: {size}")
-    if message.hex()[8:10] == '00':
-        dtype = 'Unknown'
-    elif message.hex()[8:10] == '01':
-        dtype = 'DAQ'
-    elif message.hex()[8:10] == '02':
-        dtype = 'Noise'
-    #print(f"Data type: {dtype}")
+class AudioStreamOutput:
+    def __init__(self):
+        self.frame = None
+        self.buffer = BytesIO()
+        self.condition = Condition()
 
-    data = message[5:size]
-
-    if data.hex()[0:2] == '00':
-        dformat = 'Unknown'
-    elif data.hex()[0:2] == '01':
-        dformat = 'PCM16'
-    elif data.hex()[0:2] == '02':
-        dformat = 'PCM24'
-    #print(f"Data format: {dformat}")
-    seq = data.hex()[2:6]
-    #print(f"Sequence number: {seq}")
-    sr = int(data.hex()[6:14], 16)
-    #print(f"Sample rate: {sr}")
-    chmap = int(data.hex()[14:22], 16)
-    #print(f"Enabled channels: {chmap}")
-    scnt = int(data.hex()[22:26], 16)
-    #print(f"Samples per channel: {scnt}")
-    raw = data[13:(3*scnt*chmap)+13]
-    #print(raw.hex())
+    def write(self, buf):
+        if buf.startswith(b'\x0a\x06'):
+            self.buffer.truncate()
+            with self.condition:
+                self.frame = self.buffer.getvalue()[18:]
+                self.condition.notify_all()
+            self.buffer.seek(0)
+        return self.buffer.write(buf)
     
-    return raw, scnt
-
 def genHeader(sampleRate, bitsPerSample, channels, samples):
     datasize = samples #* channels * bitsPerSample // 8
     endian = 'little'
@@ -76,32 +57,27 @@ class StreamingHandler(BaseHTTPRequestHandler):
         self.send_header('Content-Type', 'audio/x-wav')
         self.end_headers()
 
-        d = b''
-        i = 0
-        raw_size = 0
+        try:
+            with socket(AF_INET, SOCK_DGRAM) as sock:
+                sock.bind(('', 80))
+                print("Bound")
+                self.send_header('Content-Type', 'audio/x-wav')
+                self.end_headers()
+                self.wfile.write(genHeader(96_000, 16, 1, 102400000))
+                try:
+                    while True:
+                        message, _ = sock.recvfrom(1536)
+                        self.wfile.write(message[18:])
+                except:
+                    pass
+        except:
+            pass
         
-        self.wfile.write(genHeader(96_000, 16, 1, 1024000))
-        
-        with socket(AF_INET, SOCK_DGRAM) as sock:
-            sock.bind(('', 5453))
-            print("Bound")
-            try:
-                while True:
-                    raw, scnt = parse(sock)
-                    d += raw
-                    raw_size += scnt * 3
-                    i += 1
-
-                    if i % 6 == 0:
-                        self.wfile.write(d)
-                        d = b''
-
-            except KeyboardInterrupt:
-                print("Done")
-
 class StreamingServer(ThreadingMixIn, HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
+
+audioOutput = AudioStreamOutput()
 
 def serve(port = 0):
     if port <= 0 and not port.isdigit():
@@ -117,6 +93,7 @@ def serve(port = 0):
         print(f'Additional information: {str(e)}')
         server.server_close()
         return 2
+    server.server_close()
     return 0
 
 if __name__ == "__main__":
