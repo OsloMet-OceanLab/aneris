@@ -12,7 +12,7 @@ INSTALL_DIR := /etc/$(TARGET)
 
 default: $(TARGET)
 
-$(TARGET): $(TARGET).o GPIO.o Logger.o Web_Server.o Cpython
+$(TARGET): $(TARGET).o GPIO.o Logger.o Web_Server.o
 	$(CPP) -o $(TARGET) $(TARGET).o GPIO.o Logger.o Web_Server.o $(CFLAGS) $(THREAD_LIB) $(PYTHON_LIB)
 	$(RM) *.o
 
@@ -33,12 +33,12 @@ Cpython: bit_converter/bit_converter.cpp
 
 install:
 	mkdir $(INSTALL_DIR)
-	cp $(TARGET) web_server.py bit_converter$(CPYTHON_EXTENSION) $(INSTALL_DIR)
+	cp $(TARGET) web_server.py $(INSTALL_DIR)
 	cp -r web/ $(INSTALL_DIR)
 	cp $(TARGET).service /etc/systemd/system/
 	systemctl daemon-reload
 
 clean:
-	$(RM) $(TARGET).out *.o bit_converter$(CPYTHON_EXTENSION)
+	$(RM) $(TARGET).out *.o
 	
 remake: clean $(TARGET)

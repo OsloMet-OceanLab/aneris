@@ -7,6 +7,7 @@ Created on Wed Feb 22 10:11:51 2023
 
 from socket import socket, AF_INET, SOCK_DGRAM
 import sys
+from bit_converter import bytes_to_16
 
 def genHeader(sampleRate, bitsPerSample, channels, samples):
     datasize = samples #* channels * bitsPerSample // 8
@@ -71,12 +72,7 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             raw = data[13:]#(3*scnt*chmap)+13]
             print(raw.hex())
             
-            sys.exit(0)
-            
-            #for j in range(0, len(raw), 2):
-                #d += int.from_bytes(raw[j:j+2], 'little', signed=True).to_bytes(2, byteorder='little', signed=True)
-                
-            d += fix_bytes(raw)
+            d += bytes_to_16(raw)
             raw_size += scnt * 3
             i += 1
             
