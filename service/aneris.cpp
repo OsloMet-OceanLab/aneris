@@ -101,8 +101,10 @@ int main(void)
 	/* currently checks that led pin is       */
 	/* enabled, but could also check that     */
 	/* network card is up? TBD                */
+	/* N.B. most likely unnecessary, can      */
+	/* probably be deleted                    */
 	/******************************************/
-	try
+	/*try
 	{
 		gpio::GPIO *hydrophone = new gpio::GPIO(GPIO_HYDROPHONE, gpio::GPIO_INPUT);
 		if(!hydrophone) throw gpio::GPIOError("Couldn't allocate memory for 'hydrophone' variable");
@@ -114,7 +116,7 @@ int main(void)
 	{
 		Logger::log(Logger::LOG_ERROR, e.what());
 		Logger::log(Logger::LOG_ERROR, "Hydrophone is not available");
-	}
+	}*/
 	
 	/**************************/
 	/* start command listener */
@@ -262,12 +264,46 @@ int main(void)
 				delete wiper;
 				break;
 			}
-			case 7: // clean up log file
+			case 7: // turn porpoise on
+			{
+				gpio::GPIO *hydrophone = nullptr;
+				try
+				{
+					hydrophone = new gpio::GPIO(GPIO_HYDROPHONE, gpio::GPIO_OUTPUT);
+					if(!hydrophone) throw gpio::GPIOError("Couldn't allocate memory for 'hydrophone' variable");
+					hydrophone->setval(gpio::GPIO_HIGH);
+					Logger::log(Logger::LOG_INFO, "Enabled hydrophone");
+				}
+				catch(gpio::GPIOError& e)
+				{
+					Logger::log(Logger::LOG_ERROR, e.what());
+				}
+				delete hydrophone;
+				break;
+			}
+			case 8: // turn porpoise off
+			{
+				gpio::GPIO *hydrophone = nullptr;
+				try
+				{
+					hydrophone = new gpio::GPIO(GPIO_HYDROPHONE, gpio::GPIO_OUTPUT);
+					if(!hydrophone) throw gpio::GPIOError("Couldn't allocate memory for 'hydrophone' variable");
+					hydrophone->setval(gpio::GPIO_LOW);
+					Logger::log(Logger::LOG_INFO, "Disabled hydrophone");
+				}
+				catch(gpio::GPIOError& e)
+				{
+					Logger::log(Logger::LOG_ERROR, e.what());
+				}
+				delete hydrophone;
+				break;
+			}
+			case 9: // clean up log file
 			{
 				Logger::clearLog();
 				break;
 			}
-			case 8: // start web server process
+			case 10: // start web server process
 			{
 				if(!thread_running)
 				{
@@ -280,7 +316,7 @@ int main(void)
 					break;
 				}
 			}
-			case 9: // end web server process
+			case 11: // end web server process
 			{
 				if(thread_running)
 				{
