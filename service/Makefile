@@ -8,11 +8,11 @@ PYBIND_LIB := $(shell python3 -m pybind11 --includes)
 CPYTHON_EXTENSION := $(shell python3-config --extension-suffix)
 
 TARGET := aneris
-INSTALL_DIR := /etc/$(TARGET)
+INSTALL_DIR := /etc/$(TARGET)/
 
 default: $(TARGET)
 
-$(TARGET): $(TARGET).o GPIO.o Logger.o Web_Server.o
+$(TARGET): $(TARGET).o GPIO.o Logger.o Web_Server.o ctl
 	$(CPP) -o $(TARGET) $(TARGET).o GPIO.o Logger.o Web_Server.o $(CFLAGS) $(THREAD_LIB) $(PYTHON_LIB)
 	$(RM) *.o
 
@@ -31,11 +31,15 @@ Web_Server.o: Web_Server/Web_Server.cpp
 Cpython: bit_converter/bit_converter.cpp
 	$(CPP) -shared -O3 -Wall -fPIC $(PYBIND_LIB) bit_converter/bit_converter.cpp -o bit_converter$(CPYTHON_EXTENSION)
 
+ctl: $(TARGET)-ctl.cpp
+	$(CPP) -o $(TARGET)-ctl $(TARGET)-ctl.cpp $(CFLAGS)
+
 install:
 	mkdir $(INSTALL_DIR)
 	cp $(TARGET) web_server.py $(INSTALL_DIR)
 	cp -r web/ $(INSTALL_DIR)
 	cp $(TARGET).service /etc/systemd/system/
+	cp $(TARGET)-ctl /usr/bin/
 	systemctl daemon-reload
 
 clean:
