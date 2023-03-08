@@ -7,7 +7,7 @@
 #define SOCKET_PATH "/var/run/aneris.sock"
 #define COMMAND_SIZE 2
 
-void printHelp();
+void printHelp(char *pName);
 
 int main(int argc, char **argv)
 {
