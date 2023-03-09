@@ -2,15 +2,24 @@
 # make sure the legacy camera stack is enabled if it doesn't work
 # include copyright notice here
 
-from io import BytesIO
-from picamera import PiCamera
-from logging import warning
-from socketserver import ThreadingMixIn
-from threading import Condition
-from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib.parse import urlsplit
-from socket import socket, AF_UNIX, SOCK_DGRAM
-#from datetime import datetime
+try:
+    # camera imports
+    from io import BytesIO
+    from threading import Condition
+    from picamera import PiCamera
+
+    # web server imports
+    from logging import warning
+    from socketserver import ThreadingMixIn
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+    from urllib.parse import urlsplit
+    from socket import socket, AF_UNIX, SOCK_DGRAM
+    #from datetime import datetime
+except ImportError as e:
+    print('Couldn\'t import all required modules')
+    print(f'Additional information: {str(e)}')
+
+__version__ = '1.0.0'
 
 HOME_DIR =	'/home/pi/Desktop/aneris-bachelorprosjekt/service/'
 WEB_DIR =	HOME_DIR + 'web/'
