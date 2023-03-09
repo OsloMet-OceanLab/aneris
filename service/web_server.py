@@ -10,7 +10,6 @@ from threading import Condition
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlsplit
 from socket import socket, AF_UNIX, SOCK_DGRAM
-from bit_converter import bytes_to_16
 #from datetime import datetime
 
 HOME_DIR =	'/home/pi/Desktop/aneris-bachelorprosjekt/service/'
