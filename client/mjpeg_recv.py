@@ -2,7 +2,7 @@ from cv2 import VideoCapture, imshow, destroyAllWindows, waitKey
 
 import cv2 # temporary, better to just import individual classes/functions
 
-class Video(VideoCapture):
+class Video(cv2.VideoCapture):
 	def __enter__(self):
 		return self
 	def __exit__(self, *args):
