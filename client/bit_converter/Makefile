@@ -7,7 +7,7 @@ EXTENSION := $(shell python3-config --extension-suffix)
 default: $(TARGET)
 
 $(TARGET):
-	$(CPP) $(CFLAGS) $(PYBIND) $(TARGET).cpp -o $(TARGET)$(EXTENSION)
+	$(CPP) $(CFLAGS) $(PYBIND) $(TARGET).cpp -o $(TARGET)$(EXTENSION) -DCPYTHON
 
 clean:
 	$(RM) $(TARGET)$(EXTENSION)

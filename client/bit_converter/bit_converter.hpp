@@ -2,18 +2,42 @@
 #define BIT_CONVERTER_HPP
 
 #include <cstdint>
-#include <pybind11/pybind11.h>
 
+#ifdef CPYTHON
+
+#include <pybind11/pybind11.h>
 namespace py = pybind11;
+
+#endif
 
 namespace bit_converter
 {
 
-py::bytes bytes_to_16(const char *buf = nullptr, size_t len = 0, bool invertEndianness = true);
-py::bytes bytes_to_32(const char *buf = nullptr, size_t len = 0, bool invertEndianness = true);
-py::bytes invert_endianness_24(const char *buf = nullptr, size_t len = 0);
+#ifdef CPYTHON
+py::bytes
+#else
+char *
+#endif
+bytes_to_16(const char *buf = nullptr, size_t len = 0, bool invertEndianness = true);
+
+#ifdef CPYTHON
+py::bytes
+#else
+char *
+#endif
+bytes_to_32(const char *buf = nullptr, size_t len = 0, bool invertEndianness = true);
+
+#ifdef CPYTHON
+py::bytes
+#else
+char *
+#endif
+
+invert_endianness_24(const char *buf = nullptr, size_t len = 0);
 
 } // end namespace bit_converter
+
+#ifdef CPYTHON
 
 PYBIND11_MODULE(bit_converter, m)
 {
@@ -26,5 +50,7 @@ PYBIND11_MODULE(bit_converter, m)
         m.def("invert_endianness_24", &bit_converter::invert_endianness_24, "Change the endianness of the sample",
                 py::arg("buf") = nullptr, py::arg("len") = 0);
 }
+
+#endif
 
 #endif
