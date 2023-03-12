@@ -32,7 +32,6 @@ py::bytes
 #else
 char *
 #endif
-
 invert_endianness_24(const char *buf = nullptr, size_t len = 0);
 
 } // end namespace bit_converter
