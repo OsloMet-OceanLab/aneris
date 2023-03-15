@@ -47,12 +47,8 @@ class StreamingHandler(BaseHTTPRequestHandler):
         path, query = urlsplit(self.path).path, urlsplit(self.path).query
         try:
             get_params = dict(query.split('=') for query in query.split('&'))
-            if 'content' not in get_params:
-                get_params['content'] = 'video'
-            #if 'timestamp' not in get_params:
-                #get_params['timestamp'] = 'false'
         except ValueError:
-            get_params = {'content': 'video'}
+            get_params = dict()
 
         if path == '/' or path == '/index.html' or path == '/index':
             try:
@@ -62,19 +58,11 @@ class StreamingHandler(BaseHTTPRequestHandler):
                     self.end_headers()
                     self.wfile.write(index.read())
             except FileNotFoundError:
-                self.send_response(404)
-                self.send_header('Content-type', 'text/plain')
-                self.end_headers()
-                self.wfile.write('Error: index.html does not exist'.encode())
+                self.send_error(500,
+                                'Error: index file does not exist',
+                                f'Check that the index file exists in directory \'{WEB_DIR}\'')
             
         elif path == '/stream':
-            if get_params['content'] == 'video':
-                self.serve_video()
-
-            elif get_params['content'] == 'audio':
-                self.stream_audio()
-
-        elif path == '/video':
             self.serve_video()
 
         elif path == '/logs':
@@ -85,10 +73,9 @@ class StreamingHandler(BaseHTTPRequestHandler):
                     self.end_headers()
                     self.wfile.write(log.read())
             except FileNotFoundError:
-                self.send_response(404)
-                self.send_header('Content-type', 'text/plain')
-                self.end_headers()
-                self.wfile.write('Error: log file does not exist'.encode())
+                self.send_error(500,
+                                'Error: log file does not exist',
+                                f'Check that the log file exists in directory \'{LOG_FILE}\'')
 
         elif path == '/console':
             self.serve_console();
@@ -118,13 +105,40 @@ class StreamingHandler(BaseHTTPRequestHandler):
                         sock.connect(SOCKET)
                         sock.sendall(post[b'command'])
                     self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    response = '{\
+                                    "result": {\
+                                    "code": "Success",\
+                                    "message": "The operation was successful"\
+                                    }\
+                                }'
+                    self.wfile.write(response.encode())
                 except:
-                    self.send_error(500)
-                    self.wfile.write('Couldn\'t connect to socket'.encode())
+                    self.send_response(500)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    response = '{\
+                                    "error": {\
+                                    "code": "SocketError",\
+                                    "message": "The server couldn\'t connect to the socket"\
+                                    }\
+                                }'
+                    self.wfile.write(response.encode())
 
             else:
-                self.send_error(400)
-                self.wfile.write('Invalid post sent'.encode())
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                response = '{\
+                                "error": {\
+                                "code": "InvalidPOST",\
+                                "message": "The POST request sent to the server did not include a \'command\' parameter"\
+                                }\
+                            }'
+                self.wfile.write(response.encode())
+
+                                
 
         else:
             self.send_error(404)
