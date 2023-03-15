@@ -5,29 +5,35 @@
         <h1>Console page</h1>
         <p>Use this page to control the device</p>
         <div class="flex-container">
-            <form method="POST" action="/console">
+            <form method="POST">
                 <button name="command" value=3 type="submit"> Lights On</button>
             </form>
+            <button onclick="addCom(3)">Lights On (Func)</button>
 
-            <form method="POST" action="/console">
+            <form method="POST">
                 <button name="command" value=4 type="submit"> Lights Off</button>
             </form>
+            <button onclick="addCom(4)">Lights Off (Func)</button>
 
-            <form method="POST" action="/console">
+            <form method="POST">
                 <button name="wipersOn" value=5 type="submit"> Wipers on</button>
             </form>
+            <button onclick="addCom(5)">Wipers on (Func)</button>
 
-            <form method="POST" action="/console">
+            <form method="POST">
                 <button name="wipersOff" value=6 type="submit"> Wipers off</button>
             </form>
+            <button onclick="addCom(6)">Wipers Off (Func)</button>
 
-            <form method="POST" action="/console">
+            <form method="POST">
                 <button name="CleanLog" value=7 type="submit"> Clean up log files</button>
             </form>
+            <button onclick="addCom(7)">Clean up log files (Func)</button>
+
         </div>
 
 
-        <!--
+            <!--
              <form method="POST" action="/console">
             <input name="command" type="text" placeholder="Write a command here" />
             <input type="submit" value="Submit" />
@@ -51,8 +57,22 @@
             }
     </style>
     <script>
-
-
+       
+        function addCom(buttonvalue) {
+            let testUrl = 'https://httpbin.org/post';
+            let url = '/console';
+            let buttonInfo = {
+                command: buttonvalue
+            }
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-type': 'application/json;' },
+                body: JSON.stringify(buttonInfo),
+            })
+                    .then(res => res.json())
+                .then(json => console.log(buttonvalue));
+            }
+        
     </script>
 </body>
 </html>
