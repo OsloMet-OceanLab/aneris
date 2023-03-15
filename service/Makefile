@@ -43,6 +43,6 @@ install:
 	systemctl daemon-reload
 
 clean:
-	$(RM) $(TARGET) *.o
+	$(RM) $(TARGET) $(TARGET)-ctl *.o
 	
 remake: clean $(TARGET)
