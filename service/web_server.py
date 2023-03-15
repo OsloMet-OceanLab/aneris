@@ -91,7 +91,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
                 self.wfile.write('Error: log file does not exist'.encode())
 
         elif path == '/console':
-            self.serve_console('GET');
+            self.serve_console();
             
         elif path == '/docs' or path == '/docs/index.html':
             self.serve_docs(path, query)
@@ -104,16 +104,26 @@ class StreamingHandler(BaseHTTPRequestHandler):
         if self.path == '/console':
             content_length = int(self.headers['Content-Length'])
             post = dict(x.split(b'=') for x in self.rfile.read(content_length).split(b';'))
-            self.serve_console('POST', post)
+
+            ### remove after, just for debug
             self.wfile.write('This is POST request. '.encode())
             self.wfile.write('Received: '.encode())
             for x in post:
                 self.wfile.write(f'{x}: {post[x]}'.encode())
+            ###
+
             if b'command' in post:
-                with socket(AF_UNIX, SOCK_DGRAM) as sock:
-                    sock.connect(SOCKET)
-                    sock.sendall(post[b'command'])
+                try:
+                    with socket(AF_UNIX, SOCK_DGRAM) as sock:
+                        sock.connect(SOCKET)
+                        sock.sendall(post[b'command'])
+                    self.send_response(200)
+                except:
+                    self.send_error(500)
+                    self.wfile.write('Couldn\'t connect to socket'.encode())
+
             else:
+                self.send_error(400)
                 self.wfile.write('Invalid post sent'.encode())
 
         else:
@@ -166,9 +176,8 @@ class StreamingHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write('Error: index.html does not exist'.encode())
 
-    def serve_console(self, method, post = None):
-        if method == 'POST':
-            pass
+    def serve_console(self):
+        
         try:
             with open(WEB_DIR + 'console.html', 'rb') as index:
                 self.send_response(200)
