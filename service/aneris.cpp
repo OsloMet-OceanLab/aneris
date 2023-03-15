@@ -21,7 +21,7 @@
 #include "Logger/Logger.hpp"
 #include "Web_Server/Web_Server.hpp"
 
-#define WEB_SERVER_PORT 5000
+#define WEB_SERVER_PORT 80
 
 #define SOCKET_PATH "/var/run/aneris.sock"
 #define COMMAND_SIZE 2
@@ -313,8 +313,8 @@ int main(void)
 						exit(3);
 					}
 					Logger::log(Logger::LOG_INFO, "Started web server process");
-					break;
 				}
+				break;
 			}
 			case 11: // end web server process
 			{
@@ -323,8 +323,8 @@ int main(void)
 					Logger::log(Logger::LOG_INFO, "Ending web server process");
 					if (pthread_cancel(ws_thread)) Logger::log(Logger::LOG_ERROR, "Couldn't stop web server process");
 					else Logger::log(Logger::LOG_INFO, "Ended web server process");
-					break;
 				}
+				break;
 			}
 			default: // return that command is invalid
 			{

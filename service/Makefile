@@ -1,11 +1,11 @@
 CPP := g++
 CFLAGS := -O3 -Wpedantic -Wall -Wextra -Wconversion -Wshadow -Werror
 #PYTHON_LIB := -I/usr/include/python3.9 -lpython3.9
-PYTHON_LIB := $(shell python3-config --includes)
+PYTHON_LIB := $(shell python3-config --includes) -lpython3.9
 THREAD_LIB := -lpthread
 
-PYBIND_LIB := $(shell python3 -m pybind11 --includes)
-CPYTHON_EXTENSION := $(shell python3-config --extension-suffix)
+#PYBIND_LIB := $(shell python3 -m pybind11 --includes)
+#CPYTHON_EXTENSION := $(shell python3-config --extension-suffix)
 
 TARGET := aneris
 INSTALL_DIR := /etc/$(TARGET)/
