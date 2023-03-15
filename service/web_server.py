@@ -88,15 +88,27 @@ class StreamingHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
     def do_POST(self):
-        if self.path == '/console':
-            content_length = int(self.headers['Content-Length'])
-            post = dict(x.split(b'=') for x in self.rfile.read(content_length).split(b';'))
+        if self.path == '/api':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post = dict(x.split(b'=') for x in self.rfile.read(content_length).split(b';'))
+            except:
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                response = '{\
+                                "error": {\
+                                "code": "InvalidPOST",\
+                                "message": "The POST request sent to the server did not include a \'command\' parameter"\
+                                }\
+                            }'
+                self.wfile.write(response.encode())
 
             ### remove after, just for debug
-            self.wfile.write('This is POST request. '.encode())
-            self.wfile.write('Received: '.encode())
-            for x in post:
-                self.wfile.write(f'{x}: {post[x]}'.encode())
+#            self.wfile.write('This is POST request. '.encode())
+#            self.wfile.write('Received: '.encode())
+#            for x in post:
+#                self.wfile.write(f'{x}: {post[x]}'.encode())
             ###
 
             if b'command' in post:
