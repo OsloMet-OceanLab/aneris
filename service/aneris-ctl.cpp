@@ -64,7 +64,7 @@ int main(int argc, char **argv)
 		}
 		case 8:
 		{
-			printf("Turning wipers off\n");
+			printf("Turning porpoise off\n");
 			break;
 		}
 		case 9:

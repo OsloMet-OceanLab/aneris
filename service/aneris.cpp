@@ -271,7 +271,7 @@ int main(void)
 				{
 					hydrophone = new gpio::GPIO(GPIO_HYDROPHONE, gpio::GPIO_OUTPUT);
 					if(!hydrophone) throw gpio::GPIOError("Couldn't allocate memory for 'hydrophone' variable");
-					hydrophone->setval(gpio::GPIO_HIGH);
+					hydrophone->setval(gpio::GPIO_LOW);
 					Logger::log(Logger::LOG_INFO, "Enabled hydrophone");
 				}
 				catch(gpio::GPIOError& e)
@@ -288,7 +288,7 @@ int main(void)
 				{
 					hydrophone = new gpio::GPIO(GPIO_HYDROPHONE, gpio::GPIO_OUTPUT);
 					if(!hydrophone) throw gpio::GPIOError("Couldn't allocate memory for 'hydrophone' variable");
-					hydrophone->setval(gpio::GPIO_LOW);
+					hydrophone->setval(gpio::GPIO_HIGH);
 					Logger::log(Logger::LOG_INFO, "Disabled hydrophone");
 				}
 				catch(gpio::GPIOError& e)

@@ -103,6 +103,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
                                 }\
                             }'
                 self.wfile.write(response.encode())
+                return
 
             ### remove after, just for debug
 #            self.wfile.write('This is POST request. '.encode())
