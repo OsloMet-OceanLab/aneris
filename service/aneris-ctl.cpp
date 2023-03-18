@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 	
-	if (!strncmp("--help", argv[1], 6))
+	if (!strncmp("--help", argv[1], 6) || !strncmp("-h", argv[1], 2))
 	{
 		printHelp(argv[0]);
 		exit(0);
