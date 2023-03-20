@@ -27,7 +27,7 @@ DOCS_DIR =	WEB_DIR + 'docs/'
 LOG_FILE =	HOME_DIR + 'aneris.log'
 SOCKET =	'/var/run/aneris.sock'
 
-class VideoStreamOutput:
+class VideoStreamBuffer:
     def __init__(self):
         self.frame = None
         self.buffer = BytesIO()
@@ -41,6 +41,15 @@ class VideoStreamOutput:
                 self.condition.notify_all()
             self.buffer.seek(0)
         return self.buffer.write(buf)
+    
+    def write2(self, buf): #h.264 encoding
+        if buf.startswith(b'\x00\x00\x00\x01'):
+            with self.condition:
+                self.buffer.seek(0)
+                self.buffer.write(buf)
+                self.buffer.truncate()
+                self.frame = self.buffer.getvalue()
+                self.condition.notify_all()
 
 class StreamingHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -163,7 +172,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
     # N.B. timestamp has been temporarily disabled
 
     def serve_video(self):
-        global videoOutput
+        global videoBuffer
         self.send_response(200)
         self.send_header('Age', 0)
         self.send_header('Cache-Control', 'no-cache, private')
@@ -178,9 +187,9 @@ class StreamingHandler(BaseHTTPRequestHandler):
                     #camera.annotate_text = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 #else:
                     #camera.annotate_text = ""
-                with videoOutput.condition:
-                    videoOutput.condition.wait()
-                    frame = videoOutput.frame
+                with videoBuffer.condition:
+                    videoBuffer.condition.wait()
+                    frame = videoBuffer.frame
                 self.wfile.write(b'--FRAME\r\n')
                 self.send_header('Content-Type', 'image/jpeg')
                 self.send_header('Content-Length', len(frame))
@@ -188,7 +197,24 @@ class StreamingHandler(BaseHTTPRequestHandler):
                 self.wfile.write(frame)
                 self.wfile.write(b'\r\n')
         except Exception as e:
-            warning('Removed streaming client %s: %s', self.client_address, str(e))
+            warning('Removed streaming client %s: %s', self.client_address, str(e)) # probaably unneeded
+    
+    def serve_video_2(self):
+        global videoBuffer
+        self.send_response(200)
+        self.send_header('Age', 0)
+        self.send_header('Cache-Control', 'no-cache, private')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
+        self.end_headers()
+        try:
+            while True:
+                with videoBuffer.condition:
+                    videoBuffer.condition.wait()
+                    frame = videoBuffer.frame
+                self.wfile.write(frame)
+        except Exception as e:
+            warning('Removed streaming client %s: %s', self.client_address, str(e)) # probably unneeded
 
     def serve_docs(self, docs, query):
         try:
@@ -221,7 +247,7 @@ class StreamingServer(ThreadingMixIn, HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
 
-videoOutput = VideoStreamOutput()
+videoBuffer = VideoStreamBuffer()
 
 def serve(port = 0):
     if port <= 0 and not port.isdigit():
@@ -229,7 +255,8 @@ def serve(port = 0):
 	
     global videoOutput
     with PiCamera(resolution='1280x720', framerate=30) as camera:
-        camera.start_recording(videoOutput, format='mjpeg') # this type of format uses lossy compression so it might or might not be suited to opencv image analysis
+        camera.start_recording(videoBuffer, format='mjpeg') # this type of format uses lossy compression so it might or might not be suited to opencv image analysis
+        #camera.start_recording(videoBuffer, format='h264', profile='baseline') # h.264 option
         try:
             return_int = 0
             address = ('', int(port)) # ip, port
