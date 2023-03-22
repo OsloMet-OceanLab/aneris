@@ -16,7 +16,7 @@ enum
 };
 
 void log(long level, std::string logMsg);
-void logf(long level, std::string fmt, ...);
+void logf(long level, const char *fmt, ...);
 void clearLog();
 
 } // end namespace Logger

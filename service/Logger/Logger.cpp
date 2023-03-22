@@ -34,7 +34,7 @@ void log(long level, std::string logMsg)
 	ofs.close();
 }
 
-void logf(long level, std::string fmt, ...)
+void logf(long level, const char *fmt, ...)
 {
 	std::string strLevel = "[]";
 	char logMsg[256];
