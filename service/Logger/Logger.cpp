@@ -2,6 +2,7 @@
 #include <fstream>
 #include <ctime>
 #include <string>
+#include <cstdarg>
 
 #define FILEPATH "aneris.log"
 //#define FILEPATH "/var/log/aneris/aneris.log"
@@ -31,6 +32,27 @@ void log(long level, std::string logMsg)
 	std::ofstream ofs(FILEPATH, std::ios_base::out | std::ios_base::app);
 	ofs << strLevel << '\t' << getCurrentTime() << '\t' << logMsg << '\n';
 	ofs.close();
+}
+
+void logf(long level, std::string fmt, ...)
+{
+	std::string strLevel = "[]";
+	char logMsg[256];
+	
+	if(level & LOG_INFO) strLevel = "[INFO]";
+	else if(level & LOG_WARN) strLevel = "[WARN]";
+	else if(level & LOG_ERROR) strLevel = "[ERROR]";
+	else if(level & LOG_FATAL) strLevel = "[FATAL]";
+
+	va_list args;
+	va_start(args, fmt);
+	vsprintf(logMsg, fmt, args);
+
+	std::ofstream ofs(FILEPATH, std::ios_base::out | std::ios_base::app);
+	ofs << strLevel << '\t' << getCurrentTime() << '\t' << logMsg << '\n';
+	ofs.close();
+
+	va_end(args);
 }
 
 void clearLog()

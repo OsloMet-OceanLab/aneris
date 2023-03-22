@@ -2,6 +2,7 @@
 #define LOG_HPP
 
 #include <string>
+#include <cstdarg>
 
 namespace Logger
 {
@@ -15,6 +16,7 @@ enum
 };
 
 void log(long level, std::string logMsg);
+void logf(long level, std::string fmt, ...);
 void clearLog();
 
 } // end namespace Logger
