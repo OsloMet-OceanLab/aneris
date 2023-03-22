@@ -46,7 +46,7 @@ void logf(long level, const char *fmt, ...)
 
 	va_list args;
 	va_start(args, fmt);
-	vsprintf(logMsg, fmt, args);
+	vsnprintf(logMsg, 256, fmt, args);
 
 	std::ofstream ofs(FILEPATH, std::ios_base::out | std::ios_base::app);
 	ofs << strLevel << '\t' << getCurrentTime() << '\t' << logMsg << '\n';
