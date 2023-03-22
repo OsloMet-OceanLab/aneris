@@ -78,11 +78,9 @@ int main(void)
 	/* integer otherwise                      */
 	/******************************************/
 	int ping_counter = 0, tether_up = 1;
-	std::string attempt = "";
 	do
 	{
-		attempt = "Testing connection to land, attempt " + std::to_string(ping_counter + 1);
-		Logger::log(Logger::LOG_INFO, attempt);
+		Logger::logf(Logger::LOG_INFO, "Testing connection to land, attempt %d", ping_counter + 1);
 		tether_up = system("ping -c 1 10.44.6.51");
 
 		if(tether_up && ping_counter < 2)
