@@ -5,29 +5,30 @@
         <h1>Console page</h1>
         <p>Use this page to control the device</p>
         <div class="flex-container">
-            <form method="POST">
+          <!--  <form method="POST">
                 <button name="command" value=3 type="submit"> Lights On</button>
             </form>
-            <button onclick="addCom(3)">Lights On (Func)</button>
-
+            
             <form method="POST">
                 <button name="command" value=4 type="submit"> Lights Off</button>
             </form>
-            <button onclick="addCom(4)">Lights Off (Func)</button>
-
-            <form method="POST">
+            
+             <form method="POST">
                 <button name="wipersOn" value=5 type="submit"> Wipers on</button>
             </form>
-            <button onclick="addCom(5)">Wipers on (Func)</button>
 
-            <form method="POST">
+              <form method="POST">
                 <button name="wipersOff" value=6 type="submit"> Wipers off</button>
             </form>
-            <button onclick="addCom(6)">Wipers Off (Func)</button>
 
-            <form method="POST">
+  <form method="POST">
                 <button name="CleanLog" value=7 type="submit"> Clean up log files</button>
             </form>
+            -->
+            <button onclick="addCom(3)">Lights On (Func)</button>
+            <button onclick="addCom(4)">Lights Off (Func)</button>
+            <button onclick="addCom(5)">Wipers on (Func)</button>          
+            <button onclick="addCom(6)">Wipers Off (Func)</button>
             <button onclick="addCom(7)">Clean up log files (Func)</button>
 
         </div>
@@ -61,6 +62,7 @@
         function addCom(buttonvalue) {
             let testUrl = 'https://httpbin.org/post';
             let url = 'http://10.44.6.51/api';
+            //let url = 'api';
             let buttonInfo = {
                 command: buttonvalue
             }
