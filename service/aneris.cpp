@@ -311,6 +311,7 @@ int main(void)
 						exit(3);
 					}
 					Logger::log(Logger::LOG_INFO, "Started web server process");
+					thread_running = true;
 				}
 				break;
 			}
@@ -321,6 +322,7 @@ int main(void)
 					Logger::log(Logger::LOG_INFO, "Ending web server process");
 					if (pthread_cancel(ws_thread)) Logger::log(Logger::LOG_ERROR, "Couldn't stop web server process");
 					else Logger::log(Logger::LOG_INFO, "Ended web server process");
+					thread_running = false;
 				}
 				break;
 			}
