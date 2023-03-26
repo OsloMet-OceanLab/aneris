@@ -10,29 +10,29 @@ THREAD_LIB := -lpthread
 TARGET := aneris
 INSTALL_DIR := /etc/$(TARGET)/
 
-default: $(TARGET)
+default: $(TARGET) $(TARGET)-ctl
 
-$(TARGET): $(TARGET).o GPIO.o Logger.o Web_Server.o ctl
-	$(CPP) -o $(TARGET) $(TARGET).o GPIO.o Logger.o Web_Server.o $(CFLAGS) $(THREAD_LIB) $(PYTHON_LIB)
+$(TARGET): $(TARGET).o GPIO.o Logger.o Web_Server.o
+	$(CPP) -o $@ $? $(CFLAGS) $(THREAD_LIB) $(PYTHON_LIB)
 	$(RM) *.o
 
 $(TARGET).o: $(TARGET).cpp
-	$(CPP) -c $(TARGET).cpp $(CFLAGS) $(THREAD_LIB)
+	$(CPP) -c $< $(CFLAGS) $(THREAD_LIB)
 	
 GPIO.o: gpio/GPIO.cpp
-	$(CPP) -c gpio/GPIO.cpp $(CFLAGS)
+	$(CPP) -c $< $(CFLAGS)
 	
 Logger.o: Logger/Logger.cpp
-	$(CPP) -c Logger/Logger.cpp $(CFLAGS)
+	$(CPP) -c $< $(CFLAGS)
 
 Web_Server.o: Web_Server/Web_Server.cpp
-	$(CPP) -c Web_Server/Web_Server.cpp $(CFLAGS) $(PYTHON_LIB)
+	$(CPP) -c $< $(CFLAGS) $(PYTHON_LIB)
 
 Cpython: bit_converter/bit_converter.cpp
-	$(CPP) -shared -O3 -Wall -fPIC $(PYBIND_LIB) bit_converter/bit_converter.cpp -o bit_converter$(CPYTHON_EXTENSION)
+	$(CPP) -shared -O3 -Wall -fPIC $(PYBIND_LIB) $< -o bit_converter$(CPYTHON_EXTENSION)
 
-ctl: $(TARGET)-ctl.cpp
-	$(CPP) -o $(TARGET)-ctl $(TARGET)-ctl.cpp $(CFLAGS)
+$(TARGET)-ctl: $(TARGET)-ctl.cpp
+	$(CPP) -o $@ $< $(CFLAGS)
 
 install:
 	mkdir $(INSTALL_DIR)

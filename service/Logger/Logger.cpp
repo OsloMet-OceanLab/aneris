@@ -4,8 +4,7 @@
 #include <string>
 #include <cstdarg>
 
-#define FILEPATH "aneris.log"
-//#define FILEPATH "/var/log/aneris/aneris.log"
+#define FILEPATH "/var/log/aneris/aneris.log"
 #define F_BUFSIZE 256
 
 namespace Logger
