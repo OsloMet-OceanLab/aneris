@@ -6,6 +6,7 @@
 
 #define FILEPATH "aneris.log"
 //#define FILEPATH "/var/log/aneris/aneris.log"
+#define F_BUFSIZE 256
 
 namespace Logger
 {
@@ -37,7 +38,7 @@ void log(long level, std::string logMsg)
 void logf(long level, const char *fmt, ...)
 {
 	std::string strLevel = "[]";
-	char logMsg[256];
+	char logMsg[F_BUFSIZE];
 	
 	if(level & LOG_INFO) strLevel = "[INFO]";
 	else if(level & LOG_WARN) strLevel = "[WARN]";
@@ -46,7 +47,7 @@ void logf(long level, const char *fmt, ...)
 
 	va_list args;
 	va_start(args, fmt);
-	vsnprintf(logMsg, 256, fmt, args);
+	vsnprintf(logMsg, F_BUFSIZE, fmt, args);
 
 	std::ofstream ofs(FILEPATH, std::ios_base::out | std::ios_base::app);
 	ofs << strLevel << '\t' << getCurrentTime() << '\t' << logMsg << '\n';
