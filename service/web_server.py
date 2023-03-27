@@ -24,7 +24,7 @@ __version__ = '1.0.0'
 HOME_DIR =	'/etc/aneris/'
 WEB_DIR =	HOME_DIR + 'web/'
 DOCS_DIR =	WEB_DIR + 'docs/'
-LOG_FILE =	'/var/log/aneris.log'
+LOG_FILE =	'/var/log/aneris/aneris.log'
 SOCKET =	'/var/run/aneris.sock'
 
 class VideoStreamBuffer:
