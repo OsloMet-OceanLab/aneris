@@ -81,7 +81,7 @@ int main(void)
 	do
 	{
 		Logger::logf(Logger::LOG_INFO, "Testing connection to land, attempt %d", ping_counter + 1);
-		tether_up = system("ping -c 1 10.44.6.51");
+		tether_up = system("ping -c 1 192.168.2.1");
 
 		if(tether_up && ping_counter < 2)
 		{
