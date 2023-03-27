@@ -21,10 +21,10 @@ except ImportError as e:
 
 __version__ = '1.0.0'
 
-HOME_DIR =	'/home/pi/Desktop/aneris-bachelorprosjekt/service/'
+HOME_DIR =	'/etc/aneris/'
 WEB_DIR =	HOME_DIR + 'web/'
 DOCS_DIR =	WEB_DIR + 'docs/'
-LOG_FILE =	HOME_DIR + 'aneris.log'
+LOG_FILE =	'/var/log/aneris.log'
 SOCKET =	'/var/run/aneris.sock'
 
 class VideoStreamBuffer:

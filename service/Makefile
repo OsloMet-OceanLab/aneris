@@ -36,6 +36,7 @@ $(TARGET)-ctl: $(TARGET)-ctl.cpp
 
 install:
 	mkdir $(INSTALL_DIR)
+	mkdir /var/log/aneris/
 	cp $(TARGET) web_server.py $(INSTALL_DIR)
 	cp -r web/ $(INSTALL_DIR)
 	cp $(TARGET).service /etc/systemd/system/
