@@ -185,14 +185,12 @@ int main(void)
 			case 1: // shutdown
 			{
 				Logger::log(Logger::LOG_INFO, "Received shutdown command");
-				//system("poweroff");
-				break;
+				system("poweroff");
 			}
 			case 2: // reboot
 			{
 				Logger::log(Logger::LOG_INFO, "Received reboot command");
-				//system("reboot");
-				break;
+				system("reboot");
 			}
 			case 3: // turn lights on
 			{
