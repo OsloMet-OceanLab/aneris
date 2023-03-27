@@ -42,6 +42,8 @@ install:
 	cp $(TARGET).service /etc/systemd/system/
 	cp $(TARGET)-ctl /usr/bin/
 	systemctl daemon-reload
+	systemctl enable aneris
+	systemctl start aneris
 
 clean:
 	$(RM) $(TARGET) $(TARGET)-ctl *.o
