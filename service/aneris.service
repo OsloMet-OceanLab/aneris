@@ -4,7 +4,7 @@ Description=Aneris streaming service
 [Service]
 User=root
 WorkingDirectory=/etc/aneris
-ExecStart=aneris
+ExecStart=/etc/aneris/aneris
 Restart=always
 
 [Install]
