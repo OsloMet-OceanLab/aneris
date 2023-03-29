@@ -14,7 +14,6 @@ default: $(TARGET) $(TARGET)-ctl
 
 $(TARGET): $(TARGET).o GPIO.o Logger.o Web_Server.o
 	$(CPP) -o $@ $? $(CFLAGS) $(THREAD_LIB) $(PYTHON_LIB)
-	$(RM) *.o
 
 $(TARGET).o: $(TARGET).cpp
 	$(CPP) -c $< $(CFLAGS) $(THREAD_LIB)
