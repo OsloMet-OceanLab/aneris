@@ -36,7 +36,7 @@ void setup()
 
 void loop()
 {
-    if(digitalRead(5) || 1)
+    if(digitalRead(PI_1))
     {
         // enable motors and drivers
         digitalWrite(REL_1, HIGH);
@@ -53,4 +53,5 @@ void loop()
         digitalWrite(REL_1, LOW);
         digitalWrite(REL_2, LOW);
     }
+    delay(300000); // wait 5 minutes until next iteration
 }
