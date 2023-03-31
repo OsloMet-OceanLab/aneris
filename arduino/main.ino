@@ -44,9 +44,10 @@ void loop()
 
         delay(1000); // 1s delay, in case the drivers need a second to boot properly
 
-        stepper.step(1600);
+        // N.B. 2600 steps are one half rotation in our scenario
+        stepper.step(2600);
         delay(100);
-        stepper.step(-1600);
+        stepper.step(-2600);
         delay(100);
 
         // disable motors and drivers
