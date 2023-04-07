@@ -70,7 +70,52 @@ int main(void)
 		Logger::log(Logger::LOG_ERROR, e.what());
 		Logger::log(Logger::LOG_ERROR, "GPIO unavailable");
 	}
-	
+
+	/*****************************************/
+	/* initialize GPIO pins to default value */
+	/*****************************************/
+	gpio::GPIO *lights = nullptr;
+	try
+	{
+		lights = new gpio::GPIO(GPIO_LIGHTS, gpio::GPIO_OUTPUT);
+		if(!lights) throw gpio::GPIOError("Couldn't allocate memory for 'lights' variable");
+		lights->setval(gpio::GPIO_HIGH);
+		Logger::log(Logger::LOG_INFO, "Enabled lights");
+	}
+	catch(gpio::GPIOError& e)
+	{
+		Logger::log(Logger::LOG_ERROR, e.what());
+	}
+	delete lights;
+
+	gpio::GPIO *wiper = nullptr;
+	try
+	{
+		wiper = new gpio::GPIO(GPIO_WIPER, gpio::GPIO_OUTPUT);
+		if(!wiper) throw gpio::GPIOError("Couldn't allocate memory for 'wiper' variable");
+		wiper->setval(gpio::GPIO_HIGH);
+		Logger::log(Logger::LOG_INFO, "Enabled wiper");
+	}
+	catch(gpio::GPIOError& e)
+	{
+		Logger::log(Logger::LOG_ERROR, e.what());
+	}
+	delete wiper;
+
+	gpio::GPIO *hydrophone = nullptr;
+	try
+	{
+		hydrophone = new gpio::GPIO(GPIO_HYDROPHONE, gpio::GPIO_OUTPUT);
+		if(!hydrophone) throw gpio::GPIOError("Couldn't allocate memory for 'hydrophone' variable");
+		hydrophone->setval(gpio::GPIO_LOW);
+		Logger::log(Logger::LOG_INFO, "Enabled hydrophone");
+	}
+	catch(gpio::GPIOError& e)
+	{
+		Logger::log(Logger::LOG_ERROR, e.what());
+	}
+	delete hydrophone;
+
 	/******************************************/
 	/* test uplink to fathom tether interface */
 	/*                                        */
