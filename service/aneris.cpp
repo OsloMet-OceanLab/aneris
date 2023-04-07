@@ -74,47 +74,47 @@ int main(void)
 	/*****************************************/
 	/* initialize GPIO pins to default value */
 	/*****************************************/
-	gpio::GPIO *lights = nullptr;
+	gpio::GPIO *lights_tmp = nullptr;
 	try
 	{
-		lights = new gpio::GPIO(GPIO_LIGHTS, gpio::GPIO_OUTPUT);
-		if(!lights) throw gpio::GPIOError("Couldn't allocate memory for 'lights' variable");
-		lights->setval(gpio::GPIO_HIGH);
+		lights_tmp = new gpio::GPIO(GPIO_LIGHTS, gpio::GPIO_OUTPUT);
+		if(!lights_tmp) throw gpio::GPIOError("Couldn't allocate memory for 'lights' variable");
+		lights_tmp->setval(gpio::GPIO_HIGH);
 		Logger::log(Logger::LOG_INFO, "Enabled lights");
 	}
 	catch(gpio::GPIOError& e)
 	{
 		Logger::log(Logger::LOG_ERROR, e.what());
 	}
-	delete lights;
+	delete lights_tmp;
 
-	gpio::GPIO *wiper = nullptr;
+	gpio::GPIO *wiper_tmp = nullptr;
 	try
 	{
-		wiper = new gpio::GPIO(GPIO_WIPER, gpio::GPIO_OUTPUT);
-		if(!wiper) throw gpio::GPIOError("Couldn't allocate memory for 'wiper' variable");
-		wiper->setval(gpio::GPIO_HIGH);
+		wiper_tmp = new gpio::GPIO(GPIO_WIPER, gpio::GPIO_OUTPUT);
+		if(!wiper_tmp) throw gpio::GPIOError("Couldn't allocate memory for 'wiper' variable");
+		wiper_tmp->setval(gpio::GPIO_HIGH);
 		Logger::log(Logger::LOG_INFO, "Enabled wiper");
 	}
 	catch(gpio::GPIOError& e)
 	{
 		Logger::log(Logger::LOG_ERROR, e.what());
 	}
-	delete wiper;
+	delete wiper_tmp;
 
-	gpio::GPIO *hydrophone = nullptr;
+	gpio::GPIO *hydrophone_tmp = nullptr;
 	try
 	{
-		hydrophone = new gpio::GPIO(GPIO_HYDROPHONE, gpio::GPIO_OUTPUT);
-		if(!hydrophone) throw gpio::GPIOError("Couldn't allocate memory for 'hydrophone' variable");
-		hydrophone->setval(gpio::GPIO_LOW);
+		hydrophone_tmp = new gpio::GPIO(GPIO_HYDROPHONE, gpio::GPIO_OUTPUT);
+		if(!hydrophone_tmp) throw gpio::GPIOError("Couldn't allocate memory for 'hydrophone' variable");
+		hydrophone_tmp->setval(gpio::GPIO_LOW);
 		Logger::log(Logger::LOG_INFO, "Enabled hydrophone");
 	}
 	catch(gpio::GPIOError& e)
 	{
 		Logger::log(Logger::LOG_ERROR, e.what());
 	}
-	delete hydrophone;
+	delete hydrophone_tmp;
 
 	/******************************************/
 	/* test uplink to fathom tether interface */
