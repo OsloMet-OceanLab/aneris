@@ -62,6 +62,7 @@ void loop()
         // disable motors and drivers
         digitalWrite(REL_1, HIGH);
         digitalWrite(REL_2, HIGH);
+        delay(300000); // wait 5 minutes until next iteration
     }
-    delay(300000); // wait 5 minutes until next iteration
+    else delay(15000);
 }
