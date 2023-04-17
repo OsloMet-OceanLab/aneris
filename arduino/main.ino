@@ -28,11 +28,11 @@ void setup()
     pinMode(PI_1, INPUT);
 
     // initialize relay pins
-    // N.B. for these pins, HIGH means the relay is off, and vice versa
+    digitalWrite(REL_1, LOW);
+    digitalWrite(REL_2, LOW);
+
     pinMode(REL_1, OUTPUT);
-    digitalWrite(REL_1, HIGH);
     pinMode(REL_2, OUTPUT);
-    digitalWrite(REL_2, HIGH);
 
     // initialize builtin led
     pinMode(LED_BUILTIN, OUTPUT);
@@ -46,8 +46,8 @@ void loop()
         digitalWrite(LED_BUILTIN, HIGH);
         
         // enable motors and drivers
-        digitalWrite(REL_1, LOW);
-        digitalWrite(REL_2, LOW);
+        digitalWrite(REL_1, HIGH);
+        digitalWrite(REL_2, HIGH);
 
         delay(1000); // 1s delay, in case the drivers need a second to boot properly
 
@@ -60,8 +60,8 @@ void loop()
         digitalWrite(LED_BUILTIN, LOW);
 
         // disable motors and drivers
-        digitalWrite(REL_1, HIGH);
-        digitalWrite(REL_2, HIGH);
+        digitalWrite(REL_1, LOW);
+        digitalWrite(REL_2, LOW);
         delay(300000); // wait 5 minutes until next iteration
     }
     else delay(15000);
