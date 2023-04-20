@@ -16,16 +16,16 @@ void setup() {
 
 void loop() {
   // Servo spins forward at full speed for 1 second.
-  myservo.writeMicroseconds(1000);
-  myservo2.writeMicroseconds(2000);
+  myservo.writeMicroseconds(1425);
+  myservo2.writeMicroseconds(1550);
   delay(2000);
   // Servo is stationary for 1 second.
   myservo.writeMicroseconds(1500);
   myservo2.writeMicroseconds(1500);
   delay(2000);
   // Servo spins in reverse at full speed for 1 second.
-  myservo.writeMicroseconds(2000);
-  myservo2.writeMicroseconds(1000);
+  myservo.writeMicroseconds(1550);
+  myservo2.writeMicroseconds(1425);
   delay(2000);
   // Servo is stationary for 1 second.
   myservo.writeMicroseconds(1500);
