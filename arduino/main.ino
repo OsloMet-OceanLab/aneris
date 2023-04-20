@@ -10,25 +10,25 @@ void setup() {
   myservo.attach(11);
   myservo2.attach(12);
   // Servo is stationary.
-  myservo.write(90);
-  myservo2.write(90);
+  myservo.writeMicroseconds(1500);
+  myservo2.writeMicroseconds(1500);
 }
 
 void loop() {
   // Servo spins forward at full speed for 1 second.
-  myservo.write(180);
-  myservo2.write(0);
-  delay(1000);
+  myservo.writeMicroseconds(0);
+  myservo2.writeMicroseconds(3000);
+  delay(2000);
   // Servo is stationary for 1 second.
-  myservo.write(90);
-  myservo2.write(90);
-  delay(1000);
+  myservo.writeMicroseconds(1500);
+  myservo2.writeMicroseconds(1500);
+  delay(2000);
   // Servo spins in reverse at full speed for 1 second.
-  myservo.write(0);
-  myservo2.write(180);
-  delay(1000);
+  myservo.writeMicroseconds(3000);
+  myservo2.writeMicroseconds(0);
+  delay(2000);
   // Servo is stationary for 1 second.
-  myservo.write(90);
-  myservo2.write(90);
-  delay(1000);
+  myservo.writeMicroseconds(1500);
+  myservo2.writeMicroseconds(1500);
+  delay(2000);
 }
