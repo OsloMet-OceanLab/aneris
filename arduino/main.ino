@@ -37,10 +37,14 @@ void loop() {
   servo[1].write(0);
 
   int hall_2_read = analogRead(HALL_2);
-  while(250 < hall_2_read && hall_2_read < 550) hall_2_read = analogRead(HALL_2);
+  while(250 < hall_2_read && hall_2_read < 900) hall_2_read = analogRead(HALL_2);
   
   servo[0].write(90);
   servo[1].write(90);
 
   delay(1000);
 }
+
+
+
+
