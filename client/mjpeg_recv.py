@@ -10,7 +10,7 @@ class Video(cv2.VideoCapture):
 
 def main():
 	try:
-		with Video("http://192.168.2.1/stream") as cap:
+		with Video("http://192.168.2.2/stream") as cap:
 			if not cap.isOpened():
 				raise Exception('Unable to open stream')
 
