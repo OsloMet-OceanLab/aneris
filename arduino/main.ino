@@ -28,6 +28,11 @@ void setup() {
   pinMode(PI_OUT, OUTPUT);
 }
 
+/** N.B. the values read by the hall effect sensors need to be adjusted based on the specific sensors used
+ * unless you use the exact ones we did, these values may not work and cause the program to never run/end
+ * also good idea to adjust the servo speed based on your specific motor/setup
+ */
+
 void loop() {
   digitalWrite(PI_OUT, HIGH);
   servo[0].write(83);
