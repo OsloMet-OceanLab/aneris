@@ -76,14 +76,6 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
             raw_size += scnt * 3
             i += 1
             
-            print(raw[:3])
-            print(d[:3])
-            
-            sys.exit(0)
-            
-            if i % 100 == 0:
-                print(i)
-            
             if i % 600 == 0:
                 import matplotlib.pyplot as plt, numpy as np
                 
@@ -99,19 +91,7 @@ with socket(AF_INET, SOCK_DGRAM) as sock:
                 plt.title('Waveform')
                 plt.show()
                 sys.exit(0)
-            
-            if i % 1000 == 0:
-                print(raw_size)
-                header = genHeader(96_000, 16, 1, raw_size)
-                #import struct
-                #d = struct.pack(f'<{raw_size//2}h', *struct.unpack(f'>{raw_size//2}h', d)) # it's possible i'm encoding this big endian audio as little endian
-                wavfile = header + d
-                
-                break
 
-        with open('test3.wav', 'wb') as stream:
-            stream.write(wavfile)
-      
     except KeyboardInterrupt:
         print("Done")
             
