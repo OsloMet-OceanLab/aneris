@@ -1,6 +1,9 @@
-# original version from https://picamera.readthedocs.io/en/latest/recipes2.html#web-streaming
-# make sure the legacy camera stack is enabled if it doesn't work
-# include copyright notice here
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Feb 22 10:11:51 2023
+
+@author: salve
+"""
 
 try:
     # camera imports
