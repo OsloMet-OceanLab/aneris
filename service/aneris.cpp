@@ -1,11 +1,6 @@
-/************************************/
-/* aneris project                   */
-/* insert information on license    */
-/* and authors here                 */
-/*                                  */
-/* brief description of the program */
-/* as well                          */
-/************************************/
+/******************/
+/* aneris project */
+/******************/
 
 #include <iostream>
 #include <unistd.h>
