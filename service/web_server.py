@@ -10,6 +10,7 @@ try:
     from io import BytesIO
     from threading import Condition
     from picamera import PiCamera
+    import cv2 as cv
 
     # web server imports
     from logging import warning
@@ -44,15 +45,6 @@ class VideoStreamBuffer:
                 self.condition.notify_all()
             self.buffer.seek(0)
         return self.buffer.write(buf)
-    
-    def write2(self, buf): #h.264 encoding
-        if buf.startswith(b'\x00\x00\x00\x01'):
-            with self.condition:
-                self.buffer.seek(0)
-                self.buffer.write(buf)
-                self.buffer.truncate()
-                self.frame = self.buffer.getvalue()
-                self.condition.notify_all()
 
 class StreamingHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -75,7 +67,11 @@ class StreamingHandler(BaseHTTPRequestHandler):
                                 f'Check that the index file exists in directory \'{WEB_DIR}\'')
             
         elif path == '/stream':
-            self.serve_video()
+            global cap
+            if cap is None:
+                self.serve_video_csi2()
+            else:
+                self.serve_video_usb()
 
         elif path == '/logs':
             try:
@@ -172,7 +168,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
     # timestamp: true, false (ignored when content: audio), default: true
     # N.B. timestamp has been temporarily disabled
 
-    def serve_video(self):
+    def serve_video_csi2(self):
         global videoBuffer
         self.send_response(200)
         self.send_header('Age', 0)
@@ -180,6 +176,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
         self.send_header('Pragma', 'no-cache')
         self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
         self.end_headers()
+        
         try:
             while True:
                 # lets us annotate time on top of the frame, but
@@ -197,8 +194,44 @@ class StreamingHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(frame)
                 self.wfile.write(b'\r\n')
+                
+        except Exception as e:
+            warning('Removed streaming client %s: %s', self.client_address, str(e)) # probably unneeded
+            
+    def serve_video_usb(self):
+        global cap
+        
+        self.send_response(200)
+        self.send_header('Age', 0)
+        self.send_header('Cache-Control', 'no-cache, private')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
+        self.end_headers()
+        
+        try:
+            while True:
+                ret, frame = cap.read()
+                if not ret:
+                    continue
+
+                #frame = cv.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                r, buf = cv.imencode(".jpg", frame) # convert to jpg for mjpeg stream
+
+                self.wfile.write(b'\r\n')
+                self.wfile.write(b'--FRAME\r\n')
+                self.send_header('Content-Type', 'image/jpeg')
+                self.send_header('Content-Length', len(buf))
+                self.end_headers()
+                self.wfile.write(bytearray(buf))
+                self.wfile.write(b'\r\n')
+
+                cv.waitKey(1)
+
         except Exception as e:
             warning('Removed streaming client %s: %s', self.client_address, str(e)) # probaably unneeded
+        finally:
+            cv.destroyAllWindows()
+            cap.release()
 
     def serve_docs(self, docs, query):
         try:
@@ -207,6 +240,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-Type', 'text/html')
                 self.end_headers()
                 self.wfile.write(index.read())
+                
         except FileNotFoundError:
             self.send_response(404)
             self.send_header('Content-type', 'text/plain')
@@ -214,13 +248,13 @@ class StreamingHandler(BaseHTTPRequestHandler):
             self.wfile.write('Error: index.html does not exist'.encode())
 
     def serve_console(self):
-        
         try:
             with open(WEB_DIR + 'console.html', 'rb') as index:
                 self.send_response(200)
                 self.send_header('Content-Type', 'text/html')
                 self.end_headers()
                 self.wfile.write(index.read())
+                
         except FileNotFoundError:
             self.send_response(404)
             self.send_header('Content-type', 'text/plain')
@@ -231,29 +265,55 @@ class StreamingServer(ThreadingMixIn, HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
 
-videoBuffer = VideoStreamBuffer()
+videoBuffer = None
+cap = None
 
-def serve(port = 0):
+def serve(port = 0, mode = 'usb'):
     if port <= 0 and not port.isdigit():
         return 1
 	
-    global videoOutput
-    with PiCamera(resolution='1280x720', framerate=30) as camera:
-        camera.start_recording(videoBuffer, format='mjpeg') # this type of format uses lossy compression so it might or might not be suited to opencv image analysis
-        #camera.start_recording(videoBuffer, format='h264', profile='baseline') # h.264 option
+    if mode == 'usb':
+        global cap
+        cap = cv.VideoCapture(0)
+        cap.set(cv.CAP_PROP_FRAME_WIDTH,1920);
+        cap.set(cv.CAP_PROP_FRAME_HEIGHT,1080);
         try:
             return_int = 0
             address = ('', int(port)) # ip, port
             server = StreamingServer(address, StreamingHandler)
             print('Stream started successfully')
             server.serve_forever()
+            
         except Exception as e:
             print('Couldn\'t start stream')
             print(f'Additional information: {str(e)}')
             return_int = 2
+            
         finally:
-            camera.stop_recording()
             return return_int
+        
+    
+    elif mode == 'csi2':
+        global videoBuffer
+        videoBuffer = VideoStreamBuffer()
+        with PiCamera(resolution='1280x720', framerate=30) as camera:
+            camera.start_recording(videoBuffer, format='mjpeg') # this type of format uses lossy compression so it might or might not be suited to opencv image analysis
+            #camera.start_recording(videoBuffer, format='h264', profile='baseline') # h.264 option
+            try:
+                return_int = 0
+                address = ('', int(port)) # ip, port
+                server = StreamingServer(address, StreamingHandler)
+                print('Stream started successfully')
+                server.serve_forever()
+                
+            except Exception as e:
+                print('Couldn\'t start stream')
+                print(f'Additional information: {str(e)}')
+                return_int = 2
+                
+            finally:
+                camera.stop_recording()
+                return return_int
 
 if __name__ == "__main__":
-    serve(5000)
+    serve(5000, 'usb')

@@ -192,8 +192,16 @@ int main(void)
 	setenv("PYTHONPATH", ".", 1);
 	pthread_t ws_thread;
 	bool thread_running;
-	int ws_port = WEB_SERVER_PORT;
-	if (pthread_create(&ws_thread, NULL, &Web_Server::serve, &ws_port))
+	Web_Server::ws_t ws_param;
+	ws_param.ws_port = WEB_SERVER_PORT;
+	ws_param.ws_mode = 
+#ifdef USE_CSI2_CAM
+	"csi2";
+#else
+	"usb";
+#endif
+
+	if (pthread_create(&ws_thread, NULL, &Web_Server::serve, &ws_param))
 	{
 		Logger::log(Logger::LOG_FATAL, "Couldn't start web server process");
 		close(sock);
@@ -234,104 +242,32 @@ int main(void)
 			}
 			case 3: // turn lights on
 			{
-				gpio::GPIO *lights = nullptr;
-				try
-				{
-					lights = new gpio::GPIO(GPIO_LIGHTS, gpio::GPIO_OUTPUT);
-					if(!lights) throw gpio::GPIOError("Couldn't allocate memory for 'lights' variable");
-					lights->setval(gpio::GPIO_HIGH);
-					Logger::log(Logger::LOG_INFO, "Enabled lights");
-				}
-				catch(gpio::GPIOError& e)
-				{
-					Logger::log(Logger::LOG_ERROR, e.what());
-				}
-				delete lights;
+				turn_lights_on();
 				break;
 			}
 			case 4: // turn lights off
 			{
-				gpio::GPIO *lights = nullptr;
-				try
-				{
-					lights = new gpio::GPIO(GPIO_LIGHTS, gpio::GPIO_OUTPUT);
-					if(!lights) throw gpio::GPIOError("Couldn't allocate memory for 'lights' variable");
-					lights->setval(gpio::GPIO_LOW);
-					Logger::log(Logger::LOG_INFO, "Disabled lights");
-				}
-				catch(gpio::GPIOError& e)
-				{
-					Logger::log(Logger::LOG_ERROR, e.what());
-				}
-				delete lights;
+				turn_lights_off();
 				break;
 			}
 			case 5: // turn wipers on
 			{
-				gpio::GPIO *wiper = nullptr;
-				try
-				{
-					wiper = new gpio::GPIO(GPIO_WIPER, gpio::GPIO_OUTPUT);
-					if(!wiper) throw gpio::GPIOError("Couldn't allocate memory for 'wiper' variable");
-					wiper->setval(gpio::GPIO_LOW);
-					Logger::log(Logger::LOG_INFO, "Enabled wiper");
-				}
-				catch(gpio::GPIOError& e)
-				{
-					Logger::log(Logger::LOG_ERROR, e.what());
-				}
-				delete wiper;
+				turn_wiper_on();
 				break;
 			}
 			case 6: // turn wipers off
 			{
-				gpio::GPIO *wiper = nullptr;
-				try
-				{
-					wiper = new gpio::GPIO(GPIO_WIPER, gpio::GPIO_OUTPUT);
-					if(!wiper) throw gpio::GPIOError("Couldn't allocate memory for 'wiper' variable");
-					wiper->setval(gpio::GPIO_HIGH);
-					Logger::log(Logger::LOG_INFO, "Disabled wiper");
-				}
-				catch(gpio::GPIOError& e)
-				{
-					Logger::log(Logger::LOG_ERROR, e.what());
-				}
-				delete wiper;
+				turn_wiper_off();
 				break;
 			}
 			case 7: // turn porpoise on
 			{
-				gpio::GPIO *hydrophone = nullptr;
-				try
-				{
-					hydrophone = new gpio::GPIO(GPIO_HYDROPHONE, gpio::GPIO_OUTPUT);
-					if(!hydrophone) throw gpio::GPIOError("Couldn't allocate memory for 'hydrophone' variable");
-					hydrophone->setval(gpio::GPIO_LOW);
-					Logger::log(Logger::LOG_INFO, "Enabled hydrophone");
-				}
-				catch(gpio::GPIOError& e)
-				{
-					Logger::log(Logger::LOG_ERROR, e.what());
-				}
-				delete hydrophone;
+				turn_porpoise_on();
 				break;
 			}
 			case 8: // turn porpoise off
 			{
-				gpio::GPIO *hydrophone = nullptr;
-				try
-				{
-					hydrophone = new gpio::GPIO(GPIO_HYDROPHONE, gpio::GPIO_OUTPUT);
-					if(!hydrophone) throw gpio::GPIOError("Couldn't allocate memory for 'hydrophone' variable");
-					hydrophone->setval(gpio::GPIO_HIGH);
-					Logger::log(Logger::LOG_INFO, "Disabled hydrophone");
-				}
-				catch(gpio::GPIOError& e)
-				{
-					Logger::log(Logger::LOG_ERROR, e.what());
-				}
-				delete hydrophone;
+				turn_porpoise_off();
 				break;
 			}
 			case 9: // clean up log file
@@ -341,16 +277,7 @@ int main(void)
 			}
 			case 10: // start web server process
 			{
-				if(!thread_running)
-				{
-					if (pthread_create(&ws_thread, NULL, &Web_Server::serve, &ws_port))
-					{
-						Logger::log(Logger::LOG_FATAL, "Couldn't start web server process");
-						exit(3);
-					}
-					Logger::log(Logger::LOG_INFO, "Started web server process");
-					thread_running = true;
-				}
+				start_web_server(&thread_running, &ws_thread, &ws_param);
 				break;
 			}
 			case 11: // end web server process
@@ -372,6 +299,104 @@ int main(void)
 			}
 		}
 	}
+}
+
+void turn_lights_on()
+{
+    std::unique_ptr<gpio::GPIO> lights = std::make_unique<gpio::GPIO>(GPIO_LIGHTS, gpio::GPIO_OUTPUT);
+    try
+    {
+        lights->setval(gpio::GPIO_HIGH);
+        Logger::log(Logger::LOG_INFO, "Enabled lights");
+    }
+    catch(gpio::GPIOError& e)
+    {
+        Logger::log(Logger::LOG_ERROR, e.what());
+    }
+}
+
+void turn_lights_off()
+{
+    std::unique_ptr<gpio::GPIO> lights = std::make_unique<gpio::GPIO>(GPIO_LIGHTS, gpio::GPIO_OUTPUT);
+    try
+    {
+        lights->setval(gpio::GPIO_LOW);
+        Logger::log(Logger::LOG_INFO, "Disabled lights");
+    }
+    catch(gpio::GPIOError& e)
+    {
+        Logger::log(Logger::LOG_ERROR, e.what());
+    }
+}
+
+void turn_wiper_on()
+{
+	std::unique_ptr<gpio::GPIO> wiper = std::make_unique<gpio::GPIO>(GPIO_WIPER, gpio::GPIO_OUTPUT);
+	try
+	{
+		wiper->setval(gpio::GPIO_LOW);
+		Logger::log(Logger::LOG_INFO, "Enabled wiper");
+	}
+	catch(gpio::GPIOError& e)
+	{
+		Logger::log(Logger::LOG_ERROR, e.what());
+	}
+}
+
+void turn_wiper_off()
+{
+	std::unique_ptr<gpio::GPIO> wiper = std::make_unique<gpio::GPIO>(GPIO_WIPER, gpio::GPIO_OUTPUT);
+	try
+	{
+		wiper->setval(gpio::GPIO_HIGH);
+		Logger::log(Logger::LOG_INFO, "Disabled wiper");
+	}
+	catch(gpio::GPIOError& e)
+	{
+		Logger::log(Logger::LOG_ERROR, e.what());
+	}
+}
+
+void turn_porpoise_on()
+{
+	std::unique_ptr<gpio::GPIO> hydrophone = std::make_unique<gpio::GPIO>(GPIO_HYDROPHONE, gpio::GPIO_OUTPUT);
+	try
+	{
+		hydrophone->setval(gpio::GPIO_LOW);
+		Logger::log(Logger::LOG_INFO, "Enabled hydrophone");
+	}
+	catch(gpio::GPIOError& e)
+	{
+		Logger::log(Logger::LOG_ERROR, e.what());
+	}
+}
+
+void turn_porpoise_off()
+{
+	std::unique_ptr<gpio::GPIO> hydrophone = std::make_unique<gpio::GPIO>(GPIO_HYDROPHONE, gpio::GPIO_OUTPUT);
+	try
+	{
+		hydrophone->setval(gpio::GPIO_HIGH);
+		Logger::log(Logger::LOG_INFO, "Disabled hydrophone");
+	}
+	catch(gpio::GPIOError& e)
+	{
+		Logger::log(Logger::LOG_ERROR, e.what());
+	}
+}
+
+void start_web_server(bool *thread_running, pthread_t *ws_thread, Web_Server::ws_t *ws_param)
+{
+	if(!*thread_running)
+		{
+			if (pthread_create(ws_thread, NULL, &Web_Server::serve, ws_param))
+			{
+				Logger::log(Logger::LOG_FATAL, "Couldn't start web server process");
+				exit(3);
+			}
+			Logger::log(Logger::LOG_INFO, "Started web server process");
+			*thread_running = true;
+		}
 }
 
 void sig_handler(int signum)

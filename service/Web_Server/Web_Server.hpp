@@ -2,11 +2,12 @@
 #define WEB_SERVER_HPP
 
 #include <exception>
+#include <string>
 
 namespace Web_Server
 {
 	
-void *serve(void *port);
+void *serve(ws_t *param);
 
 class WS_Err : std::exception
 {
@@ -21,6 +22,12 @@ public:
     }
 private:
     const char* msg;
+};
+
+struct ws_t
+{
+    int ws_port;
+    std::string ws_mode;
 };
 
 } // end namespace Web_Server

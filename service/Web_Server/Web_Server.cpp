@@ -13,7 +13,7 @@ static void cleanup_handler(void *ret);
 
 PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
 
-void *serve(void *port)
+void *serve(ws_t *param)
 {
 	long ret = 0;
 
@@ -33,7 +33,8 @@ void *serve(void *port)
 		if (!pFunc || !PyCallable_Check(pFunc)) throw WS_Err("Couldn't find function");
 		{
 			pArgs = PyTuple_New(1);
-			PyTuple_SetItem(pArgs, 0, PyLong_FromLong(*(int*)port));
+			PyTuple_SetItem(pArgs, 0, PyLong_FromLong(param->port));
+			PyTuple_SetItem(pArgs, 1, PyString_FromString(param->mode));
 			
 			pValue = PyObject_CallObject(pFunc, pArgs);
 			if (pValue == NULL) throw WS_Err("Call to function failed");
