@@ -1,5 +1,6 @@
 # exclude __pycache__ folder, aneris.log file, compiled binaries
 service/__pycache__
 service/aneris.log
+service/web_server_test.py
 *.out
 *.cpython*
