@@ -163,8 +163,6 @@ class StreamingHandler(BaseHTTPRequestHandler):
                             }'
                 self.wfile.write(response.encode())
 
-                                
-
         else:
             self.send_error(404)
             self.end_headers()
@@ -201,23 +199,6 @@ class StreamingHandler(BaseHTTPRequestHandler):
                 self.wfile.write(b'\r\n')
         except Exception as e:
             warning('Removed streaming client %s: %s', self.client_address, str(e)) # probaably unneeded
-    
-    def serve_video_2(self):
-        global videoBuffer
-        self.send_response(200)
-        self.send_header('Age', 0)
-        self.send_header('Cache-Control', 'no-cache, private')
-        self.send_header('Pragma', 'no-cache')
-        self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
-        self.end_headers()
-        try:
-            while True:
-                with videoBuffer.condition:
-                    videoBuffer.condition.wait()
-                    frame = videoBuffer.frame
-                self.wfile.write(frame)
-        except Exception as e:
-            warning('Removed streaming client %s: %s', self.client_address, str(e)) # probably unneeded
 
     def serve_docs(self, docs, query):
         try:
