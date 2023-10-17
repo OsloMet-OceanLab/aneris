@@ -18,7 +18,9 @@ try:
     from http.server import BaseHTTPRequestHandler, HTTPServer
     from urllib.parse import urlsplit
     from socket import socket, AF_UNIX, SOCK_DGRAM
+    import json
     #from datetime import datetime
+    
 except ImportError as e:
     print('Couldn\'t import all required modules')
     print(f'Additional information: {str(e)}')
@@ -99,65 +101,56 @@ class StreamingHandler(BaseHTTPRequestHandler):
         if self.path == '/api':
             try:
                 content_length = int(self.headers['Content-Length'])
-                post = dict(x.split(b'=') for x in self.rfile.read(content_length).split(b';'))
-            except:
+                post = json.loads(self.rfile.read(content_length))
+            except Exception as e:
                 self.send_response(400)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
-                response = '{\
-                                "error": {\
-                                "code": "InvalidPOST",\
-                                "message": "The POST request sent to the server did not include a \'command\' parameter"\
-                                }\
-                            }'
-                self.wfile.write(response.encode())
+                response = {'error': {
+                                'code': 'InvalidPOST',
+                                'message': 'The POST request sent to the server did not include a \'command\' parameter'
+                                }
+                            }
+                self.wfile.write(json.dumps(response).encode())
+                print(str(e))
                 return
 
-            ### remove after, just for debug
-#            self.wfile.write('This is POST request. '.encode())
-#            self.wfile.write('Received: '.encode())
-#            for x in post:
-#                self.wfile.write(f'{x}: {post[x]}'.encode())
-            ###
-
-            if b'command' in post:
+            if 'command' in post:
                 try:
                     with socket(AF_UNIX, SOCK_DGRAM) as sock:
                         sock.connect(SOCKET)
-                        sock.sendall(post[b'command'])
+                        sock.sendall(post['command'])
                     self.send_response(200)
                     self.send_header('Content-type', 'application/json')
                     self.end_headers()
-                    response = '{\
-                                    "result": {\
-                                    "code": "Success",\
-                                    "message": "The operation was successful"\
-                                    }\
-                                }'
-                    self.wfile.write(response.encode())
+                    response = {
+                                    'result': {
+                                    'code': 'Success',
+                                    'message': 'The operation was successful'
+                                    }
+                                }
+                    self.wfile.write(json.dumps(response).encode())
                 except:
                     self.send_response(500)
                     self.send_header('Content-type', 'application/json')
                     self.end_headers()
-                    response = '{\
-                                    "error": {\
-                                    "code": "SocketError",\
-                                    "message": "The server couldn\'t connect to the socket"\
-                                    }\
-                                }'
-                    self.wfile.write(response.encode())
+                    response = {'error': {
+                                    'code': 'SocketError',
+                                    'message': 'The server couldn\'t connect to the socket'
+                                    }
+                                }
+                    self.wfile.write(json.dumps(response).encode())
 
             else:
                 self.send_response(400)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
-                response = '{\
-                                "error": {\
-                                "code": "InvalidPOST",\
-                                "message": "The POST request sent to the server did not include a \'command\' parameter"\
-                                }\
-                            }'
-                self.wfile.write(response.encode())
+                response = {'error': {
+                                'code': 'InvalidPOST',
+                                'message': 'The POST request sent to the server did not include a \'command\' parameter'
+                                }
+                            }
+                self.wfile.write(json.dumps(response).encode())
 
         else:
             self.send_error(404)
