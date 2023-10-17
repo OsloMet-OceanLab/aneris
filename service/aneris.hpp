@@ -25,15 +25,25 @@
 /*************/
 /* Constants */
 /*************/
-#define WEB_SERVER_PORT 80
+#ifndef WEB_SERVER_PORT
+#   define WEB_SERVER_PORT 80
+#endif
 
 #define SOCKET_PATH "/var/run/aneris.sock"
 #define COMMAND_SIZE 2
 
+#ifndef GPIO_LIGHTS
 #define GPIO_LIGHTS 4
+#endif
+#ifndef GPIO_TEST
 #define GPIO_TEST 17
+#endif
+#ifndef GPIO_HYDROPHONE
 #define GPIO_HYDROPHONE 27
+#endif
+#ifndef GPIO_WIPER
 #define GPIO_WIPER 22
+#endif
 
 /**************/
 /* Prototypes */

@@ -10,7 +10,11 @@ THREAD_LIB := -lpthread
 TARGET := aneris
 INSTALL_DIR := /etc/$(TARGET)/
 
-default: $(TARGET) $(TARGET)-ctl
+default: dependencies $(TARGET) $(TARGET)-ctl
+
+dependencies:
+	apt install python3.9-dev g++ python3-picamera
+	pip3 install pybind11 opencv-python
 
 $(TARGET): $(TARGET).o GPIO.o Logger.o Web_Server.o
 	$(CPP) -o $@ $? $(CFLAGS) $(THREAD_LIB) $(PYTHON_LIB)

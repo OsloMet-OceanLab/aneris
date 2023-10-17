@@ -3,8 +3,12 @@
 #include "../Logger/Logger.hpp"
 
 #define PY_SSIZE_T_CLEAN
-#define PY_MODULE_NAME "web_server"
-#define PY_FUNC_NAME "serve"
+#ifndef PY_MODULE_NAME
+#	define PY_MODULE_NAME "web_server"
+#endif
+#ifndef PY_FUNC_NAME
+#	define PY_FUNC_NAME "serve"
+#endif
 
 namespace Web_Server
 {
