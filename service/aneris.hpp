@@ -17,6 +17,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <pthread.h>
+#include <memory>
 
 #include "gpio/GPIO.hpp"
 #include "Logger/Logger.hpp"
