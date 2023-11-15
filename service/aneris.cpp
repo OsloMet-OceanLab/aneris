@@ -210,11 +210,13 @@ int main(void)
 			{
 				Logger::log(Logger::LOG_INFO, "Received shutdown command");
 				system("poweroff");
+				break;
 			}
 			case 2: // reboot
 			{
 				Logger::log(Logger::LOG_INFO, "Received reboot command");
 				system("reboot");
+				break;
 			}
 			case 3: // turn lights on
 			{

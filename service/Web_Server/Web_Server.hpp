@@ -7,8 +7,6 @@
 namespace Web_Server
 {
 	
-void *serve(ws_t *param);
-
 class WS_Err : std::exception
 {
 public:
@@ -29,6 +27,8 @@ struct ws_t
     int ws_port;
     std::string ws_mode;
 };
+
+void *serve(void *param);
 
 } // end namespace Web_Server
 
