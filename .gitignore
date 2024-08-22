@@ -1,7 +1,7 @@
 # exclude __pycache__ folder, aneris.log file, compiled binaries
 **/.DS_Store
-service/__pycache__
-service/aneris.log
-service/web_server_test.py
+src/__pycache__
+src/aneris.log
+src/web_server_test.py
 *.out
 *.cpython*
